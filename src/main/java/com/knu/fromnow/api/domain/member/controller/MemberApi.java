@@ -6,6 +6,7 @@ import com.knu.fromnow.api.global.error.dto.ApiErrorResponse;
 import com.knu.fromnow.api.global.spec.ApiBasicResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.headers.Header;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -29,9 +30,15 @@ public interface MemberApi {
     ResponseEntity<ApiBasicResponse> duplicateCheckMember(
             @Parameter(description = "프로필 이름", required = true) DuplicateCheckDto duplicateCheckDto);
 
-    @ApiResponses(
+
+
+
+
+   /* @ApiResponses(
             value = {
-                    @ApiResponse(responseCode = "200", description = "멤버 생성 성공!"),
+                    @ApiResponse(responseCode = "200", description = "멤버 생성 성공!", headers = {
+                            @Header(name = "Authorization", description = "Bearer Access Token")
+                    }),
                     @ApiResponse(responseCode = "409",
                             description = "중복 된 프로필 이름이 이미 존재 함",
                             content = @Content(mediaType = "application/json",
@@ -40,5 +47,5 @@ public interface MemberApi {
     )
     @Operation(summary = "멤버 생성 로직", description = "멤버 생성 로직")
     ResponseEntity<ApiBasicResponse> createMember(
-            @Parameter(description = "프로필 이름", required = true) CreateMemberDto createMemberDto);
+            @Parameter(description = "프로필 이름", required = true) CreateMemberDto createMemberDto);*/
 }

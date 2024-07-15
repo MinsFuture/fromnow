@@ -27,12 +27,4 @@ public class ApiMemberController implements MemberApi{
 
         return ResponseEntity.status(response.getCode()).body(response);
     }
-
-    @PostMapping
-    public ResponseEntity<ApiBasicResponse> createMember(
-            @RequestBody @Valid CreateMemberDto createMemberDto) {
-        ApiBasicResponse response = memberService.createMember(createMemberDto);
-
-        return ResponseEntity.status(response.getCode()).body(response);
-    }
 }
