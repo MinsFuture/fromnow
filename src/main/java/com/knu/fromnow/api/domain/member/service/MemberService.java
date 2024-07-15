@@ -1,5 +1,6 @@
 package com.knu.fromnow.api.domain.member.service;
 
+import com.knu.fromnow.api.auth.jwt.service.JwtService;
 import com.knu.fromnow.api.domain.member.dto.request.CreateMemberDto;
 import com.knu.fromnow.api.domain.member.dto.request.DuplicateCheckDto;
 import com.knu.fromnow.api.domain.member.entity.Member;
@@ -9,6 +10,9 @@ import com.knu.fromnow.api.global.error.custom.MemberException;
 import com.knu.fromnow.api.global.error.errorcode.MemberErrorCode;
 import com.knu.fromnow.api.global.spec.ApiBasicResponse;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -18,6 +22,7 @@ import org.springframework.transaction.annotation.Transactional;
 public class MemberService {
 
     private final MemberRepository memberRepository;
+    private final JwtService jwtService;
 
     /**
      * ProfileName 중복 체크 로직
@@ -37,30 +42,8 @@ public class MemberService {
                 .build();
     }
 
-
-    /**
-     * 초기 앱 진입 시 ProfileName 설정 로직
-     *
-     * @param createMemberDto
-     * @return ApiBasicResponse
-     */
-    public ApiBasicResponse createMember(CreateMemberDto createMemberDto){
-        if(memberRepository.existsByProfileName(createMemberDto.getProfileName())){
-            throw new MemberException(MemberErrorCode.CONFLICT_PROFILE_NAME_MEMBER_EXCEPTION);
-        }
-
-        Member member = Member.builder()
-                .role(Role.ROLE_BASIC_USER)
-                .identifier(createMemberDto.getIdentifier())
-                .profileName(createMemberDto.getProfileName())
-                .build();
-
-        memberRepository.save(member);
-
-        return ApiBasicResponse.builder()
-                .status(true)
-                .code(200)
-                .message("멤버 가입 성공!")
-                .build();
+    public Member findByEmail(String email){
+        return memberRepository.findByEmail(email)
+                .orElseThrow(() -> new MemberException(MemberErrorCode.No_EXIST_EMAIL_MEMBER_EXCEPTION));
     }
 }
