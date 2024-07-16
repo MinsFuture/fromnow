@@ -58,7 +58,8 @@ public class JwtAuthorizationFilter extends OncePerRequestFilter {
             //JWT 토큰을 파싱해서 member 정보를 가져옴
             Member member = null;
 
-            if (jwtService.getRole(accesstoken) == Role.ROLE_GOOGLE_USER || jwtService.getRole(accesstoken) == Role.ROLE_KAKAO_USER) {
+            if (jwtService.getRole(accesstoken).equals(Role.ROLE_GOOGLE_USER.name())
+                    || jwtService.getRole(accesstoken).equals(Role.ROLE_KAKAO_USER)) {
                 String email = jwtService.getEmail(accesstoken);
                 member = memberService.findByEmail(email);
             }

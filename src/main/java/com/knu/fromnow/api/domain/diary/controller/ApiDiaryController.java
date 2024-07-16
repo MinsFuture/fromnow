@@ -24,9 +24,9 @@ public class ApiDiaryController {
     @PostMapping
     @PreAuthorize("isAuthenticated()")
     public ResponseEntity<ApiBasicResponse> createDiary(
-            @RequestPart("uploadPhotos")MultipartFile[] files,
-            @RequestPart("createBoardDto") CreateDiaryDto createDiaryDto,
-            @AuthenticationPrincipal PrincipalDetails principalDetails){
+            @RequestPart("uploadPhotos") MultipartFile[] files,
+            @RequestPart("createDiaryDto") CreateDiaryDto createDiaryDto,
+            @AuthenticationPrincipal PrincipalDetails principalDetails) {
 
         ApiBasicResponse apiBasicResponse
                 = diaryService.createDiary(files, createDiaryDto, principalDetails);
