@@ -30,10 +30,12 @@ public class DiaryService {
                 .orElseThrow(() -> new MemberException(MemberErrorCode.No_EXIST_EMAIL_MEMBER_EXCEPTION));
 
         Diary diary = Diary.builder()
+                .content(createDiaryDto.getContent())
                 .member(member)
                 .build();
 
         photoService.uploadPhoto(files, diary);
+        diaryRepository.save(diary);
 
         ApiBasicResponse apiBasicResponse = ApiBasicResponse.builder()
                 .status(true)

@@ -29,6 +29,10 @@ public class Diary {
     @Column(name = "diary_id")
     private Long id;
 
+    private String content;
+
+    private LocalDateTime createdTime;
+
     @OneToMany(mappedBy = "diary")
     private List<Photo> photoList = new ArrayList<>();
 
@@ -36,11 +40,11 @@ public class Diary {
     @JoinColumn(name = "member_id")
     private Member member;
 
-    private LocalDateTime createdTime;
-
     @Builder
-    public Diary(Member member, LocalDateTime createdTime) {
-        this.member = member;
+    public Diary(String content, LocalDateTime createdTime, Member member) {
+        this.content = content;
         this.createdTime = LocalDateTime.now();
+        this.member = member;
+        member.getDiaryList().add(this);
     }
 }

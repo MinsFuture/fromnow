@@ -11,15 +11,21 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import lombok.AccessLevel;
 import lombok.Builder;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
+
+import java.time.LocalDateTime;
 
 @Entity(name = "photos")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
+@Getter
 public class Photo {
 
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "photo_id")
     private Long id;
+
+    private LocalDateTime createdTime;
 
     private String photoUrl;
 
@@ -28,7 +34,10 @@ public class Photo {
     private Diary diary;
 
     @Builder
-    public Photo(String photoUrl) {
+    public Photo(LocalDateTime createdTime, String photoUrl, Diary diary) {
+        this.createdTime = LocalDateTime.now();
         this.photoUrl = photoUrl;
+        this.diary = diary;
+        diary.getPhotoList().add(this);
     }
 }
