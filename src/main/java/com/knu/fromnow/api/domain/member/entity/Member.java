@@ -1,6 +1,7 @@
 package com.knu.fromnow.api.domain.member.entity;
 
-import com.knu.fromnow.api.domain.diary.entity.Board;
+import com.knu.fromnow.api.domain.board.entity.Board;
+import com.knu.fromnow.api.domain.diary.entity.DiaryMember;
 import com.knu.fromnow.api.domain.photo.entity.Photo;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -15,6 +16,7 @@ import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.checkerframework.checker.units.qual.A;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -45,6 +47,9 @@ public class Member {
 
     @OneToMany(mappedBy = "member")
     private List<Board> boardList = new ArrayList<>();
+
+    @OneToMany(mappedBy = "member")
+    private List<DiaryMember> diaryMembers = new ArrayList<>();
 
     @Builder
     public Member(Role role, String email, String profileName, String refreshToken) {

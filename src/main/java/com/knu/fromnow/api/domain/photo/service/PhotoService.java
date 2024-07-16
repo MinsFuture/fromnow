@@ -4,7 +4,7 @@ import com.google.cloud.WriteChannel;
 import com.google.cloud.storage.BlobId;
 import com.google.cloud.storage.BlobInfo;
 import com.google.cloud.storage.Storage;
-import com.knu.fromnow.api.domain.diary.entity.Board;
+import com.knu.fromnow.api.domain.board.entity.Board;
 import com.knu.fromnow.api.domain.photo.entity.Photo;
 import com.knu.fromnow.api.domain.photo.repository.PhotoRepository;
 import lombok.RequiredArgsConstructor;
@@ -37,7 +37,7 @@ public class PhotoService {
         for (MultipartFile file : files) {
             String photoUrl = uploadImageToGcs(file);
             Photo photo = Photo.builder()
-                    .diary(board)
+                    .board(board)
                     .photoUrl(photoUrl)
                     .build();
 
