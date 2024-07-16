@@ -1,6 +1,6 @@
 package com.knu.fromnow.api.domain.photo.entity;
 
-import com.knu.fromnow.api.domain.diary.entity.Diary;
+import com.knu.fromnow.api.domain.diary.entity.Board;
 import com.knu.fromnow.api.domain.member.entity.Member;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -37,13 +37,13 @@ public class Photo {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "diary_id")
-    private Diary diary;
+    private Board board;
 
     @Builder
-    public Photo(Member member, LocalDateTime createdTime, String photoUrl, Diary diary) {
+    public Photo(Member member, LocalDateTime createdTime, String photoUrl, Board board) {
         this.member = member;
         this.createdTime = LocalDateTime.now();
         this.photoUrl = photoUrl;
-        this.diary = diary;
+        this.board = board;
     }
 }

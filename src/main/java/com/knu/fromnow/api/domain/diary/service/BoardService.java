@@ -1,8 +1,8 @@
 package com.knu.fromnow.api.domain.diary.service;
 
-import com.knu.fromnow.api.domain.diary.dto.CreateDiaryDto;
-import com.knu.fromnow.api.domain.diary.entity.Diary;
-import com.knu.fromnow.api.domain.diary.repository.DiaryRepository;
+import com.knu.fromnow.api.domain.diary.dto.CreateBoardDto;
+import com.knu.fromnow.api.domain.diary.entity.Board;
+import com.knu.fromnow.api.domain.diary.repository.BoardRepository;
 import com.knu.fromnow.api.domain.member.entity.Member;
 import com.knu.fromnow.api.domain.member.entity.PrincipalDetails;
 import com.knu.fromnow.api.domain.member.repository.MemberRepository;
@@ -18,26 +18,26 @@ import org.springframework.web.multipart.MultipartFile;
 @Service
 @RequiredArgsConstructor
 @Transactional
-public class DiaryService {
+public class BoardService {
 
     private final PhotoService photoService;
-    private final DiaryRepository diaryRepository;
+    private final BoardRepository boardRepository;
     private final MemberRepository memberRepository;
 
-    public ApiBasicResponse createDiary(MultipartFile[] files, CreateDiaryDto createDiaryDto, PrincipalDetails principalDetails){
+    public ApiBasicResponse createBoard(MultipartFile[] files, CreateBoardDto createBoardDto, PrincipalDetails principalDetails){
 
         Member member = memberRepository.findByEmail(principalDetails.getEmail())
                 .orElseThrow(() -> new MemberException(MemberErrorCode.No_EXIST_EMAIL_MEMBER_EXCEPTION));
 
-        Diary diary = Diary.builder()
-                .content(createDiaryDto.getContent())
+        Board board = Board.builder()
+                .content(createBoardDto.getContent())
                 .member(member)
                 .build();
 
-        photoService.uploadPhoto(files, diary);
+        photoService.uploadPhoto(files, board);
 
-        member.getDiaryList().add(diary);
-        diaryRepository.save(diary);
+        member.getBoardList().add(board);
+        boardRepository.save(board);
 
         ApiBasicResponse apiBasicResponse = ApiBasicResponse.builder()
                 .status(true)

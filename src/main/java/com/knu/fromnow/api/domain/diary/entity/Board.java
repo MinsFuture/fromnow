@@ -20,10 +20,10 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
-@Entity(name = "Diarys")
+@Entity(name = "Boards")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Getter
-public class Diary {
+public class Board {
 
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "diary_id")
@@ -41,7 +41,7 @@ public class Diary {
     private Member member;
 
     @Builder
-    public Diary(String content, LocalDateTime createdTime, Member member) {
+    public Board(String content, LocalDateTime createdTime, Member member) {
         this.content = content;
         this.createdTime = LocalDateTime.now();
         this.member = member;
