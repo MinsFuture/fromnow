@@ -7,10 +7,12 @@ import org.springframework.context.support.DefaultMessageSourceResolvable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
+import org.springframework.web.HttpMediaTypeNotSupportedException;
 import org.springframework.web.HttpRequestMethodNotSupportedException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.servlet.mvc.support.DefaultHandlerExceptionResolver;
 
 import java.util.stream.Collectors;
@@ -71,5 +73,27 @@ public class ExControllerAdvice {
                 .build();
 
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(apiErrorResponse);
+    }
+
+    @ExceptionHandler(HttpClientErrorException.class)
+    public ResponseEntity<ApiErrorResponse> handleHttpClientErrorException(HttpClientErrorException e){
+        ApiErrorResponse apiErrorResponse = ApiErrorResponse.builder()
+                .status(false)
+                .code(400)
+                .message(e.getMessage())
+                .build();
+
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(apiErrorResponse);
+    }
+
+    @ExceptionHandler(HttpMediaTypeNotSupportedException.class)
+    public ResponseEntity<ApiErrorResponse> handleHttpMediaTypeNotSupportedException(HttpMediaTypeNotSupportedException e){
+        ApiErrorResponse apiErrorResponse = ApiErrorResponse.builder()
+                .status(false)
+                .code(415)
+                .message(e.getMessage() + "\n Dto는 application/json 타입, Photo는 multipart/form-data 타입")
+                .build();
+
+        return ResponseEntity.status(415).body(apiErrorResponse);
     }
 }

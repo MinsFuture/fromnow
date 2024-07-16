@@ -7,8 +7,6 @@ import com.knu.fromnow.api.auth.oauth2.entity.Oauth2Attribute;
 import com.knu.fromnow.api.domain.member.entity.Member;
 import com.knu.fromnow.api.domain.member.entity.Role;
 import com.knu.fromnow.api.domain.member.repository.MemberRepository;
-import com.knu.fromnow.api.global.error.custom.MemberException;
-import com.knu.fromnow.api.global.error.errorcode.MemberErrorCode;
 import com.knu.fromnow.api.global.spec.ApiBasicResponse;
 import lombok.RequiredArgsConstructor;
 import net.minidev.json.JSONObject;

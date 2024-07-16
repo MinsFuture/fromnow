@@ -2,7 +2,9 @@ package com.knu.fromnow.api.global.error.custom;
 
 import com.knu.fromnow.api.auth.jwt.dto.response.TokenStatus;
 import com.knu.fromnow.api.global.error.errorcode.JwtTokenErrorCode;
+import lombok.Getter;
 
+@Getter
 public class NotValidTokenException extends RuntimeException{
 
     private JwtTokenErrorCode errorCode;

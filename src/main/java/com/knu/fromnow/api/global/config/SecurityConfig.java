@@ -1,5 +1,7 @@
 package com.knu.fromnow.api.global.config;
 
+import com.knu.fromnow.api.auth.jwt.filter.JwtAuthorizationFilter;
+import com.knu.fromnow.api.auth.jwt.filter.JwtExceptionFilter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -8,6 +10,7 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.logout.LogoutFilter;
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.cors.CorsConfiguration;
@@ -20,6 +23,9 @@ import java.util.Arrays;
 @EnableWebSecurity
 @RequiredArgsConstructor
 public class SecurityConfig {
+
+    private final JwtAuthorizationFilter jwtAuthorizationFilter;
+    private final JwtExceptionFilter jwtExceptionFilter;
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
@@ -38,9 +44,8 @@ public class SecurityConfig {
                                 .requestMatchers(new AntPathRequestMatcher("/swagger-ui/**")).permitAll()
                                 .anyRequest().authenticated()
                         )
-//                        .addFilterAfter(customJsonUserPasswordAuthenticationFilter(), LogoutFilter.class)
-//                        .addFilterBefore(jwtAuthorizationFilter, CustomJsonUserPasswordAuthenticationFilter.class)
-//                        .addFilterBefore(jwtExceptionHandlerFilter, JwtAuthorizationFilter.class)
+                        .addFilterAfter(jwtAuthorizationFilter, LogoutFilter.class)
+                        .addFilterBefore(jwtExceptionFilter, JwtAuthorizationFilter.class)
                         .sessionManagement((session) -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                         .build();
     }
