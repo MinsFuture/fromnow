@@ -1,8 +1,8 @@
-package com.knu.fromnow.api.domain.diary.service;
+package com.knu.fromnow.api.domain.board.service;
 
-import com.knu.fromnow.api.domain.diary.dto.CreateBoardDto;
-import com.knu.fromnow.api.domain.diary.entity.Board;
-import com.knu.fromnow.api.domain.diary.repository.BoardRepository;
+import com.knu.fromnow.api.domain.board.dto.CreateBoardDto;
+import com.knu.fromnow.api.domain.board.entity.Board;
+import com.knu.fromnow.api.domain.board.repository.BoardRepository;
 import com.knu.fromnow.api.domain.member.entity.Member;
 import com.knu.fromnow.api.domain.member.entity.PrincipalDetails;
 import com.knu.fromnow.api.domain.member.repository.MemberRepository;

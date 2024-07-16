@@ -1,6 +1,6 @@
-package com.knu.fromnow.api.domain.diary.repository;
+package com.knu.fromnow.api.domain.board.repository;
 
-import com.knu.fromnow.api.domain.diary.entity.Board;
+import com.knu.fromnow.api.domain.board.entity.Board;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface BoardRepository extends JpaRepository<Board, Long> {

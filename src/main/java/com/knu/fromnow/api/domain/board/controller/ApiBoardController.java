@@ -1,7 +1,7 @@
-package com.knu.fromnow.api.domain.diary.controller;
+package com.knu.fromnow.api.domain.board.controller;
 
-import com.knu.fromnow.api.domain.diary.dto.CreateBoardDto;
-import com.knu.fromnow.api.domain.diary.service.BoardService;
+import com.knu.fromnow.api.domain.board.dto.CreateBoardDto;
+import com.knu.fromnow.api.domain.board.service.BoardService;
 import com.knu.fromnow.api.domain.member.entity.PrincipalDetails;
 import com.knu.fromnow.api.global.spec.ApiBasicResponse;
 import lombok.RequiredArgsConstructor;
