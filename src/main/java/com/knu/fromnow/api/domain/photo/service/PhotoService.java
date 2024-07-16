@@ -4,9 +4,7 @@ import com.google.cloud.WriteChannel;
 import com.google.cloud.storage.BlobId;
 import com.google.cloud.storage.BlobInfo;
 import com.google.cloud.storage.Storage;
-import com.google.cloud.storage.StorageOptions;
-import com.knu.fromnow.api.domain.diary.entity.Diary;
-import com.knu.fromnow.api.domain.member.entity.Member;
+import com.knu.fromnow.api.domain.diary.entity.Board;
 import com.knu.fromnow.api.domain.photo.entity.Photo;
 import com.knu.fromnow.api.domain.photo.repository.PhotoRepository;
 import lombok.RequiredArgsConstructor;
@@ -17,7 +15,6 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.nio.ByteBuffer;
-import java.util.List;
 import java.util.UUID;
 
 @Service
@@ -36,15 +33,15 @@ public class PhotoService {
     private final Storage storage;
 
 
-    public void uploadPhoto(MultipartFile[] files, Diary diary){
+    public void uploadPhoto(MultipartFile[] files, Board board){
         for (MultipartFile file : files) {
             String photoUrl = uploadImageToGcs(file);
             Photo photo = Photo.builder()
-                    .diary(diary)
+                    .diary(board)
                     .photoUrl(photoUrl)
                     .build();
 
-            diary.getPhotoList().add(photo);
+            board.getPhotoList().add(photo);
             photoRepository.save(photo);
         }
     }
