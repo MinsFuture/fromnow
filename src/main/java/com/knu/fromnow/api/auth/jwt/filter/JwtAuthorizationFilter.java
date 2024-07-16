@@ -5,6 +5,8 @@ import com.knu.fromnow.api.domain.member.entity.Member;
 import com.knu.fromnow.api.domain.member.entity.PrincipalDetails;
 import com.knu.fromnow.api.domain.member.entity.Role;
 import com.knu.fromnow.api.domain.member.service.MemberService;
+import com.knu.fromnow.api.global.error.custom.NotValidTokenException;
+import com.knu.fromnow.api.global.error.errorcode.JwtTokenErrorCode;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -32,7 +34,7 @@ public class JwtAuthorizationFilter extends OncePerRequestFilter {
     protected boolean shouldNotFilter(HttpServletRequest request) throws ServletException {
         // filter를 거치고 싶지 않은 path를 여기서 관리함
         String[] excludePathLists = {"/favicon.ico", "/swagger-ui/index.html", "/api/jwt/reissue"};
-        String[] excludePathStartsWithLists = {"/login", "/oauth2", "/api/members", "/v3", "/swagger-ui", "/ws", "/api/oauth2"};
+        String[] excludePathStartsWithLists = {"/login", "/oauth2", "/api/member/check", "/v3", "/swagger-ui", "/ws", "/api/oauth2"};
 
         String path = request.getRequestURI();
 
@@ -52,6 +54,13 @@ public class JwtAuthorizationFilter extends OncePerRequestFilter {
                                     FilterChain filterChain) throws ServletException, IOException {
 
         log.info("request url = {}", request.getRequestURI());
+
+        String authorizationHeader = request.getHeader("Authorization");
+        // Authorization 헤더가 없는 경우 처리
+        if (authorizationHeader == null || !authorizationHeader.startsWith("Bearer ")) {
+            throw new NotValidTokenException(JwtTokenErrorCode.NO_EXIST_AUTHORIZATION_HEADER_EXCEPTION);
+        }
+
         String accesstoken = request.getHeader("Authorization").substring(7);
 
         if (jwtService.validateToken(accesstoken)) {

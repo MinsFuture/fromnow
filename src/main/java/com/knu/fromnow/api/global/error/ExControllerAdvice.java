@@ -13,6 +13,7 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.client.HttpClientErrorException;
+import org.springframework.web.multipart.MultipartException;
 import org.springframework.web.servlet.mvc.support.DefaultHandlerExceptionResolver;
 
 import java.util.stream.Collectors;
@@ -34,9 +35,6 @@ public class ExControllerAdvice {
 
     @ExceptionHandler(HttpRequestMethodNotSupportedException.class)
     public ResponseEntity<ApiErrorResponse> handleHttpRequestMethodNotSupportedException(HttpRequestMethodNotSupportedException e){
-
-        log.info("handleHttpRequestMethodNotSupportedException");
-
         ApiErrorResponse apiErrorResponse = ApiErrorResponse.builder()
                 .status(false)
                 .code(405)
@@ -59,9 +57,6 @@ public class ExControllerAdvice {
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<ApiErrorResponse> handleMethodArgumentNotValidException(MethodArgumentNotValidException e){
-
-        log.info("handleMethodArgumentNotValidException");
-
         String errorMessages = e.getBindingResult().getAllErrors().stream()
                 .map(DefaultMessageSourceResolvable::getDefaultMessage)
                 .collect(Collectors.joining(", "));
@@ -95,5 +90,16 @@ public class ExControllerAdvice {
                 .build();
 
         return ResponseEntity.status(415).body(apiErrorResponse);
+    }
+
+    @ExceptionHandler(MultipartException.class)
+    public ResponseEntity<ApiErrorResponse> handleMultipartException(MultipartException e){
+        ApiErrorResponse apiErrorResponse = ApiErrorResponse.builder()
+                .status(false)
+                .code(404)
+                .message("요청 형식은 Multipart request여야 합니다")
+                .build();
+
+        return ResponseEntity.status(404).body(apiErrorResponse);
     }
 }
