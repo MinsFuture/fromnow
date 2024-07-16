@@ -2,19 +2,19 @@ package com.knu.fromnow.api.domain.member.service;
 
 import com.knu.fromnow.api.auth.jwt.service.JwtService;
 import com.knu.fromnow.api.domain.member.dto.request.CreateMemberDto;
-import com.knu.fromnow.api.domain.member.dto.request.DuplicateCheckDto;
 import com.knu.fromnow.api.domain.member.entity.Member;
-import com.knu.fromnow.api.domain.member.entity.Role;
+import com.knu.fromnow.api.domain.member.entity.PrincipalDetails;
 import com.knu.fromnow.api.domain.member.repository.MemberRepository;
+import com.knu.fromnow.api.domain.photo.entity.Photo;
+import com.knu.fromnow.api.domain.photo.repository.PhotoRepository;
+import com.knu.fromnow.api.domain.photo.service.PhotoService;
 import com.knu.fromnow.api.global.error.custom.MemberException;
 import com.knu.fromnow.api.global.error.errorcode.MemberErrorCode;
 import com.knu.fromnow.api.global.spec.ApiBasicResponse;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
 @Service
 @RequiredArgsConstructor
@@ -22,16 +22,18 @@ import org.springframework.transaction.annotation.Transactional;
 public class MemberService {
 
     private final MemberRepository memberRepository;
+    private final PhotoService photoService;
     private final JwtService jwtService;
+    private final PhotoRepository photoRepository;
 
     /**
      * ProfileName 중복 체크 로직
      *
-     * @param duplicateCheckDto
+     * @param createMemberDto
      * @return ApiBasicResponse
      */
-    public ApiBasicResponse duplicateCheckMember(DuplicateCheckDto duplicateCheckDto){
-        if(memberRepository.existsByProfileName(duplicateCheckDto.getProfileName())){
+    public ApiBasicResponse duplicateCheckMember(CreateMemberDto createMemberDto){
+        if(memberRepository.existsByProfileName(createMemberDto.getProfileName())){
             throw new MemberException(MemberErrorCode.CONFLICT_PROFILE_NAME_MEMBER_EXCEPTION);
         }
 
@@ -42,8 +44,48 @@ public class MemberService {
                 .build();
     }
 
+    public ApiBasicResponse setProfileName(CreateMemberDto createMemberDto, PrincipalDetails principalDetails){
+        if(memberRepository.existsByProfileName(createMemberDto.getProfileName())){
+            throw new MemberException(MemberErrorCode.CONFLICT_PROFILE_NAME_MEMBER_EXCEPTION);
+        };
+
+        Member member = memberRepository.findByEmail(principalDetails.getEmail())
+                .orElseThrow(() -> new MemberException(MemberErrorCode.No_EXIST_EMAIL_MEMBER_EXCEPTION));
+
+        member.setProfileName(createMemberDto.getProfileName());
+        memberRepository.save(member);
+
+        return ApiBasicResponse.builder()
+                .status(true)
+                .code(200)
+                .message("프로필 이름 설정 성공!")
+                .build();
+    }
+
+    public ApiBasicResponse setMemberPhoto(MultipartFile file, PrincipalDetails principalDetails){
+        String photoUrl = photoService.uploadImageToGcs(file);
+
+        Member member = memberRepository.findByEmail(principalDetails.getEmail())
+                .orElseThrow(() -> new MemberException(MemberErrorCode.No_EXIST_EMAIL_MEMBER_EXCEPTION));
+
+
+        Photo photo = Photo.builder()
+                .photoUrl(photoUrl)
+                .member(member)
+                .build();
+        photoRepository.save(photo);
+
+        return ApiBasicResponse.builder()
+                .status(true)
+                .code(200)
+                .message("프로필 사진 설정 성공!")
+                .build();
+    }
+
+
     public Member findByEmail(String email){
         return memberRepository.findByEmail(email)
                 .orElseThrow(() -> new MemberException(MemberErrorCode.No_EXIST_EMAIL_MEMBER_EXCEPTION));
     }
+
 }

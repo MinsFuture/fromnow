@@ -45,6 +45,5 @@ public class Diary {
         this.content = content;
         this.createdTime = LocalDateTime.now();
         this.member = member;
-        member.getDiaryList().add(this);
     }
 }

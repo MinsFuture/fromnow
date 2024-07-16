@@ -1,6 +1,7 @@
 package com.knu.fromnow.api.domain.photo.entity;
 
 import com.knu.fromnow.api.domain.diary.entity.Diary;
+import com.knu.fromnow.api.domain.member.entity.Member;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
@@ -9,6 +10,7 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToOne;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
@@ -25,6 +27,10 @@ public class Photo {
     @Column(name = "photo_id")
     private Long id;
 
+    @OneToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "member_id")
+    private Member member;
+
     private LocalDateTime createdTime;
 
     private String photoUrl;
@@ -34,10 +40,10 @@ public class Photo {
     private Diary diary;
 
     @Builder
-    public Photo(LocalDateTime createdTime, String photoUrl, Diary diary) {
+    public Photo(Member member, LocalDateTime createdTime, String photoUrl, Diary diary) {
+        this.member = member;
         this.createdTime = LocalDateTime.now();
         this.photoUrl = photoUrl;
         this.diary = diary;
-        diary.getPhotoList().add(this);
     }
 }

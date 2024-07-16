@@ -38,17 +38,18 @@ public class PhotoService {
 
     public void uploadPhoto(MultipartFile[] files, Diary diary){
         for (MultipartFile file : files) {
-            String photoUrl = uploadImageToGcs(bucketName, file);
+            String photoUrl = uploadImageToGcs(file);
             Photo photo = Photo.builder()
                     .diary(diary)
                     .photoUrl(photoUrl)
                     .build();
 
+            diary.getPhotoList().add(photo);
             photoRepository.save(photo);
         }
     }
 
-    public String uploadImageToGcs(String bucketName, MultipartFile file){
+    public String uploadImageToGcs(MultipartFile file){
         String uniqueFileName = createPhotoName(file);
         BlobId blobId = BlobId.of(bucketName, uniqueFileName);
         BlobInfo blobInfo = BlobInfo.newBuilder(blobId)

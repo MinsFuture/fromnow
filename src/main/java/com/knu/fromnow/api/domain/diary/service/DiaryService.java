@@ -35,6 +35,8 @@ public class DiaryService {
                 .build();
 
         photoService.uploadPhoto(files, diary);
+
+        member.getDiaryList().add(diary);
         diaryRepository.save(diary);
 
         ApiBasicResponse apiBasicResponse = ApiBasicResponse.builder()
