@@ -7,6 +7,8 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.io.ClassPathResource;
 
+import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
 
 @Configuration
@@ -15,8 +17,11 @@ public class StorageConfig {
     @Bean
     public Storage storage() throws IOException {
 
-        ClassPathResource resource = new ClassPathResource("sunny-wavelet-429609-t9-5d820b98637e.json");
-        GoogleCredentials credentials = GoogleCredentials.fromStream(resource.getInputStream());
+        FileInputStream inputStream = new FileInputStream("/home/helloaway214/bucket/sunny-wavelet-429609-t9-5d820b98637e.json");
+
+        // GoogleCredentials 객체 생성
+        GoogleCredentials credentials = GoogleCredentials.fromStream(inputStream);
+
         String projectId = "sunny-wavelet-429609-t9";
 
         return StorageOptions.newBuilder()
