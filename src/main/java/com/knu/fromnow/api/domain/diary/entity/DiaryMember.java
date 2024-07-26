@@ -25,9 +25,6 @@ public class DiaryMember {
     @Column(name = "diary_member_id")
     private Long id;
 
-    @Enumerated(EnumType.STRING)
-    private DiaryType diaryType;
-
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "diary_id")
     private Diary diary;
@@ -37,8 +34,7 @@ public class DiaryMember {
     private Member member;
 
     @Builder
-    public DiaryMember(DiaryType diaryType, Diary diary, Member member) {
-        this.diaryType = diaryType;
+    public DiaryMember(Diary diary, Member member) {
         this.diary = diary;
         this.member = member;
     }

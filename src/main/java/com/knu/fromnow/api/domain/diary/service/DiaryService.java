@@ -1,6 +1,8 @@
 package com.knu.fromnow.api.domain.diary.service;
 
-import com.knu.fromnow.api.domain.diary.dto.CreateDiaryDto;
+import com.knu.fromnow.api.domain.diary.dto.request.CreateDiaryDto;
+import com.knu.fromnow.api.domain.diary.dto.response.ApiDiaryResponse;
+import com.knu.fromnow.api.domain.diary.dto.response.DiaryOverViewResponseDto;
 import com.knu.fromnow.api.domain.diary.entity.Diary;
 import com.knu.fromnow.api.domain.diary.entity.DiaryMember;
 import com.knu.fromnow.api.domain.diary.repository.DiaryMemberRepository;
@@ -14,6 +16,9 @@ import com.knu.fromnow.api.global.spec.ApiBasicResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -31,7 +36,7 @@ public class DiaryService {
 
         Diary diary = Diary.builder()
                 .title(createDiaryDto.getTitle())
-                .owner(member)
+                .diaryType(createDiaryDto.getDiaryType())
                 .build();
 
         diaryRepository.save(diary);
@@ -39,7 +44,6 @@ public class DiaryService {
         DiaryMember diaryMember = DiaryMember.builder()
                 .diary(diary)
                 .member(member)
-                .diaryType(createDiaryDto.getDiaryType())
                 .build();
 
         member.getDiaryMembers().add(diaryMember);
@@ -54,4 +58,30 @@ public class DiaryService {
                 .build();
     }
 
+    public ApiDiaryResponse<List<DiaryOverViewResponseDto>> getDiaryOverView(PrincipalDetails principalDetails){
+        Member member = memberRepository.findByEmail(principalDetails.getEmail())
+                .orElseThrow(() -> new MemberException(MemberErrorCode.No_EXIST_EMAIL_MEMBER_EXCEPTION));
+
+        List<Long> diaryIds = diaryMemberRepository.findDiaryIdsByMemberId(member.getId());
+        List<Diary> diaryList = diaryRepository.findByIdIn(diaryIds);
+
+        List<DiaryOverViewResponseDto> responseDtoList = new ArrayList<>();
+
+        for (Diary diary : diaryList) {
+            DiaryOverViewResponseDto diaryOverViewResponseDto = DiaryOverViewResponseDto.builder()
+                    .id(diary.getId())
+                    .title(diary.getTitle())
+                    .diaryType(diary.getDiaryType())
+                    .build();
+
+            responseDtoList.add(diaryOverViewResponseDto);
+        }
+
+        return ApiDiaryResponse.<List<DiaryOverViewResponseDto>>builder()
+                .status(true)
+                .code(200)
+                .message("다이어리 리스트 반환 성공!")
+                .data(responseDtoList)
+                .build();
+    }
 }

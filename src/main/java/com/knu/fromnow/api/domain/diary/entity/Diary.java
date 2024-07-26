@@ -3,6 +3,8 @@ package com.knu.fromnow.api.domain.diary.entity;
 import com.knu.fromnow.api.domain.member.entity.Member;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -28,15 +30,15 @@ public class Diary {
 
     private String title;
 
-    @OneToOne(fetch = FetchType.LAZY)
-    private Member owner;
+    @Enumerated(EnumType.STRING)
+    private DiaryType diaryType;
 
     @OneToMany(mappedBy = "diary")
     private List<DiaryMember> diaryMembers = new ArrayList<>();
 
     @Builder
-    public Diary(Member owner, String title) {
-        this.owner = owner;
+    public Diary(DiaryType diaryType, String title) {
+        this.diaryType = diaryType;
         this.title = title;
     }
 }
