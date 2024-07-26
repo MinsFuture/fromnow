@@ -31,4 +31,5 @@ public class StorageConfig {
         } catch (IOException e) {
             throw new RuntimeException("Error reading file at path: /config/sunny-wavelet-429609-t9-5d820b98637e.json", e);
         }
+    }
 }
