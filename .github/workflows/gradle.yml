@@ -69,5 +69,5 @@ jobs:
             sudo docker stop fromnow-backend
             sudo docker rm fromnow-backend
             sudo docker pull ${{ secrets.DOCKER_USERNAME }}/fromnow
-            sudo docker run --name petwalk-backend -d -p 8080:8080 ${{ secrets.DOCKER_USERNAME }}/fromnow
+            sudo docker run --name fromnow-backend -d -p 8080:8080 ${{ secrets.DOCKER_USERNAME }}/fromnow
             sudo docker image prune -f
