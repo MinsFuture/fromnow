@@ -38,9 +38,6 @@ public class Member {
     @OneToOne(mappedBy = "member")
     private Photo photo;
 
-    @OneToOne(mappedBy = "owner")
-    private Diary diary;
-
     private String email;
 
     private String profileName;
