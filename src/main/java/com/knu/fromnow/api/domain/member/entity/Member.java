@@ -1,6 +1,7 @@
 package com.knu.fromnow.api.domain.member.entity;
 
 import com.knu.fromnow.api.domain.board.entity.Board;
+import com.knu.fromnow.api.domain.diary.entity.Diary;
 import com.knu.fromnow.api.domain.diary.entity.DiaryMember;
 import com.knu.fromnow.api.domain.photo.entity.Photo;
 import jakarta.persistence.Column;
@@ -36,6 +37,9 @@ public class Member {
 
     @OneToOne(mappedBy = "member")
     private Photo photo;
+
+    @OneToOne(mappedBy = "owner")
+    private Diary diary;
 
     private String email;
 

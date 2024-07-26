@@ -31,6 +31,7 @@ public class DiaryService {
 
         Diary diary = Diary.builder()
                 .title(createDiaryDto.getTitle())
+                .owner(member)
                 .build();
 
         diaryRepository.save(diary);
