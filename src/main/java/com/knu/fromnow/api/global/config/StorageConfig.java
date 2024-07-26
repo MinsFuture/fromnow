@@ -28,7 +28,7 @@ public class StorageConfig {
         InputStream inputStream = resource.getInputStream();
 
         // 임시 파일을 생성한다.
-        Path tempFilePath = Files.createTempFile("google-credentials", ".json");
+        Path tempFilePath = Files.createTempFile("sunny-wavelet-429609-t9-5d820b98637e", ".json");
         File tempFile = tempFilePath.toFile();
 
         try {
