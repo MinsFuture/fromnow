@@ -10,6 +10,8 @@ import org.springframework.core.io.ClassPathResource;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 
 @Configuration
 public class StorageConfig {
@@ -17,7 +19,8 @@ public class StorageConfig {
     @Bean
     public Storage storage() throws IOException {
 
-        FileInputStream inputStream = new FileInputStream("../home/helloaway214/bucket/sunny-wavelet-429609-t9-5d820b98637e.json");
+        Path path = Paths.get("/home/helloaway214/bucket/sunny-wavelet-429609-t9-5d820b98637e.json");
+        FileInputStream inputStream = new FileInputStream(path.toAbsolutePath().toString());
 
         // GoogleCredentials 객체 생성
         GoogleCredentials credentials = GoogleCredentials.fromStream(inputStream);
