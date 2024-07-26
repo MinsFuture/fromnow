@@ -9,8 +9,6 @@ COPY ${JAR_FILE} app.jar
 
 COPY src/main/resources/sunny-wavelet-429609-t9-5d820b98637e.json /app/resources/sunny-wavelet-429609-t9-5d820b98637e.json
 
-COPY src/main/resources/sunny-wavelet-429609-t9-5d820b98637e.json /src/main/resources/sunny-wavelet-429609-t9-5d820b98637e.json
-# Copy the GCP credentials JSON file
 EXPOSE 8080
 
 # Entry point to run the application with the 'dev' profile active
