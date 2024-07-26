@@ -27,7 +27,7 @@ spring:
     gcp:
       storage:
         credentials:
-          location: classpath:sunny-wavelet-429609-t9-5d820b98637e.json
+          location: classpath:src/main/resources/sunny-wavelet-429609-t9-5d820b98637e.json
         project-id: sunny-wavelet-429609-t9-5d820b98637e
         bucket: fromnow-bucket
 
