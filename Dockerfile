@@ -6,9 +6,9 @@ ARG JAR_FILE=build/libs/fromnow-0.0.1-SNAPSHOT.jar
 
 # Copy the JAR file to the container
 COPY ${JAR_FILE} app.jar
-
 # Copy the GCP credentials JSON file
 COPY src/main/resources/application-dev.yml application-dev.yml
+
 COPY src/main/resources/sunny-wavelet-429609-t9-5d820b98637e.json sunny-wavelet-429609-t9-5d820b98637e.json
 
 # Expose the port
