@@ -15,7 +15,7 @@ public class StorageConfig {
     @Bean
     public Storage storage() throws IOException {
 
-        ClassPathResource resource = new ClassPathResource("/resources/sunny-wavelet-429609-t9-5d820b98637e.json");
+        ClassPathResource resource = new ClassPathResource("src/main/resources/sunny-wavelet-429609-t9-5d820b98637e.json");
         GoogleCredentials credentials = GoogleCredentials.fromStream(resource.getInputStream());
         String projectId = "sunny-wavelet-429609-t9";
 
