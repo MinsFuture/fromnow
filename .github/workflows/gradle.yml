@@ -12,6 +12,7 @@ permissions:
 
 jobs:
   CI-CD:
+    environment : actions
     runs-on: ubuntu-latest
     steps:
 
