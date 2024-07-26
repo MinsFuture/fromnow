@@ -17,7 +17,7 @@ public class StorageConfig {
     @Bean
     public Storage storage() throws IOException {
 
-        FileInputStream inputStream = new FileInputStream("/home/helloaway214/bucket/sunny-wavelet-429609-t9-5d820b98637e.json");
+        FileInputStream inputStream = new FileInputStream("../home/helloaway214/bucket/sunny-wavelet-429609-t9-5d820b98637e.json");
 
         // GoogleCredentials 객체 생성
         GoogleCredentials credentials = GoogleCredentials.fromStream(inputStream);
