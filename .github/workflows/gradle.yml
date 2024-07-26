@@ -44,17 +44,7 @@ jobs:
           cd ./src/main/resources # resources 폴더로 이동
           echo "${{ secrets.YML }}" > ./application.yml # github actions에서 설정한 값을 application.yml 파일에 쓰기 (덮어쓰기)
         shell: bash
-
-     # Gcp Photo 설정
-      - name: make BUCKET_KEY
-        if: |
-          contains(github.ref, 'main') ||
-          contains(github.ref, 'develop')
-        run: |
-          cd ./src/main/resources # resources 폴더로 이동
-          echo "${{ secrets.BUCKET_KEY }}" > ./sunny-wavelet-429609-t9-5d820b98637e.json # github actions에서 설정한 값을 application.yml 파일에 쓰기 (덮어쓰기)
-        shell: bash
-
+        
         # gradle build
       - name: Build with Gradle
         run: ./gradlew build -x test
