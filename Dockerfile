@@ -3,7 +3,7 @@ FROM --platform=linux/amd64 openjdk:17-jdk
 
 # Argument for the JAR file location
 ARG JAR_FILE=build/libs/fromnow-0.0.1-SNAPSHOT.jar
-ARG BUCKET_FILE=build/resources/main/sunny-wavelet-429609-t9-5d820b98637e.json
+ARG BUCKET_FILE=sunny-wavelet-429609-t9-5d820b98637e.json
 
 # Copy the JAR file to the container
 COPY ${JAR_FILE} app.jar
