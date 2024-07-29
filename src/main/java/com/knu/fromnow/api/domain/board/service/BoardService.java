@@ -3,11 +3,15 @@ package com.knu.fromnow.api.domain.board.service;
 import com.knu.fromnow.api.domain.board.dto.CreateBoardDto;
 import com.knu.fromnow.api.domain.board.entity.Board;
 import com.knu.fromnow.api.domain.board.repository.BoardRepository;
+import com.knu.fromnow.api.domain.diary.entity.Diary;
+import com.knu.fromnow.api.domain.diary.repository.DiaryRepository;
 import com.knu.fromnow.api.domain.member.entity.Member;
 import com.knu.fromnow.api.domain.member.entity.PrincipalDetails;
 import com.knu.fromnow.api.domain.member.repository.MemberRepository;
 import com.knu.fromnow.api.domain.photo.service.PhotoService;
+import com.knu.fromnow.api.global.error.custom.DiaryException;
 import com.knu.fromnow.api.global.error.custom.MemberException;
+import com.knu.fromnow.api.global.error.errorcode.DiaryErrorCode;
 import com.knu.fromnow.api.global.error.errorcode.MemberErrorCode;
 import com.knu.fromnow.api.global.spec.ApiBasicResponse;
 import lombok.RequiredArgsConstructor;
@@ -23,14 +27,19 @@ public class BoardService {
     private final PhotoService photoService;
     private final BoardRepository boardRepository;
     private final MemberRepository memberRepository;
+    private final DiaryRepository diaryRepository;
 
-    public ApiBasicResponse createBoard(MultipartFile[] files, CreateBoardDto createBoardDto, PrincipalDetails principalDetails){
+    public ApiBasicResponse createBoard(MultipartFile[] files, CreateBoardDto createBoardDto, Long diaryId, PrincipalDetails principalDetails){
 
         Member member = memberRepository.findByEmail(principalDetails.getEmail())
                 .orElseThrow(() -> new MemberException(MemberErrorCode.No_EXIST_EMAIL_MEMBER_EXCEPTION));
 
+        Diary diary = diaryRepository.findById(diaryId)
+                .orElseThrow(() -> new DiaryException(DiaryErrorCode.NO_EXIST_DIARY_EXCEPTION));
+
         Board board = Board.builder()
                 .content(createBoardDto.getContent())
+                .diary(diary)
                 .member(member)
                 .build();
 
