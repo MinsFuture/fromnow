@@ -52,6 +52,9 @@ public class Member {
     @OneToMany(mappedBy = "member")
     private List<DiaryMember> diaryMembers = new ArrayList<>();
 
+    @OneToMany(mappedBy = "owner")
+    private List<Diary> diaryList = new ArrayList<>();
+
     @Builder
     public Member(Role role, String email, String profileName, String refreshToken) {
         this.role = role;

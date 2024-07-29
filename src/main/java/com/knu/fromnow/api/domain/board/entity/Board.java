@@ -1,5 +1,6 @@
 package com.knu.fromnow.api.domain.board.entity;
 
+import com.knu.fromnow.api.domain.diary.entity.Diary;
 import com.knu.fromnow.api.domain.member.entity.Member;
 import com.knu.fromnow.api.domain.photo.entity.Photo;
 import jakarta.persistence.Column;
@@ -37,13 +38,18 @@ public class Board {
     private List<Photo> photoList = new ArrayList<>();
 
     @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "diary_id")
+    private Diary diary;
+
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "member_id")
     private Member member;
 
     @Builder
-    public Board(String content, LocalDateTime createdTime, Member member) {
+    public Board(String content, LocalDateTime createdTime, Diary diary, Member member) {
         this.content = content;
         this.createdTime = LocalDateTime.now();
+        this.diary = diary;
         this.member = member;
     }
 }

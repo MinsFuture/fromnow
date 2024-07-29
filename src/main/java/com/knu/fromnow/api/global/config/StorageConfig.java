@@ -17,7 +17,12 @@ public class StorageConfig {
     @Bean
     public Storage storage() throws IOException {
         try {
-            FileInputStream inputStream = new FileInputStream("/config/sunny-wavelet-429609-t9-5d820b98637e.json");
+            // local
+            FileInputStream inputStream = new FileInputStream("sunny-wavelet-429609-t9-5d820b98637e.json");
+
+            // dev
+//            FileInputStream inputStream = new FileInputStream("/config/sunny-wavelet-429609-t9-5d820b98637e.json");
+
             GoogleCredentials credentials = GoogleCredentials.fromStream(inputStream);
             String projectId = "sunny-wavelet-429609-t9";
 
