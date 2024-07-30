@@ -2,6 +2,7 @@ package com.knu.fromnow.api.domain.diary.controller;
 
 
 import com.knu.fromnow.api.domain.diary.dto.request.CreateDiaryDto;
+import com.knu.fromnow.api.domain.diary.dto.request.UpdateDiaryDto;
 import com.knu.fromnow.api.domain.diary.dto.response.ApiDiaryResponse;
 import com.knu.fromnow.api.domain.diary.dto.response.BoardOverViewResponseDto;
 import com.knu.fromnow.api.domain.diary.dto.response.DiaryOverViewResponseDto;
@@ -12,9 +13,11 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -55,12 +58,36 @@ public class ApiDiaryController {
     public ResponseEntity<ApiDiaryResponse<List<BoardOverViewResponseDto>>> getBoardOverviews(
         @RequestParam(defaultValue = "0") int page,
         @RequestParam(defaultValue = "10") int size,
-        @PathVariable("diaryId") Long id
+        @PathVariable("diaryId") Long id,
+        @AuthenticationPrincipal PrincipalDetails principalDetails
     ){
 
-        ApiDiaryResponse<List<BoardOverViewResponseDto>> boardOverviews = diaryService.getBoardOverviews(page, size, id);
+        ApiDiaryResponse<List<BoardOverViewResponseDto>> boardOverviews = diaryService.getBoardOverviews(page, size, id, principalDetails);
 
         return ResponseEntity.status(boardOverviews.getCode()).body(boardOverviews);
+    }
+
+    @PutMapping("{diaryId}")
+    @PreAuthorize("isAuthenticated()")
+    public ResponseEntity<ApiBasicResponse> updateDiaryTitle(
+            @RequestBody UpdateDiaryDto updateDiarydto,
+            @AuthenticationPrincipal PrincipalDetails principalDetails,
+            @PathVariable("diaryId") Long diaryId
+    ){
+        ApiBasicResponse response = diaryService.updateDiaryTitle(updateDiarydto, principalDetails, diaryId);
+
+        return ResponseEntity.status(response.getCode()).body(response);
+    }
+
+    @DeleteMapping("{diaryId}")
+    @PreAuthorize("isAuthenticated()")
+    public ResponseEntity<ApiBasicResponse> deleteDiary(
+            @AuthenticationPrincipal PrincipalDetails principalDetails,
+            @PathVariable("diaryId") Long diaryId
+    ){
+        ApiBasicResponse response = diaryService.deleteDiary(principalDetails, diaryId);
+
+        return ResponseEntity.status(response.getCode()).body(response);
     }
 
 }
