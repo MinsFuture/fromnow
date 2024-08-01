@@ -1,5 +1,6 @@
 package com.knu.fromnow.api.domain.friend.controller;
 
+import com.knu.fromnow.api.domain.friend.dto.request.AcceptFriendDto;
 import com.knu.fromnow.api.domain.friend.dto.request.SentFriendDto;
 import com.knu.fromnow.api.domain.friend.dto.response.ApiFriendResponse;
 import com.knu.fromnow.api.domain.friend.dto.response.FriendSearchResponseDto;
@@ -39,6 +40,16 @@ public class ApiFriendController {
             @RequestBody SentFriendDto sentFriendDto,
             @AuthenticationPrincipal PrincipalDetails principalDetails){
         ApiBasicResponse response = friendService.inviteFriend(sentFriendDto, principalDetails);
+
+        return ResponseEntity.status(response.getCode()).body(response);
+    }
+
+    @PostMapping("/accept")
+    @PreAuthorize("isAuthenticated()")
+    public ResponseEntity<ApiBasicResponse> acceptFriend(
+            @RequestBody AcceptFriendDto acceptFriendDto,
+            @AuthenticationPrincipal PrincipalDetails principalDetails){
+        ApiBasicResponse response = friendService.acceptFriend(acceptFriendDto, principalDetails);
 
         return ResponseEntity.status(response.getCode()).body(response);
     }

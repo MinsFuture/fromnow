@@ -1,7 +1,7 @@
 spring:
   jpa:
     hibernate:
-      ddl-auto: create
+      ddl-auto: update
     properties:
       hibernate:
         show_sql: true
@@ -22,7 +22,6 @@ spring:
       max-file-size: 10MB
       max-request-size: 10MB
 
-
   cloud:
     gcp:
       storage:
@@ -31,6 +30,10 @@ spring:
         project-id: sunny-wavelet-429609-t9-5d820b98637e
         bucket: fromnow-bucket
 
+google:
+  cloud:
+    credentials:
+      path: sunny-wavelet-429609-t9-5d820b98637e.json
 
 logging:
   level:

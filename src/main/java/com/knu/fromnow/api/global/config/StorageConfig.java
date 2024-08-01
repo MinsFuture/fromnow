@@ -3,6 +3,7 @@ package com.knu.fromnow.api.global.config;
 import com.google.auth.oauth2.GoogleCredentials;
 import com.google.cloud.storage.Storage;
 import com.google.cloud.storage.StorageOptions;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -13,14 +14,13 @@ import java.io.IOException;
 @Configuration
 public class StorageConfig {
 
+    @Value("${google.cloud.credentials.path}")
+    private String credentialsPath;
+
     @Bean
     public Storage storage() throws IOException {
         try {
-            // local
-//            FileInputStream inputStream = new FileInputStream("sunny-wavelet-429609-t9-5d820b98637e.json");
-
-            // dev
-            FileInputStream inputStream = new FileInputStream("/config/sunny-wavelet-429609-t9-5d820b98637e.json");
+            FileInputStream inputStream = new FileInputStream(credentialsPath);
 
             GoogleCredentials credentials = GoogleCredentials.fromStream(inputStream);
             String projectId = "sunny-wavelet-429609-t9";

@@ -1,5 +1,6 @@
 package com.knu.fromnow.api.domain.friend.service;
 
+import com.knu.fromnow.api.domain.friend.dto.request.AcceptFriendDto;
 import com.knu.fromnow.api.domain.friend.dto.request.SentFriendDto;
 import com.knu.fromnow.api.domain.friend.dto.response.ApiFriendResponse;
 import com.knu.fromnow.api.domain.friend.dto.response.FriendSearchResponseDto;
@@ -8,7 +9,9 @@ import com.knu.fromnow.api.domain.friend.repository.FriendRepository;
 import com.knu.fromnow.api.domain.member.entity.Member;
 import com.knu.fromnow.api.domain.member.entity.PrincipalDetails;
 import com.knu.fromnow.api.domain.member.repository.MemberRepository;
+import com.knu.fromnow.api.global.error.custom.FriendException;
 import com.knu.fromnow.api.global.error.custom.MemberException;
+import com.knu.fromnow.api.global.error.errorcode.FriendErrorCode;
 import com.knu.fromnow.api.global.error.errorcode.MemberErrorCode;
 import com.knu.fromnow.api.global.spec.ApiBasicResponse;
 import lombok.RequiredArgsConstructor;
@@ -44,7 +47,7 @@ public class FriendService {
         Member fromMember = memberRepository.findByEmail(principalDetails.getEmail())
                 .orElseThrow(() -> new MemberException(MemberErrorCode.No_EXIST_EMAIL_MEMBER_EXCEPTION));
 
-        Member toMember = memberRepository.findByProfileName(sentFriendDto.getToProfileName())
+        Member toMember = memberRepository.findByProfileName(sentFriendDto.getSentProfileName())
                 .orElseThrow(() -> new MemberException(MemberErrorCode.NO_EXIST_PROFILE_NAME_MEMBER_EXCEPTION));
 
         Friend sentFriendRequest = Friend.builder()
@@ -70,4 +73,30 @@ public class FriendService {
                 .build();
     }
 
+    public ApiBasicResponse acceptFriend(AcceptFriendDto acceptFriendDto, PrincipalDetails principalDetails) {
+
+        // 나
+        Member fromMember = memberRepository.findByEmail(principalDetails.getEmail())
+                .orElseThrow(() -> new MemberException(MemberErrorCode.No_EXIST_EMAIL_MEMBER_EXCEPTION));
+
+        // 수락 당하는 애
+        Member toMember = memberRepository.findById(acceptFriendDto.getAcceptMemberId())
+                .orElseThrow(() -> new MemberException(MemberErrorCode.NO_EXIST_PROFILE_NAME_MEMBER_EXCEPTION));
+
+        Friend friend = friendRepository.findByFromMemberIdAndToMemberId(fromMember.getId(), toMember.getId())
+                .orElseThrow(() -> new FriendException(FriendErrorCode.INVALID_FRIEND_REQUEST_EXCEPTION));
+
+        if(friend.isAreWeFriend()){
+            throw new FriendException(FriendErrorCode.ALREADY_WE_ARE_FRIEND_EXCEPTION);
+        }
+
+        friend.acceptFriend();
+        friendRepository.save(friend);
+
+        return ApiBasicResponse.builder()
+                .status(true)
+                .code(200)
+                .message("친구 수락에 성공하였습니다")
+                .build();
+    }
 }

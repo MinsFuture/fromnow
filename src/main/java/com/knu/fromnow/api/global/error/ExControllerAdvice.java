@@ -1,5 +1,6 @@
 package com.knu.fromnow.api.global.error;
 
+import com.knu.fromnow.api.global.error.custom.FriendException;
 import com.knu.fromnow.api.global.error.custom.MemberException;
 import com.knu.fromnow.api.global.error.dto.ApiErrorResponse;
 import lombok.extern.slf4j.Slf4j;
@@ -33,6 +34,20 @@ public class ExControllerAdvice {
         return ResponseEntity.status(apiErrorResponse.getCode()).body(apiErrorResponse);
     }
 
+    @ExceptionHandler(FriendException.class)
+    public ResponseEntity<ApiErrorResponse> handleFriendException(FriendException e){
+        ApiErrorResponse apiErrorResponse = ApiErrorResponse.builder()
+                .status(false)
+                .code(e.getFriendErrorCode().getCode())
+                .message(e.getFriendErrorCode().getMessage())
+                .build();
+
+        return ResponseEntity.status(apiErrorResponse.getCode()).body(apiErrorResponse);
+    }
+
+    /**
+     * Http Method가 잘못 됨 -> Get인데 Post 등
+     */
     @ExceptionHandler(HttpRequestMethodNotSupportedException.class)
     public ResponseEntity<ApiErrorResponse> handleHttpRequestMethodNotSupportedException(HttpRequestMethodNotSupportedException e){
         ApiErrorResponse apiErrorResponse = ApiErrorResponse.builder()
@@ -44,6 +59,9 @@ public class ExControllerAdvice {
         return ResponseEntity.status(405).body(apiErrorResponse);
     }
 
+    /**
+     * Api 요청 스펙이 잘못 됨 -> Json 형식으로 안보냄
+     */
     @ExceptionHandler(HttpMessageNotReadableException.class)
     public ResponseEntity<ApiErrorResponse> handleHttpMessageNotReadableException(HttpMessageNotReadableException e){
         ApiErrorResponse apiErrorResponse = ApiErrorResponse.builder()
@@ -55,6 +73,9 @@ public class ExControllerAdvice {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(apiErrorResponse);
     }
 
+    /**
+     * Validation 실패
+     */
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<ApiErrorResponse> handleMethodArgumentNotValidException(MethodArgumentNotValidException e){
         String errorMessages = e.getBindingResult().getAllErrors().stream()
@@ -81,6 +102,9 @@ public class ExControllerAdvice {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(apiErrorResponse);
     }
 
+    /**
+     * MultiPart/Form-data 등으로 안보내는 등
+     */
     @ExceptionHandler(HttpMediaTypeNotSupportedException.class)
     public ResponseEntity<ApiErrorResponse> handleHttpMediaTypeNotSupportedException(HttpMediaTypeNotSupportedException e){
         ApiErrorResponse apiErrorResponse = ApiErrorResponse.builder()

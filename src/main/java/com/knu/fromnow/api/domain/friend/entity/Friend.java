@@ -41,4 +41,8 @@ public class Friend {
         this.areWeFriend = areWeFriend;
         this.createdTime = LocalDateTime.now();
     }
+
+    public void acceptFriend(){
+        this.areWeFriend = true;
+    }
 }
