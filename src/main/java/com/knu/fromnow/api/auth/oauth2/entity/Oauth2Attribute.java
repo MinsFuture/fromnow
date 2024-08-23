@@ -17,6 +17,8 @@ public class Oauth2Attribute {
         switch (provider) {
             case "google":
                 return Oauth2Attribute.ofGoogle(provider, usernameAttributeName, attributes);
+            case "kakao":
+                return Oauth2Attribute.ofKakao(provider, attributes);
             default:
                 throw new RuntimeException("소셜 로그인 접근 실패");
         }
@@ -33,5 +35,12 @@ public class Oauth2Attribute {
                 .build();
     }
 
+    private static Oauth2Attribute ofKakao(String provider, Map<String, Object> attributes) {
 
+        return Oauth2Attribute.builder()
+                .provider(provider)
+                .username(String.valueOf(attributes.get("nickname")))
+                .email(String.valueOf(attributes.get("email")))
+                .build();
+    }
 }
