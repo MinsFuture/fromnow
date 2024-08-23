@@ -9,7 +9,7 @@ import com.knu.fromnow.api.domain.photo.entity.Photo;
 import com.knu.fromnow.api.domain.photo.repository.PhotoRepository;
 import com.knu.fromnow.api.domain.photo.service.PhotoService;
 import com.knu.fromnow.api.global.error.custom.MemberException;
-import com.knu.fromnow.api.global.error.errorcode.MemberErrorCode;
+import com.knu.fromnow.api.global.error.errorcode.custom.MemberErrorCode;
 import com.knu.fromnow.api.global.spec.ApiBasicResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;

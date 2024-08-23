@@ -6,7 +6,7 @@ import com.knu.fromnow.api.domain.member.entity.PrincipalDetails;
 import com.knu.fromnow.api.domain.member.entity.Role;
 import com.knu.fromnow.api.domain.member.service.MemberService;
 import com.knu.fromnow.api.global.error.custom.NotValidTokenException;
-import com.knu.fromnow.api.global.error.errorcode.JwtTokenErrorCode;
+import com.knu.fromnow.api.global.error.errorcode.custom.JwtTokenErrorCode;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;

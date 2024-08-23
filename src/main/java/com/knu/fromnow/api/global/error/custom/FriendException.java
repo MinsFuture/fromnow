@@ -1,6 +1,6 @@
 package com.knu.fromnow.api.global.error.custom;
 
-import com.knu.fromnow.api.global.error.errorcode.FriendErrorCode;
+import com.knu.fromnow.api.global.error.errorcode.custom.FriendErrorCode;
 import lombok.Getter;
 
 @Getter

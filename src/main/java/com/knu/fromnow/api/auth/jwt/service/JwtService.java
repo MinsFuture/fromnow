@@ -1,6 +1,6 @@
 package com.knu.fromnow.api.auth.jwt.service;
 
-import com.knu.fromnow.api.domain.member.entity.Role;
+import com.knu.fromnow.api.domain.member.entity.Member;
 import com.knu.fromnow.api.domain.member.repository.MemberRepository;
 import com.knu.fromnow.api.global.error.custom.NotValidTokenException;
 import io.jsonwebtoken.ExpiredJwtException;
@@ -19,8 +19,7 @@ import javax.crypto.spec.SecretKeySpec;
 import java.nio.charset.StandardCharsets;
 import java.util.Date;
 
-import static com.knu.fromnow.api.auth.jwt.dto.response.TokenStatus.*;
-import static com.knu.fromnow.api.global.error.errorcode.JwtTokenErrorCode.*;
+import static com.knu.fromnow.api.global.error.errorcode.custom.JwtTokenErrorCode.*;
 
 @Service
 @Slf4j
@@ -75,19 +74,19 @@ public class JwtService {
             return true;
         } catch (io.jsonwebtoken.security.SecurityException | MalformedJwtException e) {
             log.info("Invalid JWT Token", e);
-            throw new NotValidTokenException(NOT_VALID_TOKEN_EXCEPTION, INVALID);
+            throw new NotValidTokenException(NOT_VALID_TOKEN_EXCEPTION);
         } catch (ExpiredJwtException e) {
             log.info("Expired JWT Token", e);
             if (isRefreshTokenExpired(e)) {
-                throw new NotValidTokenException(EXPIRED_REFRESH_TOKEN_EXCEPTION, REFRESH_TOKEN_EXPIRED);
+                throw new NotValidTokenException(EXPIRED_REFRESH_TOKEN_EXCEPTION);
             }
-            throw new NotValidTokenException(EXPIRED_ACCESS_TOKEN_EXCEPTION, ACCESS_TOKEN_EXPIRED);
+            throw new NotValidTokenException(EXPIRED_ACCESS_TOKEN_EXCEPTION);
         } catch (UnsupportedJwtException e) {
             log.info("Unsupported JWT Token", e);
-            throw new NotValidTokenException(UNSUPPORTED_TOKEN_EXCEPTION, UNSUPPORTED);
+            throw new NotValidTokenException(UNSUPPORTED_TOKEN_EXCEPTION);
         } catch (IllegalArgumentException e) {
             log.info("JWT claims string is empty.", e);
-            throw new NotValidTokenException(MISMATCH_CLAIMS_EXCEPTION, MISMATCH_CLAIMS);
+            throw new NotValidTokenException(MISMATCH_CLAIMS_EXCEPTION);
         }
     }
 
@@ -119,6 +118,20 @@ public class JwtService {
         cookie.setHttpOnly(true);
 
         return cookie;
+    }
+
+    public String getAccessTokenFromRefresh(String refreshToken){
+        if(refreshToken == null){
+            throw new NotValidTokenException(REFRESH_TOKEN_COOKIE_NULL_EXCEPTION);
+        }
+
+        validateToken(refreshToken);
+        Member member = memberRepository.findByRefreshToken(refreshToken)
+                .orElseThrow(() -> new NotValidTokenException(REFRESH_TOKEN_MISMATCH_EXCEPTION));
+
+        String accessToken = createAccessToken(member.getEmail(), member.getRole().name());
+
+        return accessToken;
     }
 
     private static boolean isRefreshTokenExpired(ExpiredJwtException e) {

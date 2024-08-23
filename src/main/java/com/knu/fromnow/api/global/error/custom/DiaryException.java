@@ -1,6 +1,6 @@
 package com.knu.fromnow.api.global.error.custom;
 
-import com.knu.fromnow.api.global.error.errorcode.DiaryErrorCode;
+import com.knu.fromnow.api.global.error.errorcode.custom.DiaryErrorCode;
 import lombok.Getter;
 
 @Getter

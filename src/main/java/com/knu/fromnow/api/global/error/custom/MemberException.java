@@ -1,6 +1,6 @@
 package com.knu.fromnow.api.global.error.custom;
 
-import com.knu.fromnow.api.global.error.errorcode.MemberErrorCode;
+import com.knu.fromnow.api.global.error.errorcode.custom.MemberErrorCode;
 import lombok.Getter;
 
 @Getter

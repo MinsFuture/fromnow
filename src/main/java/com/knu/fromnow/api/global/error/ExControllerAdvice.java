@@ -2,7 +2,9 @@ package com.knu.fromnow.api.global.error;
 
 import com.knu.fromnow.api.global.error.custom.FriendException;
 import com.knu.fromnow.api.global.error.custom.MemberException;
+import com.knu.fromnow.api.global.error.custom.NotValidTokenException;
 import com.knu.fromnow.api.global.error.dto.ApiErrorResponse;
+import com.knu.fromnow.api.global.error.errorcode.ErrorCode;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.support.DefaultMessageSourceResolvable;
 import org.springframework.http.HttpStatus;
@@ -23,23 +25,38 @@ import java.util.stream.Collectors;
 @Slf4j
 public class ExControllerAdvice {
 
-    @ExceptionHandler(MemberException.class)
-    public ResponseEntity<ApiErrorResponse> handleMemberException(MemberException e){
+    // 공통적으로 사용되는 메서드
+    private ResponseEntity<ApiErrorResponse> buildErrorResponse(ErrorCode errorCode) {
         ApiErrorResponse apiErrorResponse = ApiErrorResponse.builder()
                 .status(false)
-                .code(e.getMemberErrorCode().getCode())
-                .message(e.getMemberErrorCode().getMessage())
+                .code(errorCode.getHttpStatus().value())
+                .message(errorCode.getMessage())
                 .build();
 
         return ResponseEntity.status(apiErrorResponse.getCode()).body(apiErrorResponse);
     }
 
+    // MemberException 처리
+    @ExceptionHandler(MemberException.class)
+    public ResponseEntity<ApiErrorResponse> handleMemberException(MemberException e) {
+        return buildErrorResponse(e.getMemberErrorCode());
+    }
+
+    // FriendException 처리
     @ExceptionHandler(FriendException.class)
-    public ResponseEntity<ApiErrorResponse> handleFriendException(FriendException e){
+    public ResponseEntity<ApiErrorResponse> handleFriendException(FriendException e) {
+        return buildErrorResponse(e.getFriendErrorCode());
+    }
+
+    //
+    @ExceptionHandler(NotValidTokenException.class)
+    public ResponseEntity<ApiErrorResponse> handleNotValidTokenException(NotValidTokenException e){
+
         ApiErrorResponse apiErrorResponse = ApiErrorResponse.builder()
                 .status(false)
-                .code(e.getFriendErrorCode().getCode())
-                .message(e.getFriendErrorCode().getMessage())
+                .code(e.getErrorCode().getHttpStatus().value())
+                .message(e.getErrorCode().getMessage())
+                .data(e.getErrorCode().getData())
                 .build();
 
         return ResponseEntity.status(apiErrorResponse.getCode()).body(apiErrorResponse);
