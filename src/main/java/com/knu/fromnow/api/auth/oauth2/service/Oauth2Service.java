@@ -54,10 +54,12 @@ public class Oauth2Service {
                     return getMemberByProvider(oauth2Attribute, provider);
                 });
 
-        if (member.getProfileName() == null) {
+        if (member.getRole() == Role.ROLE_NEW_USER) {
             httpStatus = HttpStatus.CREATED;
             message = "새로 회원가입하는 유저입니다!";
         }
+
+        member.setMemberRole(provider);
 
         String accessToken = jwtService.createAccessToken(member.getEmail(), member.getRole().name());
         String refreshToken = jwtService.createRefreshToken();
@@ -67,7 +69,7 @@ public class Oauth2Service {
         ResponseCookie responseCookie = ResponseCookie.from("Authorization-refresh", refreshToken)
                 .httpOnly(true)
                 .sameSite("None")
-                .maxAge(14 * 24 * 60 *60)
+                .maxAge(14 * 24 * 60 * 60)
                 .path("/")
                 .build();
 
@@ -101,9 +103,9 @@ public class Oauth2Service {
         return Oauth2Attribute.of("google", "sub", body);
     }
 
-    private Oauth2Attribute getKakaoData(String idToken){
+    private Oauth2Attribute getKakaoData(String idToken) {
 
-        HashMap<String, Object> attributes= new HashMap<String,Object>();
+        HashMap<String, Object> attributes = new HashMap<String, Object>();
 
         // HTTP Header 생성
         HttpHeaders headers = new HttpHeaders();
@@ -138,23 +140,11 @@ public class Oauth2Service {
     }
 
     private Member getMemberByProvider(Oauth2Attribute oauth2Attribute, String provider) {
-        Member newMember = null;
-
-        if (provider.equals("google")) {
-            newMember = Member.builder()
-                    .role(Role.ROLE_GOOGLE_USER)
-                    .email(oauth2Attribute.getEmail())
-                    .build();
-        }
-
-        if (provider.equals("kakao")) {
-            newMember = Member.builder()
-                    .role(Role.ROLE_KAKAO_USER)
-                    .email(oauth2Attribute.getEmail())
-                    .build();
-        }
+        Member newMember = Member.builder()
+                .role(Role.ROLE_NEW_USER)
+                .email(oauth2Attribute.getEmail())
+                .build();
 
         return newMember;
     }
-
 }

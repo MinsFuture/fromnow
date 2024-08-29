@@ -76,4 +76,14 @@ public class Member {
         this.photo = photo;
     }
 
+    public void setMemberRole(String provider){
+       if(provider.equals("google")){
+            this.role = Role.ROLE_GOOGLE_USER;
+       }
+
+       if(provider.equals("kakao")){
+           this.role = Role.ROLE_KAKAO_USER;
+       }
+    }
+
 }
