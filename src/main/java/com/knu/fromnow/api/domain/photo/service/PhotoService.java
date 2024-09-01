@@ -8,6 +8,8 @@ import com.knu.fromnow.api.domain.board.entity.Board;
 import com.knu.fromnow.api.domain.photo.entity.Photo;
 import com.knu.fromnow.api.domain.photo.repository.PhotoRepository;
 import lombok.RequiredArgsConstructor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -15,6 +17,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.nio.ByteBuffer;
+import java.util.Random;
 import java.util.UUID;
 
 @Service
@@ -22,6 +25,7 @@ import java.util.UUID;
 @Transactional
 public class PhotoService {
 
+    private static final Logger log = LoggerFactory.getLogger(PhotoService.class);
     private final PhotoRepository photoRepository;
 
     @Value("${spring.cloud.gcp.storage.bucket}")
@@ -47,6 +51,13 @@ public class PhotoService {
     }
 
     public String uploadImageToGcs(MultipartFile file){
+        if(file.isEmpty()){
+            Random random = new Random();
+            int number = random.nextInt(4) + 1;
+
+            return "https://storage.googleapis.com/fromnow-bucket/basic_image_00" + number + ".png";
+        }
+
         String uniqueFileName = createPhotoName(file);
         BlobId blobId = BlobId.of(bucketName, uniqueFileName);
         BlobInfo blobInfo = BlobInfo.newBuilder(blobId)

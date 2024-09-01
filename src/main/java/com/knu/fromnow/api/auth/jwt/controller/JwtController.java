@@ -3,6 +3,8 @@ package com.knu.fromnow.api.auth.jwt.controller;
 import com.knu.fromnow.api.auth.jwt.service.JwtService;
 import com.knu.fromnow.api.global.spec.ApiBasicResponse;
 import lombok.RequiredArgsConstructor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CookieValue;
@@ -15,6 +17,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/api/jwt")
 public class JwtController {
 
+    private static final Logger log = LoggerFactory.getLogger(JwtController.class);
     private final JwtService jwtService;
 
     /**
@@ -24,6 +27,7 @@ public class JwtController {
     public ResponseEntity<ApiBasicResponse> getAccessToken(
             @CookieValue(value = "Authorization-refresh") String refreshToken){
 
+        log.info("token : {}", refreshToken);
         String accessToken = jwtService.getAccessTokenFromRefresh(refreshToken);
 
         return ResponseEntity.ok()
