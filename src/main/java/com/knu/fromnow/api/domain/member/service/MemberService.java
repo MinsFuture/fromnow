@@ -68,7 +68,6 @@ public class MemberService {
         Member member = memberRepository.findByEmail(principalDetails.getEmail())
                 .orElseThrow(() -> new MemberException(MemberErrorCode.No_EXIST_EMAIL_MEMBER_EXCEPTION));
 
-
         Photo photo = Photo.builder()
                 .photoUrl(photoUrl)
                 .member(member)
