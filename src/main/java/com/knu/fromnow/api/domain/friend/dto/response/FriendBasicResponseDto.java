@@ -4,18 +4,15 @@ import lombok.Builder;
 import lombok.Getter;
 
 @Getter
-public class FriendSearchResponseDto {
+public class FriendBasicResponseDto {
     private Long memberId;
     private String profileName;
     private String profilePhotoUrl;
-    private boolean isFriend;
 
     @Builder
-
-    public FriendSearchResponseDto(Long memberId, String profileName, String profilePhotoUrl, boolean isFriend) {
+    public FriendBasicResponseDto(Long memberId, String profileName, String profilePhotoUrl) {
         this.memberId = memberId;
         this.profileName = profileName;
         this.profilePhotoUrl = profilePhotoUrl;
-        this.isFriend = isFriend;
     }
 }

@@ -53,20 +53,6 @@ public class ApiDiaryController {
         return ResponseEntity.status(diaryOverView.getCode()).body(diaryOverView);
     }
 
-    @GetMapping("/{diaryId}")
-    @PreAuthorize("isAuthenticated()")
-    public ResponseEntity<ApiDiaryResponse<List<BoardOverViewResponseDto>>> getBoardOverviews(
-        @RequestParam(defaultValue = "0") int page,
-        @RequestParam(defaultValue = "10") int size,
-        @PathVariable("diaryId") Long id,
-        @AuthenticationPrincipal PrincipalDetails principalDetails
-    ){
-
-        ApiDiaryResponse<List<BoardOverViewResponseDto>> boardOverviews = diaryService.getBoardOverviews(page, size, id, principalDetails);
-
-        return ResponseEntity.status(boardOverviews.getCode()).body(boardOverviews);
-    }
-
     @PutMapping("{diaryId}")
     @PreAuthorize("isAuthenticated()")
     public ResponseEntity<ApiBasicResponse> updateDiaryTitle(

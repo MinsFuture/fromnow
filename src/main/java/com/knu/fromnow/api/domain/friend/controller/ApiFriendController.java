@@ -2,11 +2,12 @@ package com.knu.fromnow.api.domain.friend.controller;
 
 import com.knu.fromnow.api.domain.friend.dto.request.AcceptFriendDto;
 import com.knu.fromnow.api.domain.friend.dto.request.SentFriendDto;
-import com.knu.fromnow.api.domain.friend.dto.response.ApiFriendResponse;
+import com.knu.fromnow.api.domain.friend.dto.response.FriendBasicResponseDto;
 import com.knu.fromnow.api.domain.friend.dto.response.FriendSearchResponseDto;
 import com.knu.fromnow.api.domain.friend.service.FriendService;
 import com.knu.fromnow.api.domain.member.entity.PrincipalDetails;
 import com.knu.fromnow.api.global.spec.ApiBasicResponse;
+import com.knu.fromnow.api.global.spec.ApiDataResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -18,6 +19,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.List;
+
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/friend")
@@ -25,11 +28,13 @@ public class ApiFriendController {
 
     private final FriendService friendService;
 
-    @GetMapping
-    public ResponseEntity<ApiFriendResponse<FriendSearchResponseDto>> searchFriend(
-            @RequestParam String profileName
+    @GetMapping("/search")
+    @PreAuthorize("isAuthenticated()")
+    public ResponseEntity<ApiDataResponse<List<FriendSearchResponseDto>>> searchFriends(
+            @RequestParam String profileName,
+            @AuthenticationPrincipal PrincipalDetails principalDetails
     ){
-        ApiFriendResponse<FriendSearchResponseDto> response = friendService.searchFriend(profileName);
+        ApiDataResponse<List<FriendSearchResponseDto>> response = friendService.searchFriend(profileName, principalDetails);
 
         return ResponseEntity.status(response.getCode()).body(response);
     }
@@ -50,6 +55,26 @@ public class ApiFriendController {
             @RequestBody AcceptFriendDto acceptFriendDto,
             @AuthenticationPrincipal PrincipalDetails principalDetails){
         ApiBasicResponse response = friendService.acceptFriend(acceptFriendDto, principalDetails);
+
+        return ResponseEntity.status(response.getCode()).body(response);
+    }
+
+    @GetMapping("/mutual")
+    @PreAuthorize("isAuthenticated()")
+    public ResponseEntity<ApiDataResponse<List<FriendBasicResponseDto>>> getAllMyFriend(
+            @AuthenticationPrincipal PrincipalDetails principalDetails
+    ){
+        ApiDataResponse<List<FriendBasicResponseDto>> response = friendService.getAllMyFriend(principalDetails);
+
+        return ResponseEntity.status(response.getCode()).body(response);
+    }
+
+    @GetMapping("/requests/received")
+    @PreAuthorize("isAuthenticated()")
+    public ResponseEntity<ApiDataResponse<List<FriendBasicResponseDto>>> getRequestsReceived(
+            @AuthenticationPrincipal PrincipalDetails principalDetails
+    ){
+        ApiDataResponse<List<FriendBasicResponseDto>> response = friendService.getRequestsReceived(principalDetails);
 
         return ResponseEntity.status(response.getCode()).body(response);
     }
