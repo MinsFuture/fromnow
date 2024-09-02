@@ -97,31 +97,6 @@ public class DiaryService {
                 .build();
     }
 
-    public ApiDiaryResponse<List<BoardOverViewResponseDto>> getBoardOverviews(int page, int size, Long diaryId, PrincipalDetails principalDetails){
-        Member member = memberRepository.findByEmail(principalDetails.getEmail())
-                .orElseThrow(() -> new MemberException(MemberErrorCode.No_EXIST_EMAIL_MEMBER_EXCEPTION));
-
-        List<DiaryMember> diaryMembers = member.getDiaryMembers();
-        boolean hasMatchingMember = diaryMembers.stream()
-                .anyMatch(diaryMember -> diaryMember.getMember().equals(member));
-
-        if(!hasMatchingMember){
-            throw new MemberException(MemberErrorCode.NO_MATCHING_MEMBER_EXCEPTION);
-        }
-
-        PageRequest pageRequest = PageRequest.of(page, size, Sort.by("createdTime").descending());
-        Page<Board> boards = boardRepository.findByDiaryId(diaryId, pageRequest);
-        List<Board> contents = boards.getContent();
-
-        List<BoardOverViewResponseDto> boardOverViewResponseDtos = getBoardOverViewResponseDtos(contents);
-
-        return ApiDiaryResponse.<List<BoardOverViewResponseDto>>builder()
-                .status(true)
-                .code(200)
-                .message("글 불러오기 성공!")
-                .data(boardOverViewResponseDtos)
-                .build();
-    }
 
     public ApiBasicResponse updateDiaryTitle(UpdateDiaryDto updateDiaryDto, PrincipalDetails principalDetails, Long diaryId){
         Member member = memberRepository.findByEmail(principalDetails.getEmail())
@@ -163,35 +138,6 @@ public class DiaryService {
                 .code(200)
                 .message("다이어리 삭제 성공")
                 .build();
-    }
-
-    /**
-     * Pagination한 Board로 responseDto를 만드는 메서드
-     * @param contents
-     * @return
-     */
-    private static List<BoardOverViewResponseDto> getBoardOverViewResponseDtos(List<Board> contents) {
-        List<BoardOverViewResponseDto> boardOverViewResponseDtos = new ArrayList<>();
-
-        for (Board board : contents) {
-            List<Photo> photoList = board.getPhotoList();
-            List<String> photoUrls = new ArrayList<>();
-            for (Photo photo : photoList) {
-                photoUrls.add(photo.getPhotoUrl());
-            }
-
-            BoardOverViewResponseDto boardOverViewResponseDto =
-                    BoardOverViewResponseDto.builder()
-                            .createdDate(board.getCreatedTime().toString())
-                            .profileName(board.getMember().getProfileName())
-                            .profilePhotoUrl(board.getMember().getPhoto().getPhotoUrl())
-                            .content(board.getContent())
-                            .contentPhotoUrl(photoUrls)
-                            .build();
-
-            boardOverViewResponseDtos.add(boardOverViewResponseDto);
-        }
-        return boardOverViewResponseDtos;
     }
 
 

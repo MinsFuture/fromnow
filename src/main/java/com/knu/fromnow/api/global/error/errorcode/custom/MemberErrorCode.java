@@ -7,6 +7,7 @@ import org.springframework.http.HttpStatus;
 @Getter
 public enum MemberErrorCode implements ErrorCode {
 
+    NO_EXIST_MEMBER_ID_EXCEPTION(HttpStatus.NOT_FOUND, "해당 Member Id에 해당하는 Member가 없습니다"),
     No_EXIST_EMAIL_MEMBER_EXCEPTION(HttpStatus.NOT_FOUND, "email에 해당하는 member가 없습니다"),
     NO_EXIST_PROFILE_NAME_MEMBER_EXCEPTION(HttpStatus.NOT_FOUND, "profileName에 해당하는 member가 없습니다"),
     CONFLICT_PROFILE_NAME_MEMBER_EXCEPTION(HttpStatus.CONFLICT, "이미 존재하는 profileName 입니다"),

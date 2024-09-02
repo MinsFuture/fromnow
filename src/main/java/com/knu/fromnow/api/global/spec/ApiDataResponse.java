@@ -1,10 +1,10 @@
-package com.knu.fromnow.api.domain.friend.dto.response;
+package com.knu.fromnow.api.global.spec;
 
 import lombok.Builder;
 import lombok.Data;
 
 @Data
-public class ApiFriendResponse<T> {
+public class ApiDataResponse<T> {
 
     private boolean status;
     private int code;
@@ -12,7 +12,7 @@ public class ApiFriendResponse<T> {
     private T data;
 
     @Builder
-    public ApiFriendResponse(boolean status, int code, String message, T data) {
+    public ApiDataResponse(boolean status, int code, String message, T data) {
         this.status = status;
         this.code = code;
         this.message = message;
