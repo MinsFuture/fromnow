@@ -38,7 +38,7 @@ public class SecurityConfig {
                         .authorizeHttpRequests((auth) -> auth
                                 .requestMatchers(new AntPathRequestMatcher("/error")).permitAll()
                                 .requestMatchers(new AntPathRequestMatcher("/login")).permitAll()
-                                .requestMatchers(new AntPathRequestMatcher("/api/member/**")).permitAll()
+                                .requestMatchers(new AntPathRequestMatcher("/api/jwt/**")).permitAll()
                                 .requestMatchers(new AntPathRequestMatcher("/api/oauth2/**")).permitAll()
                                 .requestMatchers(new AntPathRequestMatcher("/v3/**")).permitAll()
                                 .requestMatchers(new AntPathRequestMatcher("/swagger-ui/**")).permitAll()
