@@ -68,7 +68,7 @@ public class JwtAuthorizationFilter extends OncePerRequestFilter {
             Member member = null;
 
             if (jwtService.getRole(accesstoken).equals(Role.ROLE_GOOGLE_USER.name())
-                    || jwtService.getRole(accesstoken).equals(Role.ROLE_KAKAO_USER)) {
+                    || jwtService.getRole(accesstoken).equals(Role.ROLE_KAKAO_USER.name())) {
                 String email = jwtService.getEmail(accesstoken);
                 log.info("email : {}", email);
                 member = memberService.findByEmail(email);
