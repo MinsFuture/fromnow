@@ -13,6 +13,8 @@ import lombok.RequiredArgsConstructor;
 import net.minidev.json.JSONObject;
 import net.minidev.json.parser.JSONParser;
 import net.minidev.json.parser.ParseException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.*;
 import org.springframework.stereotype.Service;
 import org.springframework.util.MultiValueMap;
@@ -26,6 +28,7 @@ import java.util.Map;
 @RequiredArgsConstructor
 public class Oauth2Service {
 
+    private static final Logger log = LoggerFactory.getLogger(Oauth2Service.class);
     private final MemberRepository memberRepository;
     private final JwtService jwtService;
     private final RestTemplate restTemplate;
@@ -61,7 +64,13 @@ public class Oauth2Service {
 
         member.setMemberRole(provider);
 
+        log.info(provider + " email : {}", member.getEmail());
+        log.info(provider + " role : {}", member.getRole());
+
         String accessToken = jwtService.createAccessToken(member.getEmail(), member.getRole().name());
+
+        log.info("accessToken : {}", accessToken);
+
         String refreshToken = jwtService.createRefreshToken();
         member.setRefreshToken(refreshToken);
         memberRepository.save(member);
