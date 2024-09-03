@@ -70,7 +70,9 @@ public class JwtAuthorizationFilter extends OncePerRequestFilter {
             if (jwtService.getRole(accesstoken).equals(Role.ROLE_GOOGLE_USER.name())
                     || jwtService.getRole(accesstoken).equals(Role.ROLE_KAKAO_USER)) {
                 String email = jwtService.getEmail(accesstoken);
+                log.info("email : {}", email);
                 member = memberService.findByEmail(email);
+                log.info("member email : {}", member.getEmail());
             }
 
             // 해당 멤버를 authentication(인증) 해줌
