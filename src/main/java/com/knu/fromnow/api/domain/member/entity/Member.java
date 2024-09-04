@@ -3,7 +3,6 @@ package com.knu.fromnow.api.domain.member.entity;
 import com.knu.fromnow.api.domain.board.entity.Board;
 import com.knu.fromnow.api.domain.diary.entity.Diary;
 import com.knu.fromnow.api.domain.diary.entity.DiaryMember;
-import com.knu.fromnow.api.domain.photo.entity.Photo;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -12,12 +11,10 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.OneToMany;
-import jakarta.persistence.OneToOne;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import org.checkerframework.checker.units.qual.A;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -35,8 +32,7 @@ public class Member {
     @Enumerated(EnumType.STRING)
     private Role role;
 
-    @OneToOne(mappedBy = "member")
-    private Photo photo;
+    private String photoUrl;
 
     private String email;
 
@@ -72,8 +68,8 @@ public class Member {
         this.profileName = profileName;
     }
 
-    public void setMemberPhoto(Photo photo){
-        this.photo = photo;
+    public void setMemberPhoto(String photoUrl){
+        this.photoUrl = photoUrl;
     }
 
     public void setMemberRole(String provider){

@@ -5,8 +5,8 @@ import com.google.cloud.storage.BlobId;
 import com.google.cloud.storage.BlobInfo;
 import com.google.cloud.storage.Storage;
 import com.knu.fromnow.api.domain.board.entity.Board;
-import com.knu.fromnow.api.domain.photo.entity.Photo;
-import com.knu.fromnow.api.domain.photo.repository.PhotoRepository;
+import com.knu.fromnow.api.domain.photo.entity.BoardPhoto;
+import com.knu.fromnow.api.domain.photo.repository.BoardPhotoRepository;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -23,10 +23,9 @@ import java.util.UUID;
 @Service
 @RequiredArgsConstructor
 @Transactional
-public class PhotoService {
+public class BoardPhotoService {
 
-    private static final Logger log = LoggerFactory.getLogger(PhotoService.class);
-    private final PhotoRepository photoRepository;
+    private final BoardPhotoRepository boardPhotoRepository;
 
     @Value("${spring.cloud.gcp.storage.bucket}")
     private String bucketName;
@@ -36,17 +35,16 @@ public class PhotoService {
 
     private final Storage storage;
 
-
-    public void uploadPhoto(MultipartFile[] files, Board board){
+    public void uploadToBoardPhotos(MultipartFile[] files, Board board){
         for (MultipartFile file : files) {
             String photoUrl = uploadImageToGcs(file);
-            Photo photo = Photo.builder()
+            BoardPhoto photo = BoardPhoto.builder()
                     .board(board)
                     .photoUrl(photoUrl)
                     .build();
 
             board.getPhotoList().add(photo);
-            photoRepository.save(photo);
+            boardPhotoRepository.save(photo);
         }
     }
 

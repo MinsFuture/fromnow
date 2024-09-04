@@ -1,7 +1,6 @@
 package com.knu.fromnow.api.domain.photo.entity;
 
 import com.knu.fromnow.api.domain.board.entity.Board;
-import com.knu.fromnow.api.domain.member.entity.Member;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
@@ -10,28 +9,20 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
-import jakarta.persistence.OneToOne;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
-import java.time.LocalDateTime;
-
-@Entity(name = "photos")
+@Entity(name = "board_photos")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Getter
-public class Photo {
+public class BoardPhoto {
 
-    @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "photo_id")
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "board_photo_id")
     private Long id;
-
-    @OneToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "member_id")
-    private Member member;
-
-    private LocalDateTime createdTime;
 
     private String photoUrl;
 
@@ -40,9 +31,7 @@ public class Photo {
     private Board board;
 
     @Builder
-    public Photo(Member member, LocalDateTime createdTime, String photoUrl, Board board) {
-        this.member = member;
-        this.createdTime = LocalDateTime.now();
+    public BoardPhoto(String photoUrl, Board board) {
         this.photoUrl = photoUrl;
         this.board = board;
     }
