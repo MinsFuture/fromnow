@@ -25,36 +25,57 @@ import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/api/diary")
+@RequestMapping("/api/board")
 public class ApiBoardController implements BoardApi {
 
     private final BoardService boardService;
 
-    @PostMapping(value = "/{diaryId}/board", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @PostMapping(value = "/diaries/{diaryId}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     @PreAuthorize("isAuthenticated()")
     public ResponseEntity<ApiBasicResponse> createBoard(
             @PathVariable("diaryId") Long diaryId,
             @RequestPart("uploadPhotos") MultipartFile[] files,
             @RequestPart("createDiaryDto") CreateBoardDto createBoardDto,
             @AuthenticationPrincipal PrincipalDetails principalDetails) {
-
-        ApiBasicResponse apiBasicResponse
+        ApiBasicResponse response
                 = boardService.createBoard(files, createBoardDto, diaryId, principalDetails);
 
-        return ResponseEntity.status(apiBasicResponse.getCode()).body(apiBasicResponse);
+        return ResponseEntity.status(response.getCode()).body(response);
     }
 
-    @GetMapping("/{diaryId}")
+    @GetMapping("/diaries/{diaryId}")
     @PreAuthorize("isAuthenticated()")
     public ResponseEntity<ApiDiaryResponse<List<BoardOverViewResponseDto>>> getBoardOverviews(
             @PathVariable("diaryId") Long id,
             @RequestParam("date") LocalDate date,
             @AuthenticationPrincipal PrincipalDetails principalDetails
-    ){
-
+    ) {
         ApiDiaryResponse<List<BoardOverViewResponseDto>> boardOverviews = boardService.getBoardOverviews(id, date, principalDetails);
 
         return ResponseEntity.status(boardOverviews.getCode()).body(boardOverviews);
     }
+
+    @PostMapping("/{boardId}/like")
+    @PreAuthorize("isAuthenticated()")
+    public ResponseEntity<ApiBasicResponse> clickLike(
+            @PathVariable("boardId") Long id,
+            @AuthenticationPrincipal PrincipalDetails principalDetails
+    ) {
+        ApiBasicResponse response = boardService.clickLike(id, principalDetails);
+
+        return ResponseEntity.status(response.getCode()).body(response);
+    }
+
+    @PostMapping("/{boardId}/dislike")
+    @PreAuthorize("isAuthenticated()")
+    public ResponseEntity<ApiBasicResponse> clickDisLike(
+            @PathVariable("boardId") Long id,
+            @AuthenticationPrincipal PrincipalDetails principalDetails
+    ){
+        ApiBasicResponse response = boardService.clickDisLike(id, principalDetails);
+
+        return ResponseEntity.status(response.getCode()).body(response);
+    }
+
 
 }
