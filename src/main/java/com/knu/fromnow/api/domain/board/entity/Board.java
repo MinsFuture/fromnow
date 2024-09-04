@@ -3,6 +3,7 @@ package com.knu.fromnow.api.domain.board.entity;
 import com.knu.fromnow.api.domain.diary.entity.Diary;
 import com.knu.fromnow.api.domain.member.entity.Member;
 import com.knu.fromnow.api.domain.photo.entity.BoardPhoto;
+import com.knu.fromnow.api.global.BaseEntity;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
@@ -24,7 +25,7 @@ import java.util.List;
 @Entity(name = "Boards")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Getter
-public class Board {
+public class Board extends BaseEntity {
 
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "board_id")
@@ -32,7 +33,6 @@ public class Board {
 
     private String content;
 
-    private LocalDateTime createdTime;
 
     @OneToMany(mappedBy = "board")
     private List<BoardPhoto> photoList = new ArrayList<>();
@@ -46,9 +46,8 @@ public class Board {
     private Member member;
 
     @Builder
-    public Board(String content, LocalDateTime createdTime, Diary diary, Member member) {
+    public Board(String content, Diary diary, Member member) {
         this.content = content;
-        this.createdTime = LocalDateTime.now();
         this.diary = diary;
         this.member = member;
     }

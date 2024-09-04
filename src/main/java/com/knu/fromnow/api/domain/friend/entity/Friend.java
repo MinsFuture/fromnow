@@ -1,6 +1,7 @@
 package com.knu.fromnow.api.domain.friend.entity;
 
 import com.knu.fromnow.api.domain.member.entity.Member;
+import com.knu.fromnow.api.global.BaseEntity;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -16,7 +17,7 @@ import java.time.LocalDateTime;
 @Entity(name = "friends")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Getter
-public class Friend {
+public class Friend extends BaseEntity {
 
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "friend_id")
@@ -30,8 +31,6 @@ public class Friend {
 
     private boolean areWeFriend;
 
-    private LocalDateTime createdTime;
-
     @Builder
     public Friend(Long id, Long toMemberId, Long fromMemberId, String fromMemberProfileUrl, boolean areWeFriend) {
         this.id = id;
@@ -39,7 +38,6 @@ public class Friend {
         this.fromMemberId = fromMemberId;
         this.fromMemberProfileUrl = fromMemberProfileUrl;
         this.areWeFriend = areWeFriend;
-        this.createdTime = LocalDateTime.now();
     }
 
     public void acceptFriend(){
