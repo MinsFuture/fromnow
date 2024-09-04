@@ -17,12 +17,13 @@ import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.springframework.security.core.parameters.P;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
-@Entity(name = "Boards")
+@Entity(name = "boards")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Getter
 public class Board extends BaseEntity {
@@ -33,6 +34,8 @@ public class Board extends BaseEntity {
 
     private String content;
 
+    @Column(name = "board_likes")
+    private int like = 0;
 
     @OneToMany(mappedBy = "board")
     private List<BoardPhoto> photoList = new ArrayList<>();
@@ -46,9 +49,20 @@ public class Board extends BaseEntity {
     private Member member;
 
     @Builder
-    public Board(String content, Diary diary, Member member) {
+    public Board(String content, int like, Diary diary, Member member) {
         this.content = content;
+        this.like = like;
         this.diary = diary;
         this.member = member;
+    }
+
+    public void likeBoard(){
+        this.like++;
+    }
+
+    public void dislikeBoard(){
+        if(this.like > 0){
+            this.like--;
+        }
     }
 }

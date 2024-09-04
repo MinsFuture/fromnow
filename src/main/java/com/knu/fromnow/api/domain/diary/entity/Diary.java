@@ -27,7 +27,7 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
-@Entity(name = "Diarys")
+@Entity(name = "diarys")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Getter
 public class Diary extends BaseEntity {
@@ -46,7 +46,6 @@ public class Diary extends BaseEntity {
 
     @OneToMany(mappedBy = "diary", cascade = CascadeType.REMOVE)
     private List<Board> boardList = new ArrayList<>();
-
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "owner_id")

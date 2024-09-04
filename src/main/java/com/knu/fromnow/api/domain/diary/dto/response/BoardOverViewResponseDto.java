@@ -7,6 +7,7 @@ import java.util.List;
 
 @Data
 public class BoardOverViewResponseDto {
+    private Long boardId;
     private String createdDate;
     private String profilePhotoUrl;
     private String profileName;
@@ -14,7 +15,8 @@ public class BoardOverViewResponseDto {
     private String content;
 
     @Builder
-    public BoardOverViewResponseDto(String createdDate, String profilePhotoUrl, String profileName, List<String> contentPhotoUrl, String content) {
+    public BoardOverViewResponseDto(Long boardId, String createdDate, String profilePhotoUrl, String profileName, List<String> contentPhotoUrl, String content) {
+        this.boardId = boardId;
         this.createdDate = createdDate;
         this.profilePhotoUrl = profilePhotoUrl;
         this.profileName = profileName;

@@ -13,8 +13,10 @@ import com.knu.fromnow.api.domain.member.entity.PrincipalDetails;
 import com.knu.fromnow.api.domain.member.repository.MemberRepository;
 import com.knu.fromnow.api.domain.photo.entity.BoardPhoto;
 import com.knu.fromnow.api.domain.photo.service.BoardPhotoService;
+import com.knu.fromnow.api.global.error.custom.BoardException;
 import com.knu.fromnow.api.global.error.custom.DiaryException;
 import com.knu.fromnow.api.global.error.custom.MemberException;
+import com.knu.fromnow.api.global.error.errorcode.custom.BoardErrorCode;
 import com.knu.fromnow.api.global.error.errorcode.custom.DiaryErrorCode;
 import com.knu.fromnow.api.global.error.errorcode.custom.MemberErrorCode;
 import com.knu.fromnow.api.global.spec.ApiBasicResponse;
@@ -109,6 +111,7 @@ public class BoardService {
 
             BoardOverViewResponseDto boardOverViewResponseDto =
                     BoardOverViewResponseDto.builder()
+                            .boardId(board.getId())
                             .createdDate(board.getCreatedAt().toString())
                             .profileName(board.getMember().getProfileName())
                             .profilePhotoUrl(board.getMember().getPhotoUrl())
@@ -121,5 +124,33 @@ public class BoardService {
         return boardOverViewResponseDtos;
     }
 
+    public ApiBasicResponse clickLike(Long id, PrincipalDetails principalDetails){
+        // 추후 내가 누른 좋아요 볼 수 있도록 로직 추가
+        Board board = boardRepository.findById(id)
+                .orElseThrow(() -> new BoardException(BoardErrorCode.NO_EXIST_BOARD_EXCEPTION));
 
+        board.likeBoard();
+        boardRepository.save(board);
+
+        return ApiBasicResponse.builder()
+                .status(true)
+                .code(200)
+                .message("좋아요를 눌렀습니다!")
+                .build();
+    }
+
+
+    public ApiBasicResponse clickDisLike(Long id, PrincipalDetails principalDetails) {
+        Board board = boardRepository.findById(id)
+                .orElseThrow(() -> new BoardException(BoardErrorCode.NO_EXIST_BOARD_EXCEPTION));
+
+        board.dislikeBoard();
+        boardRepository.save(board);
+
+        return ApiBasicResponse.builder()
+                .status(true)
+                .code(200)
+                .message("좋아요를 취소했습니다!")
+                .build();
+    }
 }
