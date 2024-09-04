@@ -73,7 +73,7 @@ public class BoardService {
         Member member = memberRepository.findByEmail(principalDetails.getEmail())
                 .orElseThrow(() -> new MemberException(MemberErrorCode.No_EXIST_EMAIL_MEMBER_EXCEPTION));
 
-        List<Board> boards = boardRepository.findByDiaryIdAndCreatedTimeBetween(diaryId, startDateTime, endDateTime);
+        List<Board> boards = boardRepository.findByDiaryIdAndCreatedAtBetween(diaryId, startDateTime, endDateTime);
         List<BoardOverViewResponseDto> boardOverViewResponseDtos = getBoardOverViewResponseDtos(boards);
 
         List<DiaryMember> diaryMembers = member.getDiaryMembers();
@@ -109,7 +109,7 @@ public class BoardService {
 
             BoardOverViewResponseDto boardOverViewResponseDto =
                     BoardOverViewResponseDto.builder()
-                            .createdDate(board.getCreatedTime().toString())
+                            .createdDate(board.getCreatedAt().toString())
                             .profileName(board.getMember().getProfileName())
                             .profilePhotoUrl(board.getMember().getPhotoUrl())
                             .content(board.getContent())

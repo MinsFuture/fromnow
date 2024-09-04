@@ -1,6 +1,7 @@
 package com.knu.fromnow.api.domain.photo.entity;
 
 import com.knu.fromnow.api.domain.board.entity.Board;
+import com.knu.fromnow.api.global.BaseEntity;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
@@ -17,7 +18,7 @@ import lombok.NoArgsConstructor;
 @Entity(name = "board_photos")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Getter
-public class BoardPhoto {
+public class BoardPhoto extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
