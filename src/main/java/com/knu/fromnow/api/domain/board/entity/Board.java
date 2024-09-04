@@ -2,7 +2,7 @@ package com.knu.fromnow.api.domain.board.entity;
 
 import com.knu.fromnow.api.domain.diary.entity.Diary;
 import com.knu.fromnow.api.domain.member.entity.Member;
-import com.knu.fromnow.api.domain.photo.entity.Photo;
+import com.knu.fromnow.api.domain.photo.entity.BoardPhoto;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
@@ -35,7 +35,7 @@ public class Board {
     private LocalDateTime createdTime;
 
     @OneToMany(mappedBy = "board")
-    private List<Photo> photoList = new ArrayList<>();
+    private List<BoardPhoto> photoList = new ArrayList<>();
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "diary_id")

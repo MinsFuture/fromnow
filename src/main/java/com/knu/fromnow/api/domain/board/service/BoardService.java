@@ -11,17 +11,14 @@ import com.knu.fromnow.api.domain.diary.repository.DiaryRepository;
 import com.knu.fromnow.api.domain.member.entity.Member;
 import com.knu.fromnow.api.domain.member.entity.PrincipalDetails;
 import com.knu.fromnow.api.domain.member.repository.MemberRepository;
-import com.knu.fromnow.api.domain.photo.entity.Photo;
-import com.knu.fromnow.api.domain.photo.service.PhotoService;
+import com.knu.fromnow.api.domain.photo.entity.BoardPhoto;
+import com.knu.fromnow.api.domain.photo.service.BoardPhotoService;
 import com.knu.fromnow.api.global.error.custom.DiaryException;
 import com.knu.fromnow.api.global.error.custom.MemberException;
 import com.knu.fromnow.api.global.error.errorcode.custom.DiaryErrorCode;
 import com.knu.fromnow.api.global.error.errorcode.custom.MemberErrorCode;
 import com.knu.fromnow.api.global.spec.ApiBasicResponse;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -36,7 +33,7 @@ import java.util.List;
 @Transactional
 public class BoardService {
 
-    private final PhotoService photoService;
+    private final BoardPhotoService boardPhotoService;
     private final BoardRepository boardRepository;
     private final MemberRepository memberRepository;
     private final DiaryRepository diaryRepository;
@@ -55,7 +52,7 @@ public class BoardService {
                 .member(member)
                 .build();
 
-        photoService.uploadPhoto(files, board);
+        boardPhotoService.uploadToBoardPhotos(files, board);
 
         member.getBoardList().add(board);
         boardRepository.save(board);
@@ -104,9 +101,9 @@ public class BoardService {
         List<BoardOverViewResponseDto> boardOverViewResponseDtos = new ArrayList<>();
 
         for (Board board : contents) {
-            List<Photo> photoList = board.getPhotoList();
+            List<BoardPhoto> photoList = board.getPhotoList();
             List<String> photoUrls = new ArrayList<>();
-            for (Photo photo : photoList) {
+            for (BoardPhoto photo : photoList) {
                 photoUrls.add(photo.getPhotoUrl());
             }
 
@@ -114,7 +111,7 @@ public class BoardService {
                     BoardOverViewResponseDto.builder()
                             .createdDate(board.getCreatedTime().toString())
                             .profileName(board.getMember().getProfileName())
-                            .profilePhotoUrl(board.getMember().getPhoto().getPhotoUrl())
+                            .profilePhotoUrl(board.getMember().getPhotoUrl())
                             .content(board.getContent())
                             .contentPhotoUrl(photoUrls)
                             .build();

@@ -58,7 +58,7 @@ public class FriendService {
             friendsDtos.add(FriendSearchResponseDto.builder()
                     .memberId(member.getId())
                     .profileName(member.getProfileName())
-                    .profilePhotoUrl(member.getPhoto().getPhotoUrl())
+                    .profilePhotoUrl(member.getPhotoUrl())
                     .isFriend(isFriend)
                     .build());
         }
@@ -84,7 +84,7 @@ public class FriendService {
             friendsDtos.add(FriendBasicResponseDto.builder()
                     .memberId(member.getId())
                     .profileName(member.getProfileName())
-                    .profilePhotoUrl(member.getPhoto().getPhotoUrl())
+                    .profilePhotoUrl(member.getPhotoUrl())
                     .build());
         }
 
@@ -113,7 +113,7 @@ public class FriendService {
                 .fromMemberId(toMember.getId())
                 .toMemberId(fromMember.getId())
                 .areWeFriend(false)
-                .fromMemberProfileUrl(fromMember.getPhoto().getPhotoUrl())
+                .fromMemberProfileUrl(fromMember.getPhotoUrl())
                 .build();
 
         friendRepository.save(sentFriendRequest);
@@ -167,7 +167,7 @@ public class FriendService {
             friendsDtos.add(FriendBasicResponseDto.builder()
                     .memberId(member.getId())
                     .profileName(member.getProfileName())
-                    .profilePhotoUrl(member.getPhoto().getPhotoUrl())
+                    .profilePhotoUrl(member.getPhotoUrl())
                     .build());
         }
 

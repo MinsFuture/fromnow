@@ -5,9 +5,8 @@ import com.knu.fromnow.api.domain.member.dto.request.CreateMemberDto;
 import com.knu.fromnow.api.domain.member.entity.Member;
 import com.knu.fromnow.api.domain.member.entity.PrincipalDetails;
 import com.knu.fromnow.api.domain.member.repository.MemberRepository;
-import com.knu.fromnow.api.domain.photo.entity.Photo;
-import com.knu.fromnow.api.domain.photo.repository.PhotoRepository;
-import com.knu.fromnow.api.domain.photo.service.PhotoService;
+import com.knu.fromnow.api.domain.photo.repository.BoardPhotoRepository;
+import com.knu.fromnow.api.domain.photo.service.BoardPhotoService;
 import com.knu.fromnow.api.global.error.custom.MemberException;
 import com.knu.fromnow.api.global.error.errorcode.custom.MemberErrorCode;
 import com.knu.fromnow.api.global.spec.ApiBasicResponse;
@@ -22,9 +21,9 @@ import org.springframework.web.multipart.MultipartFile;
 public class MemberService {
 
     private final MemberRepository memberRepository;
-    private final PhotoService photoService;
+    private final BoardPhotoService boardPhotoService;
     private final JwtService jwtService;
-    private final PhotoRepository photoRepository;
+    private final BoardPhotoRepository boardPhotoRepository;
 
     /**
      * ProfileName 중복 체크 로직
@@ -63,16 +62,11 @@ public class MemberService {
     }
 
     public ApiBasicResponse setMemberPhoto(MultipartFile file, PrincipalDetails principalDetails){
-        String photoUrl = photoService.uploadImageToGcs(file);
-
         Member member = memberRepository.findByEmail(principalDetails.getEmail())
                 .orElseThrow(() -> new MemberException(MemberErrorCode.No_EXIST_EMAIL_MEMBER_EXCEPTION));
 
-        Photo photo = Photo.builder()
-                .photoUrl(photoUrl)
-                .member(member)
-                .build();
-        photoRepository.save(photo);
+        String photoUrl = boardPhotoService.uploadImageToGcs(file);
+        member.setMemberPhoto(photoUrl);
 
         return ApiBasicResponse.builder()
                 .status(true)
