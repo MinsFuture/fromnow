@@ -8,6 +8,8 @@ import com.knu.fromnow.api.domain.diary.dto.response.BoardOverViewResponseDto;
 import com.knu.fromnow.api.domain.diary.entity.Diary;
 import com.knu.fromnow.api.domain.diary.entity.DiaryMember;
 import com.knu.fromnow.api.domain.diary.repository.DiaryRepository;
+import com.knu.fromnow.api.domain.like.entity.Like;
+import com.knu.fromnow.api.domain.like.repository.LikeRepository;
 import com.knu.fromnow.api.domain.member.entity.Member;
 import com.knu.fromnow.api.domain.member.entity.PrincipalDetails;
 import com.knu.fromnow.api.domain.member.repository.MemberRepository;
@@ -39,6 +41,7 @@ public class BoardService {
     private final BoardRepository boardRepository;
     private final MemberRepository memberRepository;
     private final DiaryRepository diaryRepository;
+    private final LikeRepository likeRepository;
 
     public ApiBasicResponse createBoard(MultipartFile[] files, CreateBoardDto createBoardDto, Long diaryId, PrincipalDetails principalDetails){
 
@@ -99,7 +102,7 @@ public class BoardService {
      * @param contents
      * @return
      */
-    private static List<BoardOverViewResponseDto> getBoardOverViewResponseDtos(List<Board> contents) {
+    public List<BoardOverViewResponseDto> getBoardOverViewResponseDtos(List<Board> contents) {
         List<BoardOverViewResponseDto> boardOverViewResponseDtos = new ArrayList<>();
 
         for (Board board : contents) {
@@ -129,8 +132,17 @@ public class BoardService {
         Board board = boardRepository.findById(id)
                 .orElseThrow(() -> new BoardException(BoardErrorCode.NO_EXIST_BOARD_EXCEPTION));
 
+        Member member = memberRepository.findByEmail(principalDetails.getEmail())
+                .orElseThrow(() -> new MemberException(MemberErrorCode.No_EXIST_EMAIL_MEMBER_EXCEPTION));
+
         board.likeBoard();
         boardRepository.save(board);
+
+        Like like = Like.builder()
+                .board(board)
+                .member(member)
+                .build();
+        likeRepository.save(like);
 
         return ApiBasicResponse.builder()
                 .status(true)
@@ -144,8 +156,15 @@ public class BoardService {
         Board board = boardRepository.findById(id)
                 .orElseThrow(() -> new BoardException(BoardErrorCode.NO_EXIST_BOARD_EXCEPTION));
 
+        Member member = memberRepository.findByEmail(principalDetails.getEmail())
+                .orElseThrow(() -> new MemberException(MemberErrorCode.No_EXIST_EMAIL_MEMBER_EXCEPTION));
+
         board.dislikeBoard();
         boardRepository.save(board);
+
+        Like like = likeRepository.findByMemberAndBoard(member, board)
+                .orElseThrow(() -> new RuntimeException());
+        likeRepository.delete(like);
 
         return ApiBasicResponse.builder()
                 .status(true)

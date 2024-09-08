@@ -12,4 +12,5 @@ import java.util.Optional;
 public interface BoardRepository extends JpaRepository<Board, Long> {
 
     List<Board> findByDiaryIdAndCreatedAtBetween(Long diaryId, LocalDateTime startDateTime, LocalDateTime endDateTime);
+    List<Board> findByIdIn(List<Long> boardIds);
 }
