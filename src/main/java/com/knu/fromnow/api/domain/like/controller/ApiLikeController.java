@@ -21,15 +21,4 @@ public class ApiLikeController {
     
     private final LikeService likeService;
 
-    @GetMapping("/me")
-    @PreAuthorize("isAuthenticated()")
-    public ResponseEntity<ApiDataResponse<List<BoardOverViewResponseDto>>> getAllMyLikeBoards(
-            @AuthenticationPrincipal PrincipalDetails principalDetails){
-
-        ApiDataResponse<List<BoardOverViewResponseDto>> response = likeService.getAllMyLikeBoards(principalDetails);
-
-        return ResponseEntity.status(response.getCode()).body(response);
-    }
-
-
 }

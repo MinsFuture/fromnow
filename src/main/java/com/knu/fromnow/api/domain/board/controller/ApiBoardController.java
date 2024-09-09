@@ -26,7 +26,7 @@ import java.util.List;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/board")
-public class ApiBoardController implements BoardApi {
+public class ApiBoardController implements SwaggerBoardApi {
 
     private final BoardService boardService;
 

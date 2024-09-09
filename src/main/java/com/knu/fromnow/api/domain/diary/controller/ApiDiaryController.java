@@ -28,7 +28,7 @@ import java.util.List;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/diary")
-public class ApiDiaryController {
+public class ApiDiaryController implements SwaggerDiaryApi{
 
     private final DiaryService diaryService;
 
@@ -53,12 +53,13 @@ public class ApiDiaryController {
         return ResponseEntity.status(diaryOverView.getCode()).body(diaryOverView);
     }
 
+
     @PutMapping("{diaryId}")
     @PreAuthorize("isAuthenticated()")
     public ResponseEntity<ApiBasicResponse> updateDiaryTitle(
+            @PathVariable("diaryId") Long diaryId,
             @RequestBody UpdateDiaryDto updateDiarydto,
-            @AuthenticationPrincipal PrincipalDetails principalDetails,
-            @PathVariable("diaryId") Long diaryId
+            @AuthenticationPrincipal PrincipalDetails principalDetails
     ){
         ApiBasicResponse response = diaryService.updateDiaryTitle(updateDiarydto, principalDetails, diaryId);
 
@@ -68,8 +69,8 @@ public class ApiDiaryController {
     @DeleteMapping("{diaryId}")
     @PreAuthorize("isAuthenticated()")
     public ResponseEntity<ApiBasicResponse> deleteDiary(
-            @AuthenticationPrincipal PrincipalDetails principalDetails,
-            @PathVariable("diaryId") Long diaryId
+            @PathVariable("diaryId") Long diaryId,
+            @AuthenticationPrincipal PrincipalDetails principalDetails
     ){
         ApiBasicResponse response = diaryService.deleteDiary(principalDetails, diaryId);
 
