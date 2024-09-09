@@ -13,6 +13,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.slf4j.MDC;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -95,6 +96,7 @@ public class JwtAuthorizationFilter extends OncePerRequestFilter {
 
         // 세션에 사용자 등록, 해당 사용자는 스프링 시큐리티에 의해서 인증됨
         SecurityContextHolder.getContext().setAuthentication(authenticationToken);
+        MDC.put("member_email", member.getEmail());
 
         filterChain.doFilter(request, response);
     }

@@ -44,7 +44,7 @@ public class ExControllerAdvice {
     }
 
     private static ResponseEntity<ApiErrorResponse> buildResponseEntity(ApiErrorResponse apiErrorResponse){
-        log.error("ERROR [{}][{}] - Exception: {}", MDC.get("request_id"), MDC.get("request_uri"), apiErrorResponse.getMessage());
+        log.error("ERROR [ {} ][ {} ][ {} ] - Exception: {}", MDC.get("request_id"), MDC.get("member_email"), MDC.get("request_uri"), apiErrorResponse.getMessage());
         return ResponseEntity.status(apiErrorResponse.getCode()).body(apiErrorResponse);
     }
 

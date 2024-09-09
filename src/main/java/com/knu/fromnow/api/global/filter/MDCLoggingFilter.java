@@ -33,12 +33,12 @@ public class MDCLoggingFilter implements Filter {
         MDC.put("request_uri", requestURI);
 
         try {
-            log.info("REQUEST [{}][{}]", requestId, requestURI);
+            log.info("REQUEST [ {} ][ {} ]", requestId, requestURI);
             filterChain.doFilter(servletRequest, servletResponse);
         } catch (Exception e) {
-            log.error("ERROR [{}][{}] - Exception: {}", requestId, requestURI, e.getMessage());
+            log.error("ERROR [ {} ][ {} ] - Exception: {}", requestId, requestURI, e.getMessage());
         } finally {
-            log.info("RESPONSE [{}][{}]", MDC.get("request_id"), requestURI);
+            log.info("RESPONSE [ {} ][ {} ]", MDC.get("request_id"), requestURI);
             MDC.clear();
         }
     }
