@@ -24,7 +24,7 @@ import java.util.List;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/friend")
-public class ApiFriendController {
+public class ApiFriendController implements SwaggerFriendApi{
 
     private final FriendService friendService;
 
@@ -59,23 +59,5 @@ public class ApiFriendController {
         return ResponseEntity.status(response.getCode()).body(response);
     }
 
-    @GetMapping("/mutual")
-    @PreAuthorize("isAuthenticated()")
-    public ResponseEntity<ApiDataResponse<List<FriendBasicResponseDto>>> getAllMyFriend(
-            @AuthenticationPrincipal PrincipalDetails principalDetails
-    ){
-        ApiDataResponse<List<FriendBasicResponseDto>> response = friendService.getAllMyFriend(principalDetails);
 
-        return ResponseEntity.status(response.getCode()).body(response);
-    }
-
-    @GetMapping("/requests/received")
-    @PreAuthorize("isAuthenticated()")
-    public ResponseEntity<ApiDataResponse<List<FriendBasicResponseDto>>> getRequestsReceived(
-            @AuthenticationPrincipal PrincipalDetails principalDetails
-    ){
-        ApiDataResponse<List<FriendBasicResponseDto>> response = friendService.getRequestsReceived(principalDetails);
-
-        return ResponseEntity.status(response.getCode()).body(response);
-    }
 }

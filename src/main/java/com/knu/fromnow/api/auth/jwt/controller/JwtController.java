@@ -15,7 +15,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/jwt")
-public class JwtController {
+public class JwtController implements SwaggerJwtApi{
 
     private static final Logger log = LoggerFactory.getLogger(JwtController.class);
     private final JwtService jwtService;

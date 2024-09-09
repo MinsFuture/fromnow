@@ -1,0 +1,57 @@
+package com.knu.fromnow.api.domain.mypage.controller;
+
+import com.knu.fromnow.api.domain.diary.dto.response.BoardOverViewResponseDto;
+import com.knu.fromnow.api.domain.friend.dto.response.FriendBasicResponseDto;
+import com.knu.fromnow.api.domain.friend.service.FriendService;
+import com.knu.fromnow.api.domain.like.service.LikeService;
+import com.knu.fromnow.api.domain.member.entity.PrincipalDetails;
+import com.knu.fromnow.api.global.spec.ApiDataResponse;
+import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+import java.util.List;
+
+@RestController
+@RequiredArgsConstructor
+@RequestMapping("/api/my")
+public class ApiMyController implements SwaggerMyApi{
+
+    private final LikeService likeService;
+    private final FriendService friendService;
+
+    @GetMapping("/likes")
+    @PreAuthorize("isAuthenticated()")
+    public ResponseEntity<ApiDataResponse<List<BoardOverViewResponseDto>>> getAllMyLikeBoards(
+            @AuthenticationPrincipal PrincipalDetails principalDetails){
+
+        ApiDataResponse<List<BoardOverViewResponseDto>> response = likeService.getAllMyLikeBoards(principalDetails);
+
+        return ResponseEntity.status(response.getCode()).body(response);
+    }
+
+    @GetMapping("/friend/mutual")
+    @PreAuthorize("isAuthenticated()")
+    public ResponseEntity<ApiDataResponse<List<FriendBasicResponseDto>>> getAllMyFriend(
+            @AuthenticationPrincipal PrincipalDetails principalDetails
+    ){
+        ApiDataResponse<List<FriendBasicResponseDto>> response = friendService.getAllMyFriend(principalDetails);
+
+        return ResponseEntity.status(response.getCode()).body(response);
+    }
+
+    @GetMapping("/friend/requests/received")
+    @PreAuthorize("isAuthenticated()")
+    public ResponseEntity<ApiDataResponse<List<FriendBasicResponseDto>>> getRequestsReceived(
+            @AuthenticationPrincipal PrincipalDetails principalDetails
+    ){
+        ApiDataResponse<List<FriendBasicResponseDto>> response = friendService.getRequestsReceived(principalDetails);
+
+        return ResponseEntity.status(response.getCode()).body(response);
+    }
+
+}
