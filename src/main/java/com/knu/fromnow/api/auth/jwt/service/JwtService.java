@@ -2,7 +2,7 @@ package com.knu.fromnow.api.auth.jwt.service;
 
 import com.knu.fromnow.api.domain.member.entity.Member;
 import com.knu.fromnow.api.domain.member.repository.MemberRepository;
-import com.knu.fromnow.api.global.error.custom.NotValidTokenException;
+import com.knu.fromnow.api.global.error.custom.JwtTokenException;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.MalformedJwtException;
@@ -74,19 +74,19 @@ public class JwtService {
             return true;
         } catch (io.jsonwebtoken.security.SecurityException | MalformedJwtException e) {
             log.info("Invalid JWT Token", e);
-            throw new NotValidTokenException(NOT_VALID_TOKEN_EXCEPTION);
+            throw new JwtTokenException(NOT_VALID_TOKEN_EXCEPTION);
         } catch (ExpiredJwtException e) {
             log.info("Expired JWT Token", e);
             if (isRefreshTokenExpired(e)) {
-                throw new NotValidTokenException(EXPIRED_REFRESH_TOKEN_EXCEPTION);
+                throw new JwtTokenException(EXPIRED_REFRESH_TOKEN_EXCEPTION);
             }
-            throw new NotValidTokenException(EXPIRED_ACCESS_TOKEN_EXCEPTION);
+            throw new JwtTokenException(EXPIRED_ACCESS_TOKEN_EXCEPTION);
         } catch (UnsupportedJwtException e) {
             log.info("Unsupported JWT Token", e);
-            throw new NotValidTokenException(UNSUPPORTED_TOKEN_EXCEPTION);
+            throw new JwtTokenException(UNSUPPORTED_TOKEN_EXCEPTION);
         } catch (IllegalArgumentException e) {
             log.info("JWT claims string is empty.", e);
-            throw new NotValidTokenException(MISMATCH_CLAIMS_EXCEPTION);
+            throw new JwtTokenException(MISMATCH_CLAIMS_EXCEPTION);
         }
     }
 
@@ -122,12 +122,12 @@ public class JwtService {
 
     public String getAccessTokenFromRefresh(String refreshToken){
         if(refreshToken == null){
-            throw new NotValidTokenException(REFRESH_TOKEN_COOKIE_NULL_EXCEPTION);
+            throw new JwtTokenException(REFRESH_TOKEN_COOKIE_NULL_EXCEPTION);
         }
 
         validateToken(refreshToken);
         Member member = memberRepository.findByRefreshToken(refreshToken)
-                .orElseThrow(() -> new NotValidTokenException(REFRESH_TOKEN_MISMATCH_EXCEPTION));
+                .orElseThrow(() -> new JwtTokenException(REFRESH_TOKEN_MISMATCH_EXCEPTION));
 
         String accessToken = createAccessToken(member.getEmail(), member.getRole().name());
 

@@ -2,7 +2,7 @@ package com.knu.fromnow.api.domain.member.controller;
 
 import com.knu.fromnow.api.domain.member.dto.request.CreateMemberDto;
 import com.knu.fromnow.api.domain.member.entity.PrincipalDetails;
-import com.knu.fromnow.api.global.error.dto.ApiErrorResponse;
+import com.knu.fromnow.api.global.spec.ApiErrorResponse;
 import com.knu.fromnow.api.global.spec.ApiBasicResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
