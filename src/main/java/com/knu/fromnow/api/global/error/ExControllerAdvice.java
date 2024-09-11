@@ -1,5 +1,6 @@
 package com.knu.fromnow.api.global.error;
 
+import com.knu.fromnow.api.global.error.custom.DiaryMemberException;
 import com.knu.fromnow.api.global.error.custom.FriendException;
 import com.knu.fromnow.api.global.error.custom.MemberException;
 import com.knu.fromnow.api.global.error.custom.JwtTokenException;
@@ -66,6 +67,13 @@ public class ExControllerAdvice {
     @ExceptionHandler(JwtTokenException.class)
     public ResponseEntity<ApiErrorResponse> handleNotValidTokenException(JwtTokenException e){
         ApiErrorResponse apiErrorResponse = buildErrorResponseWithCustomException(e.getJwtTokenErrorCode());
+        return buildResponseEntity(apiErrorResponse);
+    }
+
+    // DiaryMemberException 처리
+    @ExceptionHandler(DiaryMemberException.class)
+    public ResponseEntity<ApiErrorResponse> handleDiaryMemberException(DiaryMemberException e){
+        ApiErrorResponse apiErrorResponse = buildErrorResponseWithCustomException(e.getDiaryMemberErrorCode());
         return buildResponseEntity(apiErrorResponse);
     }
 

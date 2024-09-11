@@ -41,6 +41,6 @@ public interface SwaggerMyApi {
             }
     )
     @Operation(summary = "받은 친구 요청 조회", description = "받은 친구 요청 조회")
-    ResponseEntity<ApiDataResponse<List<FriendBasicResponseDto>>> getRequestsReceived(
+    ResponseEntity<ApiDataResponse<List<FriendBasicResponseDto>>> getFriendRequestsReceived(
             @Parameter PrincipalDetails principalDetails);
 }
