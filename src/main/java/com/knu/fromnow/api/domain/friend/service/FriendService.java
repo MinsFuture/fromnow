@@ -153,7 +153,7 @@ public class FriendService {
                 .build();
     }
 
-    public ApiDataResponse<List<FriendBasicResponseDto>> getRequestsReceived(PrincipalDetails principalDetails) {
+    public ApiDataResponse<List<FriendBasicResponseDto>> getFriendRequestsReceived(PrincipalDetails principalDetails) {
         // from이 나인데, are we가 false인 모든 to들을 가져오기
         Member fromMember = memberRepository.findByEmail(principalDetails.getEmail())
                 .orElseThrow(() -> new MemberException(MemberErrorCode.No_EXIST_EMAIL_MEMBER_EXCEPTION));

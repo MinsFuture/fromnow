@@ -1,6 +1,9 @@
 package com.knu.fromnow.api.domain.mypage.controller;
 
 import com.knu.fromnow.api.domain.diary.dto.response.BoardOverViewResponseDto;
+import com.knu.fromnow.api.domain.diary.dto.response.DiaryRequestsReceivedDto;
+import com.knu.fromnow.api.domain.diary.service.DiaryMemberService;
+import com.knu.fromnow.api.domain.diary.service.DiaryService;
 import com.knu.fromnow.api.domain.friend.dto.response.FriendBasicResponseDto;
 import com.knu.fromnow.api.domain.friend.service.FriendService;
 import com.knu.fromnow.api.domain.like.service.LikeService;
@@ -23,6 +26,8 @@ public class ApiMyController implements SwaggerMyApi{
 
     private final LikeService likeService;
     private final FriendService friendService;
+    private final DiaryService diaryService;
+    private final DiaryMemberService diaryMemberService;
 
     @GetMapping("/likes")
     @PreAuthorize("isAuthenticated()")
@@ -46,10 +51,20 @@ public class ApiMyController implements SwaggerMyApi{
 
     @GetMapping("/friend/requests/received")
     @PreAuthorize("isAuthenticated()")
-    public ResponseEntity<ApiDataResponse<List<FriendBasicResponseDto>>> getRequestsReceived(
+    public ResponseEntity<ApiDataResponse<List<FriendBasicResponseDto>>> getFriendRequestsReceived(
             @AuthenticationPrincipal PrincipalDetails principalDetails
     ){
-        ApiDataResponse<List<FriendBasicResponseDto>> response = friendService.getRequestsReceived(principalDetails);
+        ApiDataResponse<List<FriendBasicResponseDto>> response = friendService.getFriendRequestsReceived(principalDetails);
+
+        return ResponseEntity.status(response.getCode()).body(response);
+    }
+
+    @GetMapping("/diary/requests/received")
+    @PreAuthorize("isAuthenticated()")
+    public ResponseEntity<ApiDataResponse<List<DiaryRequestsReceivedDto>>> getDiaryRequestsReceived(
+            @AuthenticationPrincipal PrincipalDetails principalDetails
+    ){
+        ApiDataResponse<List<DiaryRequestsReceivedDto>> response = diaryMemberService.getDiaryRequestsReceived(principalDetails);
 
         return ResponseEntity.status(response.getCode()).body(response);
     }

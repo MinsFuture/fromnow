@@ -1,6 +1,7 @@
 package com.knu.fromnow.api.domain.diary.entity;
 
 import com.knu.fromnow.api.domain.member.entity.Member;
+import com.knu.fromnow.api.global.BaseEntity;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -19,7 +20,7 @@ import lombok.NoArgsConstructor;
 @Entity(name = "Diary_Member")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Getter
-public class DiaryMember {
+public class DiaryMember extends BaseEntity {
 
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "diary_member_id")
@@ -33,9 +34,16 @@ public class DiaryMember {
     @JoinColumn(name = "member_id")
     private Member member;
 
+    private boolean acceptedInvite;
+
     @Builder
-    public DiaryMember(Diary diary, Member member) {
+    public DiaryMember(Diary diary, Member member, boolean acceptedInvite) {
         this.diary = diary;
         this.member = member;
+        this.acceptedInvite = acceptedInvite;
+    }
+
+    public void acceptInvitation(){
+        this.acceptedInvite = true;
     }
 }
