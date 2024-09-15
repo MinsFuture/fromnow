@@ -3,6 +3,7 @@ package com.knu.fromnow.api.domain.member.entity;
 import com.knu.fromnow.api.domain.board.entity.Board;
 import com.knu.fromnow.api.domain.diary.entity.Diary;
 import com.knu.fromnow.api.domain.diary.entity.DiaryMember;
+import com.knu.fromnow.api.domain.mission.entity.Mission;
 import com.knu.fromnow.api.global.BaseEntity;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -12,6 +13,7 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.OneToMany;
+import jakarta.persistence.OneToOne;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
@@ -40,6 +42,9 @@ public class Member extends BaseEntity {
     private String profileName;
 
     private String refreshToken;
+
+    @OneToOne(mappedBy = "member")
+    private Mission mission;
 
     @OneToMany(mappedBy = "member")
     private List<Board> boardList = new ArrayList<>();
