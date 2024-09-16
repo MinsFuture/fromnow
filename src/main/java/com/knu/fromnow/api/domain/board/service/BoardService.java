@@ -43,7 +43,7 @@ public class BoardService {
     private final DiaryRepository diaryRepository;
     private final LikeRepository likeRepository;
 
-    public ApiBasicResponse createBoard(MultipartFile[] files, CreateBoardDto createBoardDto, Long diaryId, PrincipalDetails principalDetails){
+    public ApiBasicResponse createBoard(MultipartFile file, CreateBoardDto createBoardDto, Long diaryId, PrincipalDetails principalDetails){
 
         Member member = memberRepository.findByEmail(principalDetails.getEmail())
                 .orElseThrow(() -> new MemberException(MemberErrorCode.No_EXIST_EMAIL_MEMBER_EXCEPTION));
@@ -57,7 +57,7 @@ public class BoardService {
                 .member(member)
                 .build();
 
-        boardPhotoService.uploadToBoardPhotos(files, board);
+        boardPhotoService.uploadToBoardPhotos(file, board);
 
         member.getBoardList().add(board);
         boardRepository.save(board);

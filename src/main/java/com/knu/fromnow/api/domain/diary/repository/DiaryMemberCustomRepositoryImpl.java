@@ -1,5 +1,6 @@
 package com.knu.fromnow.api.domain.diary.repository;
 
+import com.knu.fromnow.api.domain.diary.entity.Diary;
 import com.knu.fromnow.api.domain.diary.entity.QDiaryMember;
 import com.knu.fromnow.api.domain.member.entity.Member;
 import com.querydsl.jpa.impl.JPAQueryFactory;
@@ -24,6 +25,17 @@ public class DiaryMemberCustomRepositoryImpl implements DiaryMemberCustomReposit
                 .from(diaryMember)
                 .where(diaryMember.member.eq(member),
                         diaryMember.acceptedInvite.isFalse())
+                .fetch();
+    }
+
+    @Override
+    public List<Member> getMemberListsByInDiary(Diary diary){
+
+        QDiaryMember diaryMember = QDiaryMember.diaryMember;
+
+        return jpaQueryFactory.select(diaryMember.member)
+                .from(diaryMember)
+                .where(diaryMember.diary.eq(diary))
                 .fetch();
     }
 }

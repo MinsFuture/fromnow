@@ -2,6 +2,7 @@ package com.knu.fromnow.api.domain.member.service;
 
 import com.knu.fromnow.api.auth.jwt.service.JwtService;
 import com.knu.fromnow.api.domain.member.dto.request.CreateMemberDto;
+import com.knu.fromnow.api.domain.member.dto.response.ProfileMemberDto;
 import com.knu.fromnow.api.domain.member.entity.Member;
 import com.knu.fromnow.api.domain.member.entity.PrincipalDetails;
 import com.knu.fromnow.api.domain.member.repository.MemberRepository;
@@ -10,6 +11,7 @@ import com.knu.fromnow.api.domain.photo.service.BoardPhotoService;
 import com.knu.fromnow.api.global.error.custom.MemberException;
 import com.knu.fromnow.api.global.error.errorcode.custom.MemberErrorCode;
 import com.knu.fromnow.api.global.spec.ApiBasicResponse;
+import com.knu.fromnow.api.global.spec.ApiDataResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -81,4 +83,20 @@ public class MemberService {
                 .orElseThrow(() -> new MemberException(MemberErrorCode.No_EXIST_EMAIL_MEMBER_EXCEPTION));
     }
 
+    public ApiDataResponse<ProfileMemberDto> getMyProfile(PrincipalDetails principalDetails) {
+        Member member = memberRepository.findByEmail(principalDetails.getEmail())
+                .orElseThrow(() -> new MemberException(MemberErrorCode.No_EXIST_EMAIL_MEMBER_EXCEPTION));
+
+        ProfileMemberDto profileMemberDto = ProfileMemberDto.builder()
+                .profileName(member.getProfileName())
+                .photoUrl(member.getPhotoUrl())
+                .build();
+
+        return ApiDataResponse.<ProfileMemberDto>builder()
+                .status(true)
+                .code(200)
+                .message("마이페이지 프로필 불러오기 성공!")
+                .data(profileMemberDto)
+                .build();
+    }
 }
