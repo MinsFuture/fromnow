@@ -8,6 +8,7 @@ import com.knu.fromnow.api.domain.diary.dto.response.ApiDiaryResponse;
 import com.knu.fromnow.api.domain.diary.dto.response.DiaryOverViewResponseDto;
 import com.knu.fromnow.api.domain.diary.entity.Diary;
 import com.knu.fromnow.api.domain.diary.entity.DiaryMember;
+import com.knu.fromnow.api.domain.diary.repository.DiaryMemberCustomRepository;
 import com.knu.fromnow.api.domain.diary.repository.DiaryMemberRepository;
 import com.knu.fromnow.api.domain.diary.repository.DiaryRepository;
 import com.knu.fromnow.api.domain.member.entity.Member;
@@ -37,6 +38,7 @@ public class DiaryService {
     private final DiaryRepository diaryRepository;
     private final MemberRepository memberRepository;
     private final DiaryMemberRepository diaryMemberRepository;
+    private final DiaryMemberCustomRepository diaryMemberCustomRepository;
 
     public ApiBasicResponse createDiary(CreateDiaryDto createDiaryDto, PrincipalDetails principalDetails){
 
@@ -45,7 +47,6 @@ public class DiaryService {
 
         Diary diary = Diary.builder()
                 .title(createDiaryDto.getTitle())
-                .diaryType(createDiaryDto.getDiaryType())
                 .owner(member)
                 .build();
 
@@ -79,10 +80,14 @@ public class DiaryService {
         List<DiaryOverViewResponseDto> responseDtoList = new ArrayList<>();
 
         for (Diary diary : diaryList) {
+
+            List<Member> members = diaryMemberCustomRepository.getMemberListsByInDiary(diary);
+            List<String> photoUrls = members.stream().map(Member::getPhotoUrl).toList();
+
             DiaryOverViewResponseDto diaryOverViewResponseDto = DiaryOverViewResponseDto.builder()
                     .id(diary.getId())
                     .title(diary.getTitle())
-                    .diaryType(diary.getDiaryType())
+                    .photoUrls(photoUrls)
                     .build();
 
             responseDtoList.add(diaryOverViewResponseDto);

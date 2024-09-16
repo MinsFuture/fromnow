@@ -38,9 +38,6 @@ public class Diary extends BaseEntity {
 
     private String title;
 
-    @Enumerated(EnumType.STRING)
-    private DiaryType diaryType;
-
     @OneToMany(mappedBy = "diary", cascade = CascadeType.REMOVE)
     private List<DiaryMember> diaryMembers = new ArrayList<>();
 
@@ -52,8 +49,7 @@ public class Diary extends BaseEntity {
     private Member owner;
 
     @Builder
-    public Diary(DiaryType diaryType, String title, Member owner) {
-        this.diaryType = diaryType;
+    public Diary(String title, Member owner) {
         this.title = title;
         this.owner = owner;
     }
