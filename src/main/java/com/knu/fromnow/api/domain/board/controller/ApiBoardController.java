@@ -1,11 +1,12 @@
 package com.knu.fromnow.api.domain.board.controller;
 
-import com.knu.fromnow.api.domain.board.dto.CreateBoardDto;
+import com.knu.fromnow.api.domain.board.dto.request.BoardCreateRequestDto;
+import com.knu.fromnow.api.domain.board.dto.response.BoardLikeResponseDto;
+import com.knu.fromnow.api.domain.board.dto.response.BoardCreateResponseDto;
 import com.knu.fromnow.api.domain.board.service.BoardService;
-import com.knu.fromnow.api.domain.diary.dto.response.ApiDiaryResponse;
-import com.knu.fromnow.api.domain.diary.dto.response.BoardOverViewResponseDto;
+import com.knu.fromnow.api.domain.board.dto.response.BoardOverViewResponseDto;
 import com.knu.fromnow.api.domain.member.entity.PrincipalDetails;
-import com.knu.fromnow.api.global.spec.ApiBasicResponse;
+import com.knu.fromnow.api.global.spec.ApiDataResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -32,50 +33,48 @@ public class ApiBoardController implements SwaggerBoardApi {
 
     @PostMapping(value = "/diaries/{diaryId}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     @PreAuthorize("isAuthenticated()")
-    public ResponseEntity<ApiBasicResponse> createBoard(
+    public ResponseEntity<ApiDataResponse<BoardCreateResponseDto>> createBoard(
             @PathVariable("diaryId") Long diaryId,
-            @RequestPart("uploadPhotos") MultipartFile file,
-            @RequestPart("createDiaryDto") CreateBoardDto createBoardDto,
+            @RequestPart("uploadPhotos") MultipartFile[] files,
+            @RequestPart("createDiaryDto") BoardCreateRequestDto boardCreateRequestDto,
             @AuthenticationPrincipal PrincipalDetails principalDetails) {
-        ApiBasicResponse response
-                = boardService.createBoard(file, createBoardDto, diaryId, principalDetails);
+        ApiDataResponse<BoardCreateResponseDto> response
+                = boardService.createBoard(files, boardCreateRequestDto, diaryId, principalDetails);
 
         return ResponseEntity.status(response.getCode()).body(response);
     }
 
     @GetMapping("/diaries/{diaryId}")
     @PreAuthorize("isAuthenticated()")
-    public ResponseEntity<ApiDiaryResponse<List<BoardOverViewResponseDto>>> getBoardOverviews(
+    public ResponseEntity<ApiDataResponse<List<BoardOverViewResponseDto>>> getBoardOverviews(
             @PathVariable("diaryId") Long id,
             @RequestParam("date") LocalDate date,
             @AuthenticationPrincipal PrincipalDetails principalDetails
     ) {
-        ApiDiaryResponse<List<BoardOverViewResponseDto>> boardOverviews = boardService.getBoardOverviews(id, date, principalDetails);
+        ApiDataResponse<List<BoardOverViewResponseDto>> boardOverviews = boardService.getBoardOverviews(id, date, principalDetails);
 
         return ResponseEntity.status(boardOverviews.getCode()).body(boardOverviews);
     }
 
     @PostMapping("/{boardId}/like")
     @PreAuthorize("isAuthenticated()")
-    public ResponseEntity<ApiBasicResponse> clickLike(
+    public ResponseEntity<ApiDataResponse<BoardLikeResponseDto>> clickLike(
             @PathVariable("boardId") Long id,
             @AuthenticationPrincipal PrincipalDetails principalDetails
     ) {
-        ApiBasicResponse response = boardService.clickLike(id, principalDetails);
+        ApiDataResponse<BoardLikeResponseDto> response = boardService.clickLike(id, principalDetails);
 
         return ResponseEntity.status(response.getCode()).body(response);
     }
 
     @PostMapping("/{boardId}/dislike")
     @PreAuthorize("isAuthenticated()")
-    public ResponseEntity<ApiBasicResponse> clickDisLike(
+    public ResponseEntity<ApiDataResponse<BoardLikeResponseDto>> clickDisLike(
             @PathVariable("boardId") Long id,
             @AuthenticationPrincipal PrincipalDetails principalDetails
     ){
-        ApiBasicResponse response = boardService.clickDisLike(id, principalDetails);
+        ApiDataResponse<BoardLikeResponseDto> response = boardService.clickDisLike(id, principalDetails);
 
         return ResponseEntity.status(response.getCode()).body(response);
     }
-
-
 }

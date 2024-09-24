@@ -5,11 +5,13 @@ import com.knu.fromnow.api.domain.diary.dto.request.AcceptDiaryDto;
 import com.knu.fromnow.api.domain.diary.dto.request.CreateDiaryDto;
 import com.knu.fromnow.api.domain.diary.dto.request.InviteToDiaryDto;
 import com.knu.fromnow.api.domain.diary.dto.request.UpdateDiaryDto;
-import com.knu.fromnow.api.domain.diary.dto.response.ApiDiaryResponse;
+import com.knu.fromnow.api.domain.diary.dto.response.DiaryCreateResponseDto;
+import com.knu.fromnow.api.domain.diary.dto.response.DiaryInviteResponseDto;
 import com.knu.fromnow.api.domain.diary.dto.response.DiaryOverViewResponseDto;
 import com.knu.fromnow.api.domain.diary.service.DiaryService;
 import com.knu.fromnow.api.domain.member.entity.PrincipalDetails;
 import com.knu.fromnow.api.global.spec.ApiBasicResponse;
+import com.knu.fromnow.api.global.spec.ApiDataResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -34,43 +36,42 @@ public class ApiDiaryController implements SwaggerDiaryApi {
 
     @PostMapping
     @PreAuthorize("isAuthenticated()")
-    public ResponseEntity<ApiBasicResponse> createDiary(
+    public ResponseEntity<ApiDataResponse<DiaryCreateResponseDto>> createDiary(
             @RequestBody CreateDiaryDto createDiaryDto,
             @AuthenticationPrincipal PrincipalDetails principalDetails) {
+        ApiDataResponse<DiaryCreateResponseDto> response = diaryService.createDiary(createDiaryDto, principalDetails);
 
-        ApiBasicResponse apiBasicResponse = diaryService.createDiary(createDiaryDto, principalDetails);
-
-        return ResponseEntity.status(apiBasicResponse.getCode()).body(apiBasicResponse);
+        return ResponseEntity.status(response.getCode()).body(response);
     }
 
     @GetMapping("/overview")
     @PreAuthorize("isAuthenticated()")
-    public ResponseEntity<ApiDiaryResponse<List<DiaryOverViewResponseDto>>> getDiaryOverView(
+    public ResponseEntity<ApiDataResponse<List<DiaryOverViewResponseDto>>> getDiaryOverView(
             @AuthenticationPrincipal PrincipalDetails principalDetails
     ) {
-        ApiDiaryResponse<List<DiaryOverViewResponseDto>> diaryOverView = diaryService.getDiaryOverView(principalDetails);
+        ApiDataResponse<List<DiaryOverViewResponseDto>> diaryOverView = diaryService.getDiaryOverView(principalDetails);
 
         return ResponseEntity.status(diaryOverView.getCode()).body(diaryOverView);
     }
 
     @PostMapping("/invite")
     @PreAuthorize("isAuthenticated()")
-    public ResponseEntity<ApiBasicResponse> inviteToDiary(
+    public ResponseEntity<ApiDataResponse<DiaryInviteResponseDto>> inviteToDiary(
             @RequestBody InviteToDiaryDto inviteToDiaryDto,
             @AuthenticationPrincipal PrincipalDetails principalDetails
     ) {
-        ApiBasicResponse response = diaryService.inviteToDiary(inviteToDiaryDto, principalDetails);
+        ApiDataResponse<DiaryInviteResponseDto> response = diaryService.inviteToDiary(inviteToDiaryDto, principalDetails);
 
         return ResponseEntity.status(response.getCode()).body(response);
     }
 
     @PostMapping("/accept")
     @PreAuthorize("isAuthenticated()")
-    public ResponseEntity<ApiBasicResponse> acceptedInvite(
+    public ResponseEntity<ApiDataResponse<DiaryOverViewResponseDto>> acceptedInvite(
             @RequestBody AcceptDiaryDto acceptDiaryDto,
             @AuthenticationPrincipal PrincipalDetails principalDetails
     ) {
-        ApiBasicResponse response = diaryService.acceptInvite(acceptDiaryDto, principalDetails);
+        ApiDataResponse<DiaryOverViewResponseDto> response = diaryService.acceptInvite(acceptDiaryDto, principalDetails);
 
         return ResponseEntity.status(response.getCode()).body(response);
     }

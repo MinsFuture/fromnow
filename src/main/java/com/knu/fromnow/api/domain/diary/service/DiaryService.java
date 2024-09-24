@@ -4,7 +4,8 @@ import com.knu.fromnow.api.domain.diary.dto.request.AcceptDiaryDto;
 import com.knu.fromnow.api.domain.diary.dto.request.CreateDiaryDto;
 import com.knu.fromnow.api.domain.diary.dto.request.InviteToDiaryDto;
 import com.knu.fromnow.api.domain.diary.dto.request.UpdateDiaryDto;
-import com.knu.fromnow.api.domain.diary.dto.response.ApiDiaryResponse;
+import com.knu.fromnow.api.domain.diary.dto.response.DiaryCreateResponseDto;
+import com.knu.fromnow.api.domain.diary.dto.response.DiaryInviteResponseDto;
 import com.knu.fromnow.api.domain.diary.dto.response.DiaryOverViewResponseDto;
 import com.knu.fromnow.api.domain.diary.entity.Diary;
 import com.knu.fromnow.api.domain.diary.entity.DiaryMember;
@@ -21,13 +22,13 @@ import com.knu.fromnow.api.global.error.errorcode.custom.DiaryErrorCode;
 import com.knu.fromnow.api.global.error.errorcode.custom.DiaryMemberErrorCode;
 import com.knu.fromnow.api.global.error.errorcode.custom.MemberErrorCode;
 import com.knu.fromnow.api.global.spec.ApiBasicResponse;
+import com.knu.fromnow.api.global.spec.ApiDataResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -40,7 +41,7 @@ public class DiaryService {
     private final DiaryMemberRepository diaryMemberRepository;
     private final DiaryMemberCustomRepository diaryMemberCustomRepository;
 
-    public ApiBasicResponse createDiary(CreateDiaryDto createDiaryDto, PrincipalDetails principalDetails){
+    public ApiDataResponse<DiaryCreateResponseDto> createDiary(CreateDiaryDto createDiaryDto, PrincipalDetails principalDetails) {
 
         Member member = memberRepository.findByEmail(principalDetails.getEmail())
                 .orElseThrow(() -> new MemberException(MemberErrorCode.No_EXIST_EMAIL_MEMBER_EXCEPTION));
@@ -63,37 +64,23 @@ public class DiaryService {
 
         diaryMemberRepository.save(diaryMember);
 
-        return ApiBasicResponse.builder()
+        return ApiDataResponse.<DiaryCreateResponseDto>builder()
                 .status(true)
                 .code(200)
-                .message("Diary 생성 성공!")
+                .message("다이어리 생성 성공")
+                .data(DiaryCreateResponseDto.fromDiary(diary))
                 .build();
     }
 
-    public ApiDiaryResponse<List<DiaryOverViewResponseDto>> getDiaryOverView(PrincipalDetails principalDetails){
+    public ApiDataResponse<List<DiaryOverViewResponseDto>> getDiaryOverView(PrincipalDetails principalDetails) {
         Member member = memberRepository.findByEmail(principalDetails.getEmail())
                 .orElseThrow(() -> new MemberException(MemberErrorCode.No_EXIST_EMAIL_MEMBER_EXCEPTION));
 
         List<Long> diaryIds = diaryMemberRepository.findDiaryIdsByMemberId(member.getId());
         List<Diary> diaryList = diaryRepository.findByIdIn(diaryIds);
+        List<DiaryOverViewResponseDto> responseDtoList = diaryMemberCustomRepository.fetchDiaryOverviewDtosByDiaryMembers(diaryList);
 
-        List<DiaryOverViewResponseDto> responseDtoList = new ArrayList<>();
-
-        for (Diary diary : diaryList) {
-
-            List<Member> members = diaryMemberCustomRepository.getMemberListsByInDiary(diary);
-            List<String> photoUrls = members.stream().map(Member::getPhotoUrl).toList();
-
-            DiaryOverViewResponseDto diaryOverViewResponseDto = DiaryOverViewResponseDto.builder()
-                    .id(diary.getId())
-                    .title(diary.getTitle())
-                    .photoUrls(photoUrls)
-                    .build();
-
-            responseDtoList.add(diaryOverViewResponseDto);
-        }
-
-        return ApiDiaryResponse.<List<DiaryOverViewResponseDto>>builder()
+        return ApiDataResponse.<List<DiaryOverViewResponseDto>>builder()
                 .status(true)
                 .code(200)
                 .message("다이어리 리스트 반환 성공!")
@@ -102,14 +89,14 @@ public class DiaryService {
     }
 
 
-    public ApiBasicResponse updateDiaryTitle(UpdateDiaryDto updateDiaryDto, PrincipalDetails principalDetails, Long diaryId){
+    public ApiBasicResponse updateDiaryTitle(UpdateDiaryDto updateDiaryDto, PrincipalDetails principalDetails, Long diaryId) {
         Member member = memberRepository.findByEmail(principalDetails.getEmail())
                 .orElseThrow(() -> new MemberException(MemberErrorCode.No_EXIST_EMAIL_MEMBER_EXCEPTION));
 
         Diary diary = diaryRepository.findById(diaryId)
                 .orElseThrow(() -> new DiaryException(DiaryErrorCode.NO_EXIST_DIARY_EXCEPTION));
 
-        if(!diary.getOwner().equals(member)){
+        if (!diary.getOwner().equals(member)) {
             throw new MemberException(MemberErrorCode.NO_OWNER_EXCEPTION);
         }
 
@@ -131,7 +118,7 @@ public class DiaryService {
         Diary diary = diaryRepository.findById(diaryId)
                 .orElseThrow(() -> new DiaryException(DiaryErrorCode.NO_EXIST_DIARY_EXCEPTION));
 
-        if(!diary.getOwner().equals(member)){
+        if (!diary.getOwner().equals(member)) {
             throw new MemberException(MemberErrorCode.NO_OWNER_EXCEPTION);
         }
 
@@ -145,14 +132,14 @@ public class DiaryService {
     }
 
 
-    public ApiBasicResponse inviteToDiary(InviteToDiaryDto inviteToDiaryDto, PrincipalDetails principalDetails) {
+    public ApiDataResponse<DiaryInviteResponseDto> inviteToDiary(InviteToDiaryDto inviteToDiaryDto, PrincipalDetails principalDetails) {
         Diary diary = diaryRepository.findById(inviteToDiaryDto.getDiaryId())
                 .orElseThrow(() -> new DiaryException(DiaryErrorCode.NO_EXIST_DIARY_EXCEPTION));
 
         Member owner = memberRepository.findByEmail(principalDetails.getEmail())
                 .orElseThrow(() -> new MemberException(MemberErrorCode.No_EXIST_EMAIL_MEMBER_EXCEPTION));
 
-        if(!diary.getOwner().equals(owner)){
+        if (!diary.getOwner().equals(owner)) {
             throw new MemberException(MemberErrorCode.NO_OWNER_EXCEPTION);
         }
 
@@ -161,36 +148,42 @@ public class DiaryService {
 
         diaryMemberService.inviteMemberToDiary(diary, invitedMember);
 
-        return ApiBasicResponse.builder()
+        return ApiDataResponse.<DiaryInviteResponseDto>builder()
                 .status(true)
                 .code(200)
-                .message("모임 요청을 성공적으로 보냈습니다.")
+                .message("모임 요청을 성공적으로 보냈습니다. 초대를 받은 멤버 데이터는 아래와 같습니다.")
+                .data(DiaryInviteResponseDto.makeFrom(invitedMember))
                 .build();
     }
 
-    public ApiBasicResponse acceptInvite(AcceptDiaryDto acceptDiaryDto, PrincipalDetails principalDetails) {
+    public ApiDataResponse<DiaryOverViewResponseDto> acceptInvite(AcceptDiaryDto acceptDiaryDto, PrincipalDetails principalDetails) {
         Diary diary = diaryRepository.findById(acceptDiaryDto.getDiaryId())
                 .orElseThrow(() -> new DiaryException(DiaryErrorCode.NO_EXIST_DIARY_EXCEPTION));
 
         Member member = memberRepository.findByEmail(principalDetails.getEmail())
                 .orElseThrow(() -> new MemberException(MemberErrorCode.No_EXIST_EMAIL_MEMBER_EXCEPTION));
 
-
         DiaryMember diaryMember = diaryMemberRepository.findByDiaryAndMember(diary, member)
                 .orElseThrow(() -> new DiaryMemberException(DiaryMemberErrorCode.NO_EXIST_DIARY_MEMBER_EXCEPTION));
 
-        if(diaryMember.isAcceptedInvite()){
+        if (diaryMember.isAcceptedInvite()) {
             throw new DiaryMemberException(DiaryMemberErrorCode.ALREADY_ACCEPTED_INVITATION_EXCEPTION);
         }
 
         diaryMember.acceptInvitation();
         diaryMemberRepository.save(diaryMember);
 
-        return ApiBasicResponse.builder()
+        List<String> photoUrls = diaryMemberCustomRepository.fetchMemberPhotoUrlsByDiary(diary);
+
+        return ApiDataResponse.<DiaryOverViewResponseDto>builder()
                 .status(true)
                 .code(200)
-                .message("초대 수락 성공!")
+                .message("초대 수락 성공! 리스트에 추가할 다이어리 데이터는 아래와 같습니다.")
+                .data(DiaryOverViewResponseDto.builder()
+                        .id(diary.getId())
+                        .title(diary.getTitle())
+                        .photoUrls(photoUrls)
+                        .build())
                 .build();
-
     }
 }

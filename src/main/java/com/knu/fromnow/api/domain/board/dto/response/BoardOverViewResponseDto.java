@@ -1,4 +1,4 @@
-package com.knu.fromnow.api.domain.diary.dto.response;
+package com.knu.fromnow.api.domain.board.dto.response;
 
 import lombok.Builder;
 import lombok.Data;
