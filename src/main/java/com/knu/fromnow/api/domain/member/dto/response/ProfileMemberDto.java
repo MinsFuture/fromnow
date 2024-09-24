@@ -1,0 +1,17 @@
+package com.knu.fromnow.api.domain.member.dto.response;
+
+import lombok.Builder;
+import lombok.Getter;
+import org.springframework.web.bind.annotation.GetMapping;
+
+@Getter
+public class ProfileMemberDto {
+    private String profileName;
+    private String photoUrl;
+
+    @Builder
+    public ProfileMemberDto(String profileName, String photoUrl) {
+        this.profileName = profileName;
+        this.photoUrl = photoUrl;
+    }
+}

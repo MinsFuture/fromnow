@@ -35,8 +35,8 @@ public class BoardPhotoService {
 
     private final Storage storage;
 
-    public void uploadToBoardPhotos(MultipartFile[] files, Board board){
-        for (MultipartFile file : files) {
+    public void uploadToBoardPhotos(MultipartFile file, Board board){
+
             String photoUrl = uploadImageToGcs(file);
             BoardPhoto photo = BoardPhoto.builder()
                     .board(board)
@@ -45,7 +45,6 @@ public class BoardPhotoService {
 
             board.getPhotoList().add(photo);
             boardPhotoRepository.save(photo);
-        }
     }
 
     public String uploadImageToGcs(MultipartFile file){

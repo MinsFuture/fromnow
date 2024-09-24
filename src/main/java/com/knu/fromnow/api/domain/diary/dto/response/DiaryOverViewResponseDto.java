@@ -24,5 +24,4 @@ public class DiaryOverViewResponseDto {
                 .id(diary.getId())
                 .title(diary.getTitle())
                 .build();
-    }
 }

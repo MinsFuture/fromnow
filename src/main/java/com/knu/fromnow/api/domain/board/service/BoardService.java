@@ -58,7 +58,7 @@ public class BoardService {
                 .member(member)
                 .build();
 
-        boardPhotoService.uploadToBoardPhotos(files, board);
+        boardPhotoService.uploadToBoardPhotos(file, board);
 
         member.getBoardList().add(board);
         boardRepository.save(board);

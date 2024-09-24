@@ -78,7 +78,6 @@ public class DiaryService {
 
         List<Long> diaryIds = diaryMemberRepository.findDiaryIdsByMemberId(member.getId());
         List<Diary> diaryList = diaryRepository.findByIdIn(diaryIds);
-
         List<DiaryOverViewResponseDto> responseDtoList = diaryMemberCustomRepository.fetchDiaryOverviewDtosByDiaryMembers(diaryList);
 
         return ApiDataResponse.<List<DiaryOverViewResponseDto>>builder()

@@ -7,7 +7,9 @@ import com.knu.fromnow.api.domain.diary.service.DiaryService;
 import com.knu.fromnow.api.domain.friend.dto.response.FriendBasicResponseDto;
 import com.knu.fromnow.api.domain.friend.service.FriendService;
 import com.knu.fromnow.api.domain.like.service.LikeService;
+import com.knu.fromnow.api.domain.member.dto.response.ProfileMemberDto;
 import com.knu.fromnow.api.domain.member.entity.PrincipalDetails;
+import com.knu.fromnow.api.domain.member.service.MemberService;
 import com.knu.fromnow.api.global.spec.ApiDataResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -28,6 +30,17 @@ public class ApiMyController implements SwaggerMyApi{
     private final FriendService friendService;
     private final DiaryService diaryService;
     private final DiaryMemberService diaryMemberService;
+    private final MemberService memberService;
+
+    @GetMapping("/profile")
+    @PreAuthorize("isAuthenticated()")
+    public ResponseEntity<ApiDataResponse<ProfileMemberDto>> getMyProfile(
+            @AuthenticationPrincipal PrincipalDetails principalDetails
+    ){
+        ApiDataResponse<ProfileMemberDto> response = memberService.getMyProfile(principalDetails);
+
+        return ResponseEntity.status(response.getCode()).body(response);
+    }
 
     @GetMapping("/likes")
     @PreAuthorize("isAuthenticated()")
