@@ -1,6 +1,6 @@
 package com.knu.fromnow.api.domain.mypage.controller;
 
-import com.knu.fromnow.api.domain.diary.dto.response.BoardOverViewResponseDto;
+import com.knu.fromnow.api.domain.board.dto.response.BoardOverViewResponseDto;
 import com.knu.fromnow.api.domain.diary.dto.response.DiaryRequestsReceivedDto;
 import com.knu.fromnow.api.domain.diary.service.DiaryMemberService;
 import com.knu.fromnow.api.domain.diary.service.DiaryService;

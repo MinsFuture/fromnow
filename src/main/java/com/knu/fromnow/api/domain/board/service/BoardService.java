@@ -1,10 +1,11 @@
 package com.knu.fromnow.api.domain.board.service;
 
-import com.knu.fromnow.api.domain.board.dto.CreateBoardDto;
+import com.knu.fromnow.api.domain.board.dto.request.BoardCreateRequestDto;
+import com.knu.fromnow.api.domain.board.dto.response.BoardLikeResponseDto;
+import com.knu.fromnow.api.domain.board.dto.response.BoardCreateResponseDto;
 import com.knu.fromnow.api.domain.board.entity.Board;
 import com.knu.fromnow.api.domain.board.repository.BoardRepository;
-import com.knu.fromnow.api.domain.diary.dto.response.ApiDiaryResponse;
-import com.knu.fromnow.api.domain.diary.dto.response.BoardOverViewResponseDto;
+import com.knu.fromnow.api.domain.board.dto.response.BoardOverViewResponseDto;
 import com.knu.fromnow.api.domain.diary.entity.Diary;
 import com.knu.fromnow.api.domain.diary.entity.DiaryMember;
 import com.knu.fromnow.api.domain.diary.repository.DiaryRepository;
@@ -21,7 +22,7 @@ import com.knu.fromnow.api.global.error.custom.MemberException;
 import com.knu.fromnow.api.global.error.errorcode.custom.BoardErrorCode;
 import com.knu.fromnow.api.global.error.errorcode.custom.DiaryErrorCode;
 import com.knu.fromnow.api.global.error.errorcode.custom.MemberErrorCode;
-import com.knu.fromnow.api.global.spec.ApiBasicResponse;
+import com.knu.fromnow.api.global.spec.ApiDataResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -43,7 +44,7 @@ public class BoardService {
     private final DiaryRepository diaryRepository;
     private final LikeRepository likeRepository;
 
-    public ApiBasicResponse createBoard(MultipartFile[] files, CreateBoardDto createBoardDto, Long diaryId, PrincipalDetails principalDetails){
+    public ApiDataResponse<BoardCreateResponseDto> createBoard(MultipartFile[] files, BoardCreateRequestDto boardCreateRequestDto, Long diaryId, PrincipalDetails principalDetails){
 
         Member member = memberRepository.findByEmail(principalDetails.getEmail())
                 .orElseThrow(() -> new MemberException(MemberErrorCode.No_EXIST_EMAIL_MEMBER_EXCEPTION));
@@ -52,7 +53,7 @@ public class BoardService {
                 .orElseThrow(() -> new DiaryException(DiaryErrorCode.NO_EXIST_DIARY_EXCEPTION));
 
         Board board = Board.builder()
-                .content(createBoardDto.getContent())
+                .content(boardCreateRequestDto.getContent())
                 .diary(diary)
                 .member(member)
                 .build();
@@ -62,16 +63,15 @@ public class BoardService {
         member.getBoardList().add(board);
         boardRepository.save(board);
 
-        ApiBasicResponse apiBasicResponse = ApiBasicResponse.builder()
+        return ApiDataResponse.<BoardCreateResponseDto>builder()
                 .status(true)
                 .code(200)
-                .message("일기 생성 성공!")
+                .message("일상 등록 성공!")
+                .data(BoardCreateResponseDto.fromBoard(board))
                 .build();
-
-        return apiBasicResponse;
     }
 
-    public ApiDiaryResponse<List<BoardOverViewResponseDto>> getBoardOverviews(Long diaryId, LocalDate date, PrincipalDetails principalDetails){
+    public ApiDataResponse<List<BoardOverViewResponseDto>> getBoardOverviews(Long diaryId, LocalDate date, PrincipalDetails principalDetails){
         LocalDateTime startDateTime = date.atStartOfDay();
         LocalDateTime endDateTime = date.plusDays(1).atStartOfDay();
 
@@ -89,7 +89,7 @@ public class BoardService {
             throw new MemberException(MemberErrorCode.NO_MATCHING_MEMBER_EXCEPTION);
         }
 
-        return ApiDiaryResponse.<List<BoardOverViewResponseDto>>builder()
+        return ApiDataResponse.<List<BoardOverViewResponseDto>>builder()
                 .status(true)
                 .code(200)
                 .message(date + "에 해당하는 글 불러오기 성공!")
@@ -127,7 +127,7 @@ public class BoardService {
         return boardOverViewResponseDtos;
     }
 
-    public ApiBasicResponse clickLike(Long id, PrincipalDetails principalDetails){
+    public ApiDataResponse<BoardLikeResponseDto> clickLike(Long id, PrincipalDetails principalDetails){
         // 추후 내가 누른 좋아요 볼 수 있도록 로직 추가
         Board board = boardRepository.findById(id)
                 .orElseThrow(() -> new BoardException(BoardErrorCode.NO_EXIST_BOARD_EXCEPTION));
@@ -144,15 +144,16 @@ public class BoardService {
                 .build();
         likeRepository.save(like);
 
-        return ApiBasicResponse.builder()
+        return ApiDataResponse.<BoardLikeResponseDto>builder()
                 .status(true)
                 .code(200)
-                .message("좋아요를 눌렀습니다!")
+                .message("좋아요를 눌렀습니다")
+                .data(BoardLikeResponseDto.fromBoard(board))
                 .build();
     }
 
 
-    public ApiBasicResponse clickDisLike(Long id, PrincipalDetails principalDetails) {
+    public ApiDataResponse<BoardLikeResponseDto> clickDisLike(Long id, PrincipalDetails principalDetails) {
         Board board = boardRepository.findById(id)
                 .orElseThrow(() -> new BoardException(BoardErrorCode.NO_EXIST_BOARD_EXCEPTION));
 
@@ -166,10 +167,11 @@ public class BoardService {
                 .orElseThrow(() -> new RuntimeException());
         likeRepository.delete(like);
 
-        return ApiBasicResponse.builder()
+        return ApiDataResponse.<BoardLikeResponseDto>builder()
                 .status(true)
                 .code(200)
-                .message("좋아요를 취소했습니다!")
+                .message("좋아요를 취소했습니다")
+                .data(BoardLikeResponseDto.fromBoard(board))
                 .build();
     }
 }

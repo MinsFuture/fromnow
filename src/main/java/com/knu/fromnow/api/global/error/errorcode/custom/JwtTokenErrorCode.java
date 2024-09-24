@@ -12,8 +12,8 @@ import static com.knu.fromnow.api.auth.jwt.dto.response.TokenStatus.*;
 @RequiredArgsConstructor
 public enum JwtTokenErrorCode implements DataErrorCode<String> {
 
-    NO_EXIST_AUTHORIZATION_HEADER_EXCEPTION(HttpStatus.BAD_REQUEST, "Authorization 헤더가 없거나 Bearer로 시작하지 않습니다", INVALID),
     //401 JWT 인증 관련 오류
+    NO_EXIST_AUTHORIZATION_HEADER_EXCEPTION(HttpStatus.BAD_REQUEST, "Authorization 헤더가 없거나 Bearer로 시작하지 않습니다", INVALID),
     EXPIRED_ACCESS_TOKEN_EXCEPTION(HttpStatus.UNAUTHORIZED,
             "Access token이 만료되었습니다. Refresh token을 사용하세요.", ACCESS_TOKEN_EXPIRED),
 

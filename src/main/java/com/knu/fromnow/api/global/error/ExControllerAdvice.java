@@ -150,7 +150,7 @@ public class ExControllerAdvice {
     @ExceptionHandler(Exception.class)
     public ResponseEntity<ApiErrorResponse> handleAllUncaughtException(Exception e) {
         String errorMessage ="예상치 못한 에러가 발생했습니다.";
-        ApiErrorResponse apiErrorResponse = buildErrorResponseWithGeneralException(errorMessage, HttpStatus.INTERNAL_SERVER_ERROR);
+        ApiErrorResponse apiErrorResponse = buildErrorResponseWithGeneralException(errorMessage + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
 
         return buildResponseEntity(apiErrorResponse);
     }
