@@ -19,9 +19,10 @@ public class DiaryOverViewResponseDto {
         this.photoUrls = photoUrls;
     }
 
-    public static DiaryOverViewResponseDto makeFrom(Diary diary){
+    public static DiaryOverViewResponseDto makeFrom(Diary diary) {
         return DiaryOverViewResponseDto.builder()
                 .id(diary.getId())
                 .title(diary.getTitle())
                 .build();
+    }
 }

@@ -44,7 +44,7 @@ public class BoardService {
     private final DiaryRepository diaryRepository;
     private final LikeRepository likeRepository;
 
-    public ApiDataResponse<BoardCreateResponseDto> createBoard(MultipartFile[] files, BoardCreateRequestDto boardCreateRequestDto, Long diaryId, PrincipalDetails principalDetails){
+    public ApiDataResponse<BoardCreateResponseDto> createBoard(MultipartFile file, BoardCreateRequestDto boardCreateRequestDto, Long diaryId, PrincipalDetails principalDetails){
 
         Member member = memberRepository.findByEmail(principalDetails.getEmail())
                 .orElseThrow(() -> new MemberException(MemberErrorCode.No_EXIST_EMAIL_MEMBER_EXCEPTION));

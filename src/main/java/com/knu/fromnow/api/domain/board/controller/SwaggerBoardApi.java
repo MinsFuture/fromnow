@@ -26,7 +26,7 @@ public interface SwaggerBoardApi {
     @Operation(summary = "일기 생성 로직", description = "File은 MultiPart/form-data 형식, Dto는 application/json 형식으로 보내주셔야 해요!")
     ResponseEntity<ApiDataResponse<BoardCreateResponseDto>> createBoard(
             @Parameter(description = "다이어리 id", required = true) Long diaryId,
-            @Parameter(description = "일기 사진들", required = true) MultipartFile[] file,
+            @Parameter(description = "일기 사진들", required = true) MultipartFile file,
             @Parameter(description = "일기 내용", required = true) BoardCreateRequestDto boardCreateRequestDto,
             @Parameter(description = "Bearer ey...") PrincipalDetails principalDetails);
 

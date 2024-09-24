@@ -35,11 +35,11 @@ public class ApiBoardController implements SwaggerBoardApi {
     @PreAuthorize("isAuthenticated()")
     public ResponseEntity<ApiDataResponse<BoardCreateResponseDto>> createBoard(
             @PathVariable("diaryId") Long diaryId,
-            @RequestPart("uploadPhotos") MultipartFile[] files,
+            @RequestPart("uploadPhotos") MultipartFile file,
             @RequestPart("createDiaryDto") BoardCreateRequestDto boardCreateRequestDto,
             @AuthenticationPrincipal PrincipalDetails principalDetails) {
         ApiDataResponse<BoardCreateResponseDto> response
-                = boardService.createBoard(files, boardCreateRequestDto, diaryId, principalDetails);
+                = boardService.createBoard(file, boardCreateRequestDto, diaryId, principalDetails);
 
         return ResponseEntity.status(response.getCode()).body(response);
     }
