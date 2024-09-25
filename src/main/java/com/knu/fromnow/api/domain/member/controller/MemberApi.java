@@ -1,7 +1,9 @@
 package com.knu.fromnow.api.domain.member.controller;
 
 import com.knu.fromnow.api.domain.member.dto.request.CreateMemberDto;
+import com.knu.fromnow.api.domain.member.dto.response.ProfileNameResponseDto;
 import com.knu.fromnow.api.domain.member.entity.PrincipalDetails;
+import com.knu.fromnow.api.global.spec.ApiDataResponse;
 import com.knu.fromnow.api.global.spec.ApiErrorResponse;
 import com.knu.fromnow.api.global.spec.ApiBasicResponse;
 import io.swagger.v3.oas.annotations.Operation;
@@ -37,7 +39,7 @@ public interface MemberApi {
             }
     )
     @Operation(summary = "프로필 이름 생성 로직", description = "영어와 숫자로만 이루어진 4~12글자 사이여야 함")
-    ResponseEntity<ApiBasicResponse> setProfileName(
+    ResponseEntity<ApiDataResponse<ProfileNameResponseDto>> setProfileName(
             @Parameter(description = "프로필 이름", required = true) CreateMemberDto createMemberDto,
             @Parameter(description = "Bearer ey...") PrincipalDetails principalDetails);
 

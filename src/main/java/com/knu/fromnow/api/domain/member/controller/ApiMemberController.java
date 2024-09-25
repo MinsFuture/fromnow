@@ -1,9 +1,11 @@
 package com.knu.fromnow.api.domain.member.controller;
 
 import com.knu.fromnow.api.domain.member.dto.request.CreateMemberDto;
+import com.knu.fromnow.api.domain.member.dto.response.ProfileNameResponseDto;
 import com.knu.fromnow.api.domain.member.entity.PrincipalDetails;
 import com.knu.fromnow.api.domain.member.service.MemberService;
 import com.knu.fromnow.api.global.spec.ApiBasicResponse;
+import com.knu.fromnow.api.global.spec.ApiDataResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.MediaType;
@@ -34,11 +36,11 @@ public class ApiMemberController implements MemberApi {
 
     @PostMapping("/profileName")
     @PreAuthorize("isAuthenticated()")
-    public ResponseEntity<ApiBasicResponse> setProfileName(
+    public ResponseEntity<ApiDataResponse<ProfileNameResponseDto>> setProfileName(
             @RequestBody @Valid CreateMemberDto createMemberDto,
             @AuthenticationPrincipal PrincipalDetails principalDetails) {
 
-        ApiBasicResponse response = memberService.setProfileName(createMemberDto, principalDetails);
+        ApiDataResponse<ProfileNameResponseDto> response = memberService.setProfileName(createMemberDto, principalDetails);
 
         return ResponseEntity.status(response.getCode()).body(response);
     }

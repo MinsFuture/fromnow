@@ -3,6 +3,7 @@ package com.knu.fromnow.api.domain.member.service;
 import com.knu.fromnow.api.auth.jwt.service.JwtService;
 import com.knu.fromnow.api.domain.member.dto.request.CreateMemberDto;
 import com.knu.fromnow.api.domain.member.dto.response.ProfileMemberDto;
+import com.knu.fromnow.api.domain.member.dto.response.ProfileNameResponseDto;
 import com.knu.fromnow.api.domain.member.entity.Member;
 import com.knu.fromnow.api.domain.member.entity.PrincipalDetails;
 import com.knu.fromnow.api.domain.member.repository.MemberRepository;
@@ -45,7 +46,7 @@ public class MemberService {
                 .build();
     }
 
-    public ApiBasicResponse setProfileName(CreateMemberDto createMemberDto, PrincipalDetails principalDetails){
+    public ApiDataResponse<ProfileNameResponseDto> setProfileName(CreateMemberDto createMemberDto, PrincipalDetails principalDetails){
         if(memberRepository.existsByProfileName(createMemberDto.getProfileName())){
             throw new MemberException(MemberErrorCode.CONFLICT_PROFILE_NAME_MEMBER_EXCEPTION);
         };
@@ -56,10 +57,13 @@ public class MemberService {
         member.setProfileName(createMemberDto.getProfileName());
         memberRepository.save(member);
 
-        return ApiBasicResponse.builder()
+        return ApiDataResponse.<ProfileNameResponseDto>builder()
                 .status(true)
                 .code(200)
-                .message("프로필 이름 설정 성공!")
+                .message("프로필 사진 설정 성공!")
+                .data(ProfileNameResponseDto.builder()
+                        .profileName(createMemberDto.getProfileName())
+                        .build())
                 .build();
     }
 
