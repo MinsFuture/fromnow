@@ -70,7 +70,8 @@ public class DiaryMemberCustomRepositoryImpl implements DiaryMemberCustomReposit
                 .select(member.photoUrl)
                 .from(diaryMember)
                 .join(diaryMember.member, member)
-                .where(diaryMember.diary.eq(diary))
+                .where(diaryMember.diary.eq(diary),
+                        diaryMember.acceptedInvite.isTrue())
                 .fetch();
     }
 }
