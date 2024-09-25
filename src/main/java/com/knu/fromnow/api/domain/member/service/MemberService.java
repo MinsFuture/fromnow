@@ -2,6 +2,7 @@ package com.knu.fromnow.api.domain.member.service;
 
 import com.knu.fromnow.api.auth.jwt.service.JwtService;
 import com.knu.fromnow.api.domain.member.dto.request.CreateMemberDto;
+import com.knu.fromnow.api.domain.member.dto.response.PhotoUrlResponseDto;
 import com.knu.fromnow.api.domain.member.dto.response.ProfileMemberDto;
 import com.knu.fromnow.api.domain.member.dto.response.ProfileNameResponseDto;
 import com.knu.fromnow.api.domain.member.entity.Member;
@@ -67,17 +68,19 @@ public class MemberService {
                 .build();
     }
 
-    public ApiBasicResponse setMemberPhoto(MultipartFile file, PrincipalDetails principalDetails){
+    public ApiDataResponse<PhotoUrlResponseDto> setMemberPhoto(MultipartFile file, PrincipalDetails principalDetails){
         Member member = memberRepository.findByEmail(principalDetails.getEmail())
                 .orElseThrow(() -> new MemberException(MemberErrorCode.No_EXIST_EMAIL_MEMBER_EXCEPTION));
 
         String photoUrl = boardPhotoService.uploadImageToGcs(file);
         member.setMemberPhoto(photoUrl);
 
-        return ApiBasicResponse.builder()
+        return ApiDataResponse.<PhotoUrlResponseDto>builder()
                 .status(true)
                 .code(200)
-                .message("프로필 사진 설정 성공!")
+                .message("수정 한 photoUrl은 다음과 같습니다")
+                .data(PhotoUrlResponseDto.builder().photoUrl(photoUrl)
+                        .build())
                 .build();
     }
 

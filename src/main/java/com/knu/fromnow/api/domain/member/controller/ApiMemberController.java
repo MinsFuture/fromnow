@@ -1,6 +1,7 @@
 package com.knu.fromnow.api.domain.member.controller;
 
 import com.knu.fromnow.api.domain.member.dto.request.CreateMemberDto;
+import com.knu.fromnow.api.domain.member.dto.response.PhotoUrlResponseDto;
 import com.knu.fromnow.api.domain.member.dto.response.ProfileNameResponseDto;
 import com.knu.fromnow.api.domain.member.entity.PrincipalDetails;
 import com.knu.fromnow.api.domain.member.service.MemberService;
@@ -47,11 +48,11 @@ public class ApiMemberController implements MemberApi {
 
     @PostMapping(value = "/photo", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     @PreAuthorize("isAuthenticated()")
-    public ResponseEntity<ApiBasicResponse> setMemberPhoto(
+    public ResponseEntity<ApiDataResponse<PhotoUrlResponseDto>> setMemberPhoto(
             @RequestPart("uploadPhoto") MultipartFile file,
             @AuthenticationPrincipal PrincipalDetails principalDetails) {
 
-        ApiBasicResponse response = memberService.setMemberPhoto(file, principalDetails);
+        ApiDataResponse<PhotoUrlResponseDto> response = memberService.setMemberPhoto(file, principalDetails);
 
         return ResponseEntity.status(response.getCode()).body(response);
     }

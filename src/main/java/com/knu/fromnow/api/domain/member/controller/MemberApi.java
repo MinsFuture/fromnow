@@ -1,6 +1,7 @@
 package com.knu.fromnow.api.domain.member.controller;
 
 import com.knu.fromnow.api.domain.member.dto.request.CreateMemberDto;
+import com.knu.fromnow.api.domain.member.dto.response.PhotoUrlResponseDto;
 import com.knu.fromnow.api.domain.member.dto.response.ProfileNameResponseDto;
 import com.knu.fromnow.api.domain.member.entity.PrincipalDetails;
 import com.knu.fromnow.api.global.spec.ApiDataResponse;
@@ -51,7 +52,7 @@ public interface MemberApi {
             }
     )
     @Operation(summary = "프로필 사진 생성 로직", description = "MultiPart/form-data 형식으로 보내주셔야 해요!")
-    ResponseEntity<ApiBasicResponse> setMemberPhoto(
+    ResponseEntity<ApiDataResponse<PhotoUrlResponseDto>> setMemberPhoto(
             @Parameter(description = "프로필 사진", required = true) MultipartFile file,
             @Parameter(description = "Bearer ey...") PrincipalDetails principalDetails);
 
