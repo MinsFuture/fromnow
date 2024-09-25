@@ -70,7 +70,7 @@ public class DiaryService {
                 .status(true)
                 .code(200)
                 .message("다이어리 생성 성공")
-                .data(DiaryCreateResponseDto.fromDiary(diary, photoUrls))
+                .data(DiaryCreateResponseDto.fromDiary(diary))
                 .build();
     }
 

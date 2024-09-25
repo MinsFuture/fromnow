@@ -11,21 +11,23 @@ public class DiaryCreateResponseDto {
 
     private Long id;
     private String title;
-    private List<String> photoUrls;
+    private String photoUrls;
 
     @Builder
-    public DiaryCreateResponseDto(Long id, String title, List<String> photoUrls) {
+    public DiaryCreateResponseDto(Long id, String title, String photoUrls) {
         this.id = id;
         this.title = title;
         this.photoUrls = photoUrls;
     }
 
 
-    public static DiaryCreateResponseDto fromDiary(Diary diary,  List<String> photoUrls){
+
+
+    public static DiaryCreateResponseDto fromDiary(Diary diary){
         return DiaryCreateResponseDto.builder()
                 .id(diary.getId())
                 .title(diary.getTitle())
-                .photoUrls(photoUrls)
+                .photoUrls(diary.getOwner().getPhotoUrl())
                 .build();
 
     }
