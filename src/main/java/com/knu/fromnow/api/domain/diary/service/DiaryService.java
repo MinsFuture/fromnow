@@ -63,14 +63,12 @@ public class DiaryService {
         diary.getDiaryMembers().add(diaryMember);
 
         diaryMemberRepository.save(diaryMember);
-
-        List<String> photoUrls = diaryMemberCustomRepository.fetchMemberPhotoUrlsByDiary(diary);
-
+        
         return ApiDataResponse.<DiaryCreateResponseDto>builder()
                 .status(true)
                 .code(200)
                 .message("다이어리 생성 성공")
-                .data(DiaryCreateResponseDto.fromDiary(diary, photoUrls))
+                .data(DiaryCreateResponseDto.fromDiary(diary))
                 .build();
     }
 
