@@ -11,7 +11,6 @@ public class FriendSearchResponseDto {
     private boolean isFriend;
 
     @Builder
-
     public FriendSearchResponseDto(Long memberId, String profileName, String profilePhotoUrl, boolean isFriend) {
         this.memberId = memberId;
         this.profileName = profileName;

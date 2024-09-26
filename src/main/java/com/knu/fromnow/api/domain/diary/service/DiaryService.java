@@ -5,8 +5,10 @@ import com.knu.fromnow.api.domain.diary.dto.request.CreateDiaryDto;
 import com.knu.fromnow.api.domain.diary.dto.request.InviteToDiaryDto;
 import com.knu.fromnow.api.domain.diary.dto.request.UpdateDiaryDto;
 import com.knu.fromnow.api.domain.diary.dto.response.DiaryCreateResponseDto;
+import com.knu.fromnow.api.domain.diary.dto.response.DiaryDeleteResponseDto;
 import com.knu.fromnow.api.domain.diary.dto.response.DiaryInviteResponseDto;
 import com.knu.fromnow.api.domain.diary.dto.response.DiaryOverViewResponseDto;
+import com.knu.fromnow.api.domain.diary.dto.response.DiaryRequestsReceivedDto;
 import com.knu.fromnow.api.domain.diary.entity.Diary;
 import com.knu.fromnow.api.domain.diary.entity.DiaryMember;
 import com.knu.fromnow.api.domain.diary.repository.DiaryMemberCustomRepository;
@@ -24,6 +26,7 @@ import com.knu.fromnow.api.global.error.errorcode.custom.MemberErrorCode;
 import com.knu.fromnow.api.global.spec.ApiBasicResponse;
 import com.knu.fromnow.api.global.spec.ApiDataResponse;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -91,7 +94,7 @@ public class DiaryService {
     }
 
 
-    public ApiBasicResponse updateDiaryTitle(UpdateDiaryDto updateDiaryDto, PrincipalDetails principalDetails, Long diaryId) {
+    public ApiDataResponse<DiaryRequestsReceivedDto> updateDiaryTitle(UpdateDiaryDto updateDiaryDto, PrincipalDetails principalDetails, Long diaryId) {
         Member member = memberRepository.findByEmail(principalDetails.getEmail())
                 .orElseThrow(() -> new MemberException(MemberErrorCode.No_EXIST_EMAIL_MEMBER_EXCEPTION));
 
@@ -103,17 +106,20 @@ public class DiaryService {
         }
 
         diary.updateDiaryTitle(updateDiaryDto);
-
         diaryRepository.save(diary);
 
-        return ApiBasicResponse.builder()
+        return ApiDataResponse.<DiaryRequestsReceivedDto>builder()
                 .status(true)
                 .code(200)
-                .message("다이어리 이름 업데이트 성공! newTitle : " + updateDiaryDto.getNewTitle())
+                .message("다이어리 타이틀 수정")
+                .data(DiaryRequestsReceivedDto.builder()
+                        .diaryId(diary.getId())
+                        .diaryTitle(diary.getTitle())
+                        .build())
                 .build();
     }
 
-    public ApiBasicResponse deleteDiary(PrincipalDetails principalDetails, Long diaryId) {
+    public ApiDataResponse<DiaryDeleteResponseDto> deleteDiary(PrincipalDetails principalDetails, Long diaryId) {
         Member member = memberRepository.findByEmail(principalDetails.getEmail())
                 .orElseThrow(() -> new MemberException(MemberErrorCode.No_EXIST_EMAIL_MEMBER_EXCEPTION));
 
@@ -126,10 +132,13 @@ public class DiaryService {
 
         diaryRepository.delete(diary);
 
-        return ApiBasicResponse.builder()
+        return ApiDataResponse.<DiaryDeleteResponseDto>builder()
                 .status(true)
                 .code(200)
                 .message("다이어리 삭제 성공")
+                .data(DiaryDeleteResponseDto.builder()
+                        .id(diary.getId())
+                        .build())
                 .build();
     }
 

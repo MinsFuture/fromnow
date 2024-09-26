@@ -6,8 +6,10 @@ import com.knu.fromnow.api.domain.diary.dto.request.CreateDiaryDto;
 import com.knu.fromnow.api.domain.diary.dto.request.InviteToDiaryDto;
 import com.knu.fromnow.api.domain.diary.dto.request.UpdateDiaryDto;
 import com.knu.fromnow.api.domain.diary.dto.response.DiaryCreateResponseDto;
+import com.knu.fromnow.api.domain.diary.dto.response.DiaryDeleteResponseDto;
 import com.knu.fromnow.api.domain.diary.dto.response.DiaryInviteResponseDto;
 import com.knu.fromnow.api.domain.diary.dto.response.DiaryOverViewResponseDto;
+import com.knu.fromnow.api.domain.diary.dto.response.DiaryRequestsReceivedDto;
 import com.knu.fromnow.api.domain.diary.service.DiaryService;
 import com.knu.fromnow.api.domain.member.entity.PrincipalDetails;
 import com.knu.fromnow.api.global.spec.ApiBasicResponse;
@@ -79,23 +81,23 @@ public class ApiDiaryController implements SwaggerDiaryApi {
 
     @PutMapping("{diaryId}")
     @PreAuthorize("isAuthenticated()")
-    public ResponseEntity<ApiBasicResponse> updateDiaryTitle(
+    public ResponseEntity<ApiDataResponse<DiaryRequestsReceivedDto>> updateDiaryTitle(
             @PathVariable("diaryId") Long diaryId,
             @RequestBody UpdateDiaryDto updateDiarydto,
             @AuthenticationPrincipal PrincipalDetails principalDetails
     ) {
-        ApiBasicResponse response = diaryService.updateDiaryTitle(updateDiarydto, principalDetails, diaryId);
+        ApiDataResponse<DiaryRequestsReceivedDto> response = diaryService.updateDiaryTitle(updateDiarydto, principalDetails, diaryId);
 
         return ResponseEntity.status(response.getCode()).body(response);
     }
 
     @DeleteMapping("{diaryId}")
     @PreAuthorize("isAuthenticated()")
-    public ResponseEntity<ApiBasicResponse> deleteDiary(
+    public ResponseEntity<ApiDataResponse<DiaryDeleteResponseDto>> deleteDiary(
             @PathVariable("diaryId") Long diaryId,
             @AuthenticationPrincipal PrincipalDetails principalDetails
     ) {
-        ApiBasicResponse response = diaryService.deleteDiary(principalDetails, diaryId);
+        ApiDataResponse<DiaryDeleteResponseDto> response = diaryService.deleteDiary(principalDetails, diaryId);
 
         return ResponseEntity.status(response.getCode()).body(response);
     }

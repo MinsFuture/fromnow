@@ -3,8 +3,6 @@ package com.knu.fromnow.api.domain.diary.dto.response;
 import lombok.Builder;
 import lombok.Getter;
 
-import java.util.List;
-
 @Getter
 public class DiaryRequestsReceivedDto {
     private String diaryTitle;

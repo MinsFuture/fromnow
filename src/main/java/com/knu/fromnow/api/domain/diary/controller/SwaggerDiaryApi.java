@@ -5,8 +5,10 @@ import com.knu.fromnow.api.domain.diary.dto.request.CreateDiaryDto;
 import com.knu.fromnow.api.domain.diary.dto.request.InviteToDiaryDto;
 import com.knu.fromnow.api.domain.diary.dto.request.UpdateDiaryDto;
 import com.knu.fromnow.api.domain.diary.dto.response.DiaryCreateResponseDto;
+import com.knu.fromnow.api.domain.diary.dto.response.DiaryDeleteResponseDto;
 import com.knu.fromnow.api.domain.diary.dto.response.DiaryInviteResponseDto;
 import com.knu.fromnow.api.domain.diary.dto.response.DiaryOverViewResponseDto;
+import com.knu.fromnow.api.domain.diary.dto.response.DiaryRequestsReceivedDto;
 import com.knu.fromnow.api.domain.member.entity.PrincipalDetails;
 import com.knu.fromnow.api.global.spec.ApiBasicResponse;
 import com.knu.fromnow.api.global.spec.ApiDataResponse;
@@ -79,7 +81,7 @@ public interface SwaggerDiaryApi {
             }
     )
     @Operation(summary = "다이어리 이름 수정", description = "다이어리 이름을 수정합니다")
-    ResponseEntity<ApiBasicResponse> updateDiaryTitle(
+    ResponseEntity<ApiDataResponse<DiaryRequestsReceivedDto>> updateDiaryTitle(
             @Parameter(description = "다이어리 id") Long diaryId,
             @Parameter(description = "다이어리 업데이트 dto") UpdateDiaryDto updateDiarydto,
             @Parameter(description = "Bearer ey...") PrincipalDetails principalDetails);
@@ -93,7 +95,7 @@ public interface SwaggerDiaryApi {
             }
     )
     @Operation(summary = "다이어리 삭제", description = "다이어리를 삭제합니다")
-    ResponseEntity<ApiBasicResponse> deleteDiary(
+    ResponseEntity<ApiDataResponse<DiaryDeleteResponseDto>> deleteDiary(
             @Parameter(description = "다이어리 id") Long diaryId,
             @Parameter(description = "Bearer ey...") PrincipalDetails principalDetails);
 

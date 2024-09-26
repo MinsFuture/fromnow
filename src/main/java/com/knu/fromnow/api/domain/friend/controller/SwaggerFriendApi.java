@@ -2,6 +2,7 @@ package com.knu.fromnow.api.domain.friend.controller;
 
 import com.knu.fromnow.api.domain.friend.dto.request.AcceptFriendDto;
 import com.knu.fromnow.api.domain.friend.dto.request.SentFriendDto;
+import com.knu.fromnow.api.domain.friend.dto.response.FriendAcceptResponseDto;
 import com.knu.fromnow.api.domain.friend.dto.response.FriendSearchResponseDto;
 import com.knu.fromnow.api.domain.member.entity.PrincipalDetails;
 import com.knu.fromnow.api.global.spec.ApiBasicResponse;
@@ -51,7 +52,7 @@ public interface SwaggerFriendApi {
             }
     )
     @Operation(summary = "친구 수락 하기", description = "친구 요청을 수락합니다")
-    ResponseEntity<ApiBasicResponse> acceptFriend(
+    ResponseEntity<ApiDataResponse<FriendAcceptResponseDto>> acceptFriend(
             @Parameter AcceptFriendDto acceptFriendDto,
             @Parameter PrincipalDetails principalDetails
     );

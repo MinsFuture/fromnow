@@ -2,6 +2,7 @@ package com.knu.fromnow.api.domain.friend.service;
 
 import com.knu.fromnow.api.domain.friend.dto.request.AcceptFriendDto;
 import com.knu.fromnow.api.domain.friend.dto.request.SentFriendDto;
+import com.knu.fromnow.api.domain.friend.dto.response.FriendAcceptResponseDto;
 import com.knu.fromnow.api.domain.friend.dto.response.FriendBasicResponseDto;
 import com.knu.fromnow.api.domain.friend.dto.response.FriendSearchResponseDto;
 import com.knu.fromnow.api.domain.friend.entity.Friend;
@@ -126,7 +127,7 @@ public class FriendService {
                 .build();
     }
 
-    public ApiBasicResponse acceptFriend(AcceptFriendDto acceptFriendDto, PrincipalDetails principalDetails) {
+    public ApiDataResponse<FriendAcceptResponseDto> acceptFriend(AcceptFriendDto acceptFriendDto, PrincipalDetails principalDetails) {
 
         // 나
         Member fromMember = memberRepository.findByEmail(principalDetails.getEmail())
@@ -146,10 +147,16 @@ public class FriendService {
         friend.acceptFriend();
         friendRepository.save(friend);
 
-        return ApiBasicResponse.builder()
+        return ApiDataResponse.<FriendAcceptResponseDto>builder()
                 .status(true)
                 .code(200)
-                .message("친구 수락에 성공하였습니다")
+                .message("수락한 친구 데이터는 다음과 같습니다")
+                .data(FriendAcceptResponseDto.builder()
+                        .id(toMember.getId())
+                        .photoUrl(toMember.getPhotoUrl())
+                        .profileName(toMember.getProfileName())
+                        .isFriend(true)
+                        .build())
                 .build();
     }
 
