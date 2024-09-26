@@ -31,7 +31,7 @@ public class ApiFriendController implements SwaggerFriendApi{
     @GetMapping("/search")
     @PreAuthorize("isAuthenticated()")
     public ResponseEntity<ApiDataResponse<List<FriendSearchResponseDto>>> searchFriends(
-            @RequestParam String profileName,
+            @RequestParam(required = true) String profileName,
             @AuthenticationPrincipal PrincipalDetails principalDetails
     ){
         ApiDataResponse<List<FriendSearchResponseDto>> response = friendService.searchFriend(profileName, principalDetails);
