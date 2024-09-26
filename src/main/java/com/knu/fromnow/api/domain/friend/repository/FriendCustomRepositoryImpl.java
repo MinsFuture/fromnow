@@ -27,6 +27,23 @@ public class FriendCustomRepositoryImpl implements FriendCustomRepository{
     }
 
     @Override
+    public List<Long> findMutualFriends(Long myId, Long friendId) {
+
+        QFriend friend = QFriend.friend;
+
+        return jpaQueryFactory
+                .select(friend.id)
+                .from(friend)
+                .where(
+                        friend.areWeFriend.isTrue().and(
+                                (friend.fromMemberId.eq(myId).and(friend.toMemberId.eq(friendId)))
+                                        .or(friend.fromMemberId.eq(friendId).and(friend.toMemberId.eq(myId)))
+                        )
+                )
+                .fetch();
+    }
+
+    @Override
     public List<Long> findAllFriendsWithEachOther(Long memberId) {
         QFriend friend = QFriend.friend;
         QFriend selfFriend = new QFriend("selfFriend");

@@ -9,4 +9,5 @@ public interface FriendCustomRepository {
     List<Long> findAllFriendsWithEachOther(Long memberId);
     List<Long> findFriendsAmongSpecificMembers(Long memberId, List<Long> checkMemberIds);
     List<Long> findAllRequestReceived(Long memberId);
+    List<Long> findMutualFriends(Long myId, Long friendId);
 }

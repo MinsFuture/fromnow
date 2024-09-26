@@ -1,9 +1,11 @@
 package com.knu.fromnow.api.domain.friend.controller;
 
 import com.knu.fromnow.api.domain.friend.dto.request.AcceptFriendDto;
+import com.knu.fromnow.api.domain.friend.dto.request.FriendDeleteRequestDto;
 import com.knu.fromnow.api.domain.friend.dto.request.SentFriendDto;
 import com.knu.fromnow.api.domain.friend.dto.response.FriendAcceptResponseDto;
 import com.knu.fromnow.api.domain.friend.dto.response.FriendBasicResponseDto;
+import com.knu.fromnow.api.domain.friend.dto.response.FriendDeleteResponseDto;
 import com.knu.fromnow.api.domain.friend.dto.response.FriendSearchResponseDto;
 import com.knu.fromnow.api.domain.friend.service.FriendService;
 import com.knu.fromnow.api.domain.member.entity.PrincipalDetails;
@@ -13,6 +15,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -60,5 +63,13 @@ public class ApiFriendController implements SwaggerFriendApi{
         return ResponseEntity.status(response.getCode()).body(response);
     }
 
+    @DeleteMapping("/delete")
+    public ResponseEntity<ApiDataResponse<FriendDeleteResponseDto>> deleteFriend(
+            @RequestBody FriendDeleteRequestDto friendDeleteRequestDto,
+            @AuthenticationPrincipal PrincipalDetails principalDetails
+    ){
+        ApiDataResponse<FriendDeleteResponseDto> response = friendService.deleteFriend(friendDeleteRequestDto, principalDetails);
 
+        return ResponseEntity.status(response.getCode()).body(response);
+    }
 }

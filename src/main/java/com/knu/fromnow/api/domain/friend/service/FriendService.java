@@ -1,9 +1,11 @@
 package com.knu.fromnow.api.domain.friend.service;
 
 import com.knu.fromnow.api.domain.friend.dto.request.AcceptFriendDto;
+import com.knu.fromnow.api.domain.friend.dto.request.FriendDeleteRequestDto;
 import com.knu.fromnow.api.domain.friend.dto.request.SentFriendDto;
 import com.knu.fromnow.api.domain.friend.dto.response.FriendAcceptResponseDto;
 import com.knu.fromnow.api.domain.friend.dto.response.FriendBasicResponseDto;
+import com.knu.fromnow.api.domain.friend.dto.response.FriendDeleteResponseDto;
 import com.knu.fromnow.api.domain.friend.dto.response.FriendSearchResponseDto;
 import com.knu.fromnow.api.domain.friend.entity.Friend;
 import com.knu.fromnow.api.domain.friend.repository.FriendCustomRepository;
@@ -183,6 +185,34 @@ public class FriendService {
                 .code(200)
                 .message("친구 수락 대기중인 녀석들 가져오기 성공")
                 .data(friendsDtos)
+                .build();
+    }
+
+    public ApiDataResponse<FriendDeleteResponseDto> deleteFriend(FriendDeleteRequestDto friendDeleteRequestDto, PrincipalDetails principalDetails) {
+
+        Member me = memberRepository.findByEmail(principalDetails.getEmail())
+                .orElseThrow(() -> new MemberException(MemberErrorCode.No_EXIST_EMAIL_MEMBER_EXCEPTION));
+
+        Member deleteFriend = memberRepository.findById(friendDeleteRequestDto.getDeleteId())
+                .orElseThrow(() -> new MemberException(MemberErrorCode.NO_EXIST_MEMBER_ID_EXCEPTION));
+
+
+        List<Long> friendIds = friendCustomRepository.findMutualFriends(me.getId(), deleteFriend.getId());
+
+        for (Long friendId : friendIds) {
+            friendRepository.deleteById(friendId);
+        }
+
+        return ApiDataResponse.<FriendDeleteResponseDto>builder()
+                .status(true)
+                .code(200)
+                .message("삭제 한 친구의 데이터는 다음과 같습니다")
+                .data(FriendDeleteResponseDto.builder()
+                        .id(deleteFriend.getId())
+                        .profileName(deleteFriend.getProfileName())
+                        .photoUrl(deleteFriend.getPhotoUrl())
+                        .isFriend(false)
+                        .build())
                 .build();
     }
 }
