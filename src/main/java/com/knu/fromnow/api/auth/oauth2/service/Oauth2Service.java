@@ -4,11 +4,13 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.knu.fromnow.api.auth.jwt.service.JwtService;
+import com.knu.fromnow.api.auth.oauth2.dto.response.Oauth2ProfileResponseDto;
 import com.knu.fromnow.api.auth.oauth2.entity.Oauth2Attribute;
 import com.knu.fromnow.api.domain.member.entity.Member;
 import com.knu.fromnow.api.domain.member.entity.Role;
 import com.knu.fromnow.api.domain.member.repository.MemberRepository;
 import com.knu.fromnow.api.global.spec.ApiBasicResponse;
+import com.knu.fromnow.api.global.spec.ApiDataResponse;
 import lombok.RequiredArgsConstructor;
 import net.minidev.json.JSONObject;
 import net.minidev.json.parser.JSONParser;
@@ -33,7 +35,7 @@ public class Oauth2Service {
     private final JwtService jwtService;
     private final RestTemplate restTemplate;
 
-    public ResponseEntity<ApiBasicResponse> findOrSaveMember(String idToken, String provider) throws ParseException, JsonProcessingException {
+    public ApiDataResponse<Oauth2ProfileResponseDto> findOrSaveMember(String idToken, String provider) throws ParseException, JsonProcessingException {
         Oauth2Attribute oauth2Attribute;
         switch (provider) {
             case "google":
@@ -61,16 +63,9 @@ public class Oauth2Service {
             httpStatus = HttpStatus.CREATED;
             message = "새로 회원가입하는 유저입니다!";
         }
-
         member.setMemberRole(provider);
 
-        log.info(provider + " email : {}", member.getEmail());
-        log.info(provider + " role : {}", member.getRole());
-
         String accessToken = jwtService.createAccessToken(member.getEmail(), member.getRole().name());
-
-        log.info("accessToken : {}", accessToken);
-
         String refreshToken = jwtService.createRefreshToken();
         member.setRefreshToken(refreshToken);
         memberRepository.save(member);
@@ -86,13 +81,14 @@ public class Oauth2Service {
         headers.add(HttpHeaders.SET_COOKIE, responseCookie.toString());
         headers.add("Authorization", "Bearer " + accessToken);
 
-        ApiBasicResponse apiBasicResponse = ApiBasicResponse.builder()
+        return ApiDataResponse.<Oauth2ProfileResponseDto>builder()
                 .status(true)
                 .code(httpStatus.value())
                 .message(message)
+                .data(Oauth2ProfileResponseDto.builder()
+                        .profileName(member.getProfileName())
+                        .build())
                 .build();
-
-        return ResponseEntity.status(httpStatus.value()).headers(headers).body(apiBasicResponse);
     }
 
     private Oauth2Attribute getGoogleData(String idToken) throws ParseException, JsonProcessingException {

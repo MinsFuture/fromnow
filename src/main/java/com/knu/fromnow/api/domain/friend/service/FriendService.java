@@ -88,6 +88,7 @@ public class FriendService {
                     .memberId(member.getId())
                     .profileName(member.getProfileName())
                     .profilePhotoUrl(member.getPhotoUrl())
+                    .isFriend(true)
                     .build());
         }
 
@@ -177,7 +178,7 @@ public class FriendService {
                     .memberId(member.getId())
                     .profileName(member.getProfileName())
                     .profilePhotoUrl(member.getPhotoUrl())
-                    .isFriend(true)
+                    .isFriend(false)
                     .build());
         }
 
