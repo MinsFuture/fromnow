@@ -35,7 +35,7 @@ public class Oauth2Service {
     private final JwtService jwtService;
     private final RestTemplate restTemplate;
 
-    public ApiDataResponse<Oauth2ProfileResponseDto> findOrSaveMember(String idToken, String provider) throws ParseException, JsonProcessingException {
+    public ResponseEntity<ApiDataResponse<Oauth2ProfileResponseDto>> findOrSaveMember(String idToken, String provider) throws ParseException, JsonProcessingException {
         Oauth2Attribute oauth2Attribute;
         switch (provider) {
             case "google":
@@ -81,14 +81,18 @@ public class Oauth2Service {
         headers.add(HttpHeaders.SET_COOKIE, responseCookie.toString());
         headers.add("Authorization", "Bearer " + accessToken);
 
-        return ApiDataResponse.<Oauth2ProfileResponseDto>builder()
-                .status(true)
-                .code(httpStatus.value())
-                .message(message)
-                .data(Oauth2ProfileResponseDto.builder()
-                        .profileName(member.getProfileName())
-                        .build())
-                .build();
+
+        return ResponseEntity.status(httpStatus.value())
+                .headers(headers)
+                .body(ApiDataResponse.<Oauth2ProfileResponseDto>builder()
+                        .status(true)
+                        .code(httpStatus.value())
+                        .message(message)
+                        .data(Oauth2ProfileResponseDto.builder()
+                                .profileName(member.getProfileName())
+                                .build())
+                        .build());
+
     }
 
     private Oauth2Attribute getGoogleData(String idToken) throws ParseException, JsonProcessingException {

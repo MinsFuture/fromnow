@@ -27,16 +27,13 @@ public class Oauth2Controller implements Oauth2Api {
     public ResponseEntity<ApiDataResponse<Oauth2ProfileResponseDto>> oauth2Google(
             @RequestParam("id_token") String idToken) throws ParseException, JsonProcessingException {
 
-        ApiDataResponse<Oauth2ProfileResponseDto> response = oauth2Service.findOrSaveMember(idToken, "google");
-
-        return ResponseEntity.status(response.getCode()).body(response);
+        return oauth2Service.findOrSaveMember(idToken, "google");
     }
 
     @GetMapping("/kakao")
     public ResponseEntity<ApiDataResponse<Oauth2ProfileResponseDto>> oauth2Kakao(
             @RequestParam("id_token") String idToken) throws ParseException, JsonProcessingException {
-        ApiDataResponse<Oauth2ProfileResponseDto> response = oauth2Service.findOrSaveMember(idToken, "kakao");
 
-        return ResponseEntity.status(response.getCode()).body(response);
+        return oauth2Service.findOrSaveMember(idToken, "kakao");
     }
 }
