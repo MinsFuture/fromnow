@@ -1,8 +1,10 @@
 package com.knu.fromnow.api.domain.board.controller;
 
 import com.knu.fromnow.api.domain.board.dto.request.BoardCreateRequestDto;
+import com.knu.fromnow.api.domain.board.dto.request.DiaryChooseRequestDto;
 import com.knu.fromnow.api.domain.board.dto.response.BoardLikeResponseDto;
 import com.knu.fromnow.api.domain.board.dto.response.BoardCreateResponseDto;
+import com.knu.fromnow.api.domain.board.dto.response.DiaryChooseResponseDto;
 import com.knu.fromnow.api.domain.board.service.BoardService;
 import com.knu.fromnow.api.domain.board.dto.response.BoardOverViewResponseDto;
 import com.knu.fromnow.api.domain.member.entity.PrincipalDetails;
@@ -44,14 +46,27 @@ public class ApiBoardController implements SwaggerBoardApi {
         return ResponseEntity.status(response.getCode()).body(response);
     }
 
+    @PostMapping(value = "/diaries", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @PreAuthorize("isAuthenticated()")
+    public ResponseEntity<ApiDataResponse<DiaryChooseResponseDto>> createBoardAndChooseDiary(
+            @RequestPart("uploadPhotos") MultipartFile file,
+            @RequestPart("chooseDiaryDto") DiaryChooseRequestDto diaryChooseRequestDto,
+            @AuthenticationPrincipal PrincipalDetails principalDetails) {
+        ApiDataResponse<DiaryChooseResponseDto> response
+                = boardService.createBoardAndChooseDiary(file, diaryChooseRequestDto, principalDetails);
+
+        return ResponseEntity.status(response.getCode()).body(response);
+    }
+
     @GetMapping("/diaries/{diaryId}")
     @PreAuthorize("isAuthenticated()")
     public ResponseEntity<ApiDataResponse<List<BoardOverViewResponseDto>>> getBoardOverviews(
+            @RequestParam("year") Long year,
+            @RequestParam("month") Long month,
             @PathVariable("diaryId") Long id,
-            @RequestParam("date") LocalDate date,
             @AuthenticationPrincipal PrincipalDetails principalDetails
     ) {
-        ApiDataResponse<List<BoardOverViewResponseDto>> boardOverviews = boardService.getBoardOverviews(id, date, principalDetails);
+        ApiDataResponse<List<BoardOverViewResponseDto>> boardOverviews = boardService.getBoardOverviews(id, year, month, principalDetails);
 
         return ResponseEntity.status(boardOverviews.getCode()).body(boardOverviews);
     }

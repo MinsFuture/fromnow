@@ -1,8 +1,10 @@
 package com.knu.fromnow.api.domain.board.service;
 
 import com.knu.fromnow.api.domain.board.dto.request.BoardCreateRequestDto;
+import com.knu.fromnow.api.domain.board.dto.request.DiaryChooseRequestDto;
 import com.knu.fromnow.api.domain.board.dto.response.BoardLikeResponseDto;
 import com.knu.fromnow.api.domain.board.dto.response.BoardCreateResponseDto;
+import com.knu.fromnow.api.domain.board.dto.response.DiaryChooseResponseDto;
 import com.knu.fromnow.api.domain.board.entity.Board;
 import com.knu.fromnow.api.domain.board.repository.BoardRepository;
 import com.knu.fromnow.api.domain.board.dto.response.BoardOverViewResponseDto;
@@ -44,7 +46,7 @@ public class BoardService {
     private final DiaryRepository diaryRepository;
     private final LikeRepository likeRepository;
 
-    public ApiDataResponse<BoardCreateResponseDto> createBoard(MultipartFile file, BoardCreateRequestDto boardCreateRequestDto, Long diaryId, PrincipalDetails principalDetails){
+    public ApiDataResponse<BoardCreateResponseDto> createBoard(MultipartFile file, BoardCreateRequestDto boardCreateRequestDto, Long diaryId, PrincipalDetails principalDetails) {
 
         Member member = memberRepository.findByEmail(principalDetails.getEmail())
                 .orElseThrow(() -> new MemberException(MemberErrorCode.No_EXIST_EMAIL_MEMBER_EXCEPTION));
@@ -71,9 +73,12 @@ public class BoardService {
                 .build();
     }
 
-    public ApiDataResponse<List<BoardOverViewResponseDto>> getBoardOverviews(Long diaryId, LocalDate date, PrincipalDetails principalDetails){
-        LocalDateTime startDateTime = date.atStartOfDay();
-        LocalDateTime endDateTime = date.plusDays(1).atStartOfDay();
+    public ApiDataResponse<List<BoardOverViewResponseDto>> getBoardOverviews(Long diaryId, Long year, Long month, PrincipalDetails principalDetails) {
+        LocalDate startDate = LocalDate.of(year.intValue(), month.intValue(), 1);
+        LocalDate endDate = startDate.withDayOfMonth(startDate.lengthOfMonth()); // 해당 월의 마지막 날
+
+        LocalDateTime startDateTime = startDate.atStartOfDay(); // 9월 1일 00:00:00
+        LocalDateTime endDateTime = endDate.plusDays(1).atStartOfDay(); // 10월 1일 00:00:00 (exclusive)
 
         Member member = memberRepository.findByEmail(principalDetails.getEmail())
                 .orElseThrow(() -> new MemberException(MemberErrorCode.No_EXIST_EMAIL_MEMBER_EXCEPTION));
@@ -85,20 +90,21 @@ public class BoardService {
         boolean hasMatchingMember = diaryMembers.stream()
                 .anyMatch(diaryMember -> diaryMember.getMember().equals(member));
 
-        if(!hasMatchingMember){
+        if (!hasMatchingMember) {
             throw new MemberException(MemberErrorCode.NO_MATCHING_MEMBER_EXCEPTION);
         }
 
         return ApiDataResponse.<List<BoardOverViewResponseDto>>builder()
                 .status(true)
                 .code(200)
-                .message(date + "에 해당하는 글 불러오기 성공!")
+                .message(month + "월에 해당하는 글 불러오기 성공!")
                 .data(boardOverViewResponseDtos)
                 .build();
     }
 
     /**
      * Pagination한 Board로 responseDto를 만드는 메서드
+     *
      * @param contents
      * @return
      */
@@ -127,7 +133,7 @@ public class BoardService {
         return boardOverViewResponseDtos;
     }
 
-    public ApiDataResponse<BoardLikeResponseDto> clickLike(Long id, PrincipalDetails principalDetails){
+    public ApiDataResponse<BoardLikeResponseDto> clickLike(Long id, PrincipalDetails principalDetails) {
         // 추후 내가 누른 좋아요 볼 수 있도록 로직 추가
         Board board = boardRepository.findById(id)
                 .orElseThrow(() -> new BoardException(BoardErrorCode.NO_EXIST_BOARD_EXCEPTION));
@@ -172,6 +178,31 @@ public class BoardService {
                 .code(200)
                 .message("좋아요를 취소했습니다")
                 .data(BoardLikeResponseDto.fromBoard(board))
+                .build();
+    }
+
+    public ApiDataResponse<DiaryChooseResponseDto> createBoardAndChooseDiary(MultipartFile file, DiaryChooseRequestDto diaryChooseRequestDto, PrincipalDetails principalDetails) {
+        Member member = memberRepository.findByEmail(principalDetails.getEmail())
+                .orElseThrow(() -> new MemberException(MemberErrorCode.No_EXIST_EMAIL_MEMBER_EXCEPTION));
+        List<Diary> diaryList = diaryRepository.findByIdIn(diaryChooseRequestDto.getDiaryIds());
+        Board board = null;
+        for (Diary diary : diaryList) {
+            board = Board.builder()
+                    .member(member)
+                    .content(diaryChooseRequestDto.getContent())
+                    .like(0)
+                    .diary(diary)
+                    .build();
+            boardPhotoService.uploadToBoardPhotos(file, board);
+            member.getBoardList().add(board);
+            boardRepository.save(board);
+        }
+
+        return ApiDataResponse.<DiaryChooseResponseDto>builder()
+                .status(true)
+                .code(200)
+                .message("일상 등록 성공!")
+                .data(DiaryChooseResponseDto.fromBoard(board, diaryList))
                 .build();
     }
 }

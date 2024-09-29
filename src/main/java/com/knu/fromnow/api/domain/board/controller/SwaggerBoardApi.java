@@ -1,9 +1,11 @@
 package com.knu.fromnow.api.domain.board.controller;
 
 import com.knu.fromnow.api.domain.board.dto.request.BoardCreateRequestDto;
+import com.knu.fromnow.api.domain.board.dto.request.DiaryChooseRequestDto;
 import com.knu.fromnow.api.domain.board.dto.response.BoardLikeResponseDto;
 import com.knu.fromnow.api.domain.board.dto.response.BoardCreateResponseDto;
 import com.knu.fromnow.api.domain.board.dto.response.BoardOverViewResponseDto;
+import com.knu.fromnow.api.domain.board.dto.response.DiaryChooseResponseDto;
 import com.knu.fromnow.api.domain.member.entity.PrincipalDetails;
 import com.knu.fromnow.api.global.spec.ApiDataResponse;
 import io.swagger.v3.oas.annotations.Operation;
@@ -30,6 +32,20 @@ public interface SwaggerBoardApi {
             @Parameter(description = "일기 내용", required = true) BoardCreateRequestDto boardCreateRequestDto,
             @Parameter(description = "Bearer ey...") PrincipalDetails principalDetails);
 
+
+    @ApiResponses(
+            value = {
+                    @ApiResponse(responseCode = "200", description = "일기 생성 성공!"),
+                    @ApiResponse(responseCode = "4XX", description = "요청 형식이 잘못되었습니다"),
+            }
+    )
+    @Operation(summary = "일기 생성 및 선택 로직", description = "File은 MultiPart/form-data 형식, Dto는 application/json 형식으로 보내주셔야 해요!")
+    ResponseEntity<ApiDataResponse<DiaryChooseResponseDto>> createBoardAndChooseDiary(
+            @Parameter(description = "일기 사진들", required = true) MultipartFile file,
+            @Parameter(description = "일기 내용 + 넣을 diaryId list") DiaryChooseRequestDto diaryChooseRequestDto,
+            @Parameter(description = "Bearer ey...") PrincipalDetails principalDetails
+    );
+
     @ApiResponses(
             value = {
                     @ApiResponse(responseCode = "200", description = "일기 조회 성공!"),
@@ -38,8 +54,9 @@ public interface SwaggerBoardApi {
     )
     @Operation(summary = "하루 치 일기 내용들 조회", description = "다이어리 안에서 하루 치 날짜에 해당하는 일기들의 내용을 반환")
     ResponseEntity<ApiDataResponse<List<BoardOverViewResponseDto>>> getBoardOverviews(
+            @Parameter(description = "년도") Long year,
+            @Parameter(description = "월") Long month,
             @Parameter(description = "일기 id") Long id,
-            @Parameter(description = "하루 날짜, 예시 : 2024-09-09") LocalDate date,
             @Parameter PrincipalDetails principalDetails);
 
     @ApiResponses(
