@@ -11,11 +11,11 @@ public class BoardOverViewResponseDto {
     private String createdDate;
     private String profilePhotoUrl;
     private String profileName;
-    private List<String> contentPhotoUrl;
+    private String contentPhotoUrl;
     private String content;
 
     @Builder
-    public BoardOverViewResponseDto(Long boardId, String createdDate, String profilePhotoUrl, String profileName, List<String> contentPhotoUrl, String content) {
+    public BoardOverViewResponseDto(Long boardId, String createdDate, String profilePhotoUrl, String profileName, String contentPhotoUrl, String content) {
         this.boardId = boardId;
         this.createdDate = createdDate;
         this.profilePhotoUrl = profilePhotoUrl;

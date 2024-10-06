@@ -12,15 +12,15 @@ public class DiaryChooseResponseDto {
     private Long id;
     private String content;
     private int likes;
-    private List<String> photoUrls;
+    private String photoUrl;
     private List<Long> uploadDiaryIds;
 
     @Builder
-    public DiaryChooseResponseDto(Long id, String content, int likes, List<String> photoUrls, List<Long> uploadDiaryIds) {
+    public DiaryChooseResponseDto(Long id, String content, int likes, String photoUrl, List<Long> uploadDiaryIds) {
         this.id = id;
         this.content = content;
         this.likes = likes;
-        this.photoUrls = photoUrls;
+        this.photoUrl = photoUrl;
         this.uploadDiaryIds = uploadDiaryIds;
     }
 
@@ -29,7 +29,7 @@ public class DiaryChooseResponseDto {
                 .id(board.getId())
                 .likes(board.getLike())
                 .content(board.getContent())
-                .photoUrls(board.getPhotoList().stream().map(BoardPhoto::getPhotoUrl).toList())
+                .photoUrl(board.getBoardPhoto().getPhotoUrl())
                 .uploadDiaryIds(diaryList.stream().map(Diary::getId).toList())
                 .build();
     }

@@ -7,6 +7,7 @@ import com.knu.fromnow.api.domain.diary.dto.request.UpdateDiaryDto;
 import com.knu.fromnow.api.domain.diary.dto.response.DiaryCreateResponseDto;
 import com.knu.fromnow.api.domain.diary.dto.response.DiaryDeleteResponseDto;
 import com.knu.fromnow.api.domain.diary.dto.response.DiaryInviteResponseDto;
+import com.knu.fromnow.api.domain.diary.dto.response.DiaryMenuResponseDto;
 import com.knu.fromnow.api.domain.diary.dto.response.DiaryOverViewResponseDto;
 import com.knu.fromnow.api.domain.diary.dto.response.DiaryRequestsReceivedDto;
 import com.knu.fromnow.api.domain.diary.entity.Diary;
@@ -14,6 +15,7 @@ import com.knu.fromnow.api.domain.diary.entity.DiaryMember;
 import com.knu.fromnow.api.domain.diary.repository.DiaryMemberCustomRepository;
 import com.knu.fromnow.api.domain.diary.repository.DiaryMemberRepository;
 import com.knu.fromnow.api.domain.diary.repository.DiaryRepository;
+import com.knu.fromnow.api.domain.friend.repository.FriendCustomRepository;
 import com.knu.fromnow.api.domain.member.entity.Member;
 import com.knu.fromnow.api.domain.member.entity.PrincipalDetails;
 import com.knu.fromnow.api.domain.member.repository.MemberRepository;
@@ -43,6 +45,7 @@ public class DiaryService {
     private final MemberRepository memberRepository;
     private final DiaryMemberRepository diaryMemberRepository;
     private final DiaryMemberCustomRepository diaryMemberCustomRepository;
+    private final FriendCustomRepository friendCustomRepository;
 
     public ApiDataResponse<DiaryCreateResponseDto> createDiary(CreateDiaryDto createDiaryDto, PrincipalDetails principalDetails) {
 
@@ -195,6 +198,52 @@ public class DiaryService {
                         .title(diary.getTitle())
                         .photoUrls(photoUrls)
                         .build())
+                .build();
+    }
+
+    public ApiDataResponse<List<DiaryMenuResponseDto>> getDiaryMenu(Long id, PrincipalDetails principalDetails){
+        Diary diary = diaryRepository.findById(id)
+                .orElseThrow(() -> new DiaryException(DiaryErrorCode.NO_EXIST_DIARY_EXCEPTION));
+
+        Member member = memberRepository.findByEmail(principalDetails.getEmail())
+                .orElseThrow(() -> new MemberException(MemberErrorCode.No_EXIST_EMAIL_MEMBER_EXCEPTION));
+
+        Member owner = diary.getOwner();
+
+        List<DiaryMember> diaryMembers = diary.getDiaryMembers();
+        List<Long> diaryMemberIds = diaryMembers.stream().map(diaryMember -> diaryMember.getMember().getId()).toList();
+
+        List<Long> friendsAmongSpecificMembers = friendCustomRepository.findFriendsAmongSpecificMembers(member.getId(), diaryMemberIds);
+
+        List<DiaryMenuResponseDto> responseDtoList = new ArrayList<>();
+
+        for (DiaryMember diaryMember : diaryMembers) {
+            Member findMember = diaryMember.getMember();
+
+            boolean isOwner = false;
+            if(findMember.getId().equals(owner.getId())){
+                isOwner = true;
+            }
+
+            boolean isFriend = false;
+            if(friendsAmongSpecificMembers.contains(findMember.getId())){
+                isFriend = true;
+            }
+
+            responseDtoList.add(DiaryMenuResponseDto.builder()
+                    .isOwner(isOwner)
+                    .memberId(findMember.getId())
+                    .photoUrl(findMember.getPhotoUrl())
+                    .profileName(findMember.getProfileName())
+                    .isFriend(isFriend)
+                    .build());
+        }
+
+        return ApiDataResponse.<List<DiaryMenuResponseDto>>builder()
+                .status(true)
+                .code(200)
+                .message("다이어리 메뉴 정보 불러오기")
+                .data(responseDtoList)
                 .build();
     }
 }

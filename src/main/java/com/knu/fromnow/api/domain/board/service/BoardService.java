@@ -112,12 +112,6 @@ public class BoardService {
         List<BoardOverViewResponseDto> boardOverViewResponseDtos = new ArrayList<>();
 
         for (Board board : contents) {
-            List<BoardPhoto> photoList = board.getPhotoList();
-            List<String> photoUrls = new ArrayList<>();
-            for (BoardPhoto photo : photoList) {
-                photoUrls.add(photo.getPhotoUrl());
-            }
-
             BoardOverViewResponseDto boardOverViewResponseDto =
                     BoardOverViewResponseDto.builder()
                             .boardId(board.getId())
@@ -125,7 +119,7 @@ public class BoardService {
                             .profileName(board.getMember().getProfileName())
                             .profilePhotoUrl(board.getMember().getPhotoUrl())
                             .content(board.getContent())
-                            .contentPhotoUrl(photoUrls)
+                            .contentPhotoUrl(board.getBoardPhoto().getPhotoUrl())
                             .build();
 
             boardOverViewResponseDtos.add(boardOverViewResponseDto);

@@ -43,7 +43,7 @@ public class BoardPhotoService {
                     .photoUrl(photoUrl)
                     .build();
 
-            board.getPhotoList().add(photo);
+            board.uploadBoardPhoto(photo);
             boardPhotoRepository.save(photo);
     }
 

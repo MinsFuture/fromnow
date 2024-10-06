@@ -8,6 +8,7 @@ import com.knu.fromnow.api.domain.diary.dto.request.UpdateDiaryDto;
 import com.knu.fromnow.api.domain.diary.dto.response.DiaryCreateResponseDto;
 import com.knu.fromnow.api.domain.diary.dto.response.DiaryDeleteResponseDto;
 import com.knu.fromnow.api.domain.diary.dto.response.DiaryInviteResponseDto;
+import com.knu.fromnow.api.domain.diary.dto.response.DiaryMenuResponseDto;
 import com.knu.fromnow.api.domain.diary.dto.response.DiaryOverViewResponseDto;
 import com.knu.fromnow.api.domain.diary.dto.response.DiaryRequestsReceivedDto;
 import com.knu.fromnow.api.domain.diary.service.DiaryService;
@@ -54,6 +55,17 @@ public class ApiDiaryController implements SwaggerDiaryApi {
         ApiDataResponse<List<DiaryOverViewResponseDto>> diaryOverView = diaryService.getDiaryOverView(principalDetails);
 
         return ResponseEntity.status(diaryOverView.getCode()).body(diaryOverView);
+    }
+
+    @GetMapping("/{diaryId}/menu")
+    @PreAuthorize("isAuthenticated()")
+    public ResponseEntity<ApiDataResponse<List<DiaryMenuResponseDto>>> getDiaryMenu(
+            @PathVariable("diaryId") Long id,
+            @AuthenticationPrincipal PrincipalDetails principalDetails
+    ){
+        ApiDataResponse<List<DiaryMenuResponseDto>> response = diaryService.getDiaryMenu(id, principalDetails);
+
+        return ResponseEntity.status(response.getCode()).body(response);
     }
 
     @PostMapping("/invite")

@@ -13,6 +13,7 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
+import jakarta.persistence.OneToOne;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
@@ -37,8 +38,8 @@ public class Board extends BaseEntity {
     @Column(name = "board_likes")
     private int like = 0;
 
-    @OneToMany(mappedBy = "board")
-    private List<BoardPhoto> photoList = new ArrayList<>();
+    @OneToOne(mappedBy = "board")
+    private BoardPhoto boardPhoto;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "diary_id")
@@ -64,5 +65,9 @@ public class Board extends BaseEntity {
         if(this.like > 0){
             this.like--;
         }
+    }
+
+    public void uploadBoardPhoto(BoardPhoto boardPhoto){
+        this.boardPhoto = boardPhoto;
     }
 }
