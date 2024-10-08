@@ -3,6 +3,7 @@ package com.knu.fromnow.api.domain.board.entity;
 import com.knu.fromnow.api.domain.diary.entity.Diary;
 import com.knu.fromnow.api.domain.member.entity.Member;
 import com.knu.fromnow.api.domain.photo.entity.BoardPhoto;
+import com.knu.fromnow.api.domain.read.entity.BoardRead;
 import com.knu.fromnow.api.global.BaseEntity;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -48,6 +49,9 @@ public class Board extends BaseEntity {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "member_id")
     private Member member;
+
+    @OneToMany(mappedBy = "board")
+    private List<BoardRead> boardReadList = new ArrayList<>();
 
     @Builder
     public Board(String content, int like, Diary diary, Member member) {

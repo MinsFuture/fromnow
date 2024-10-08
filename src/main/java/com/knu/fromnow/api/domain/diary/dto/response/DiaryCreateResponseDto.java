@@ -21,8 +21,6 @@ public class DiaryCreateResponseDto {
     }
 
 
-
-
     public static DiaryCreateResponseDto fromDiary(Diary diary){
         return DiaryCreateResponseDto.builder()
                 .id(diary.getId())

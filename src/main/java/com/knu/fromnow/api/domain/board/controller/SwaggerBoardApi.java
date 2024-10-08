@@ -56,6 +56,7 @@ public interface SwaggerBoardApi {
     ResponseEntity<ApiDataResponse<List<BoardOverViewResponseDto>>> getBoardOverviews(
             @Parameter(description = "년도") Long year,
             @Parameter(description = "월") Long month,
+            @Parameter(description = "일") Long day,
             @Parameter(description = "일기 id") Long id,
             @Parameter PrincipalDetails principalDetails);
 

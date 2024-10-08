@@ -8,6 +8,7 @@ import com.knu.fromnow.api.domain.board.dto.response.DiaryChooseResponseDto;
 import com.knu.fromnow.api.domain.board.entity.Board;
 import com.knu.fromnow.api.domain.board.repository.BoardRepository;
 import com.knu.fromnow.api.domain.board.dto.response.BoardOverViewResponseDto;
+import com.knu.fromnow.api.domain.diary.dto.response.DiaryReadRowResponseDto;
 import com.knu.fromnow.api.domain.diary.entity.Diary;
 import com.knu.fromnow.api.domain.diary.entity.DiaryMember;
 import com.knu.fromnow.api.domain.diary.repository.DiaryRepository;
@@ -73,18 +74,18 @@ public class BoardService {
                 .build();
     }
 
-    public ApiDataResponse<List<BoardOverViewResponseDto>> getBoardOverviews(Long diaryId, Long year, Long month, PrincipalDetails principalDetails) {
-        LocalDate startDate = LocalDate.of(year.intValue(), month.intValue(), 1);
-        LocalDate endDate = startDate.withDayOfMonth(startDate.lengthOfMonth()); // 해당 월의 마지막 날
+    public ApiDataResponse<List<BoardOverViewResponseDto>> getBoardOverviews(Long diaryId, Long year, Long month, Long day, PrincipalDetails principalDetails) {
+        LocalDate currentDate = LocalDate.of(year.intValue(), month.intValue(), day.intValue());
 
-        LocalDateTime startDateTime = startDate.atStartOfDay(); // 9월 1일 00:00:00
-        LocalDateTime endDateTime = endDate.plusDays(1).atStartOfDay(); // 10월 1일 00:00:00 (exclusive)
+        // 오늘의 시작과 끝 시간
+        LocalDateTime startDateTime = currentDate.atStartOfDay(); // 오늘 00:00:00
+        LocalDateTime endDateTime = currentDate.plusDays(1).atStartOfDay(); // 내일 00:00:00 (exclusive)
 
         Member member = memberRepository.findByEmail(principalDetails.getEmail())
                 .orElseThrow(() -> new MemberException(MemberErrorCode.No_EXIST_EMAIL_MEMBER_EXCEPTION));
 
         List<Board> boards = boardRepository.findByDiaryIdAndCreatedAtBetween(diaryId, startDateTime, endDateTime);
-        List<BoardOverViewResponseDto> boardOverViewResponseDtos = getBoardOverViewResponseDtos(boards);
+        List<BoardOverViewResponseDto> boardOverViewResponseDtos = getBoardOverViewResponseDtos(boards, member);
 
         List<DiaryMember> diaryMembers = member.getDiaryMembers();
         boolean hasMatchingMember = diaryMembers.stream()
@@ -97,7 +98,7 @@ public class BoardService {
         return ApiDataResponse.<List<BoardOverViewResponseDto>>builder()
                 .status(true)
                 .code(200)
-                .message(month + "월에 해당하는 글 불러오기 성공!")
+                .message(year + "-" + month + "-" + day + "에 해당하는 글은 다음과 같습니다")
                 .data(boardOverViewResponseDtos)
                 .build();
     }
@@ -108,10 +109,13 @@ public class BoardService {
      * @param contents
      * @return
      */
-    public List<BoardOverViewResponseDto> getBoardOverViewResponseDtos(List<Board> contents) {
+    public List<BoardOverViewResponseDto> getBoardOverViewResponseDtos(List<Board> contents, Member member) {
         List<BoardOverViewResponseDto> boardOverViewResponseDtos = new ArrayList<>();
 
         for (Board board : contents) {
+
+            boolean isRead = board.getBoardReadList().stream().anyMatch(boardRead -> boardRead.getMember().getId().equals(member.getId()));
+
             BoardOverViewResponseDto boardOverViewResponseDto =
                     BoardOverViewResponseDto.builder()
                             .boardId(board.getId())
@@ -120,6 +124,7 @@ public class BoardService {
                             .profilePhotoUrl(board.getMember().getPhotoUrl())
                             .content(board.getContent())
                             .contentPhotoUrl(board.getBoardPhoto().getPhotoUrl())
+                            .isRead(isRead)
                             .build();
 
             boardOverViewResponseDtos.add(boardOverViewResponseDto);
@@ -199,4 +204,6 @@ public class BoardService {
                 .data(DiaryChooseResponseDto.fromBoard(board, diaryList))
                 .build();
     }
+
+
 }
