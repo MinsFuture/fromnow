@@ -10,6 +10,7 @@ import com.knu.fromnow.api.domain.diary.dto.response.DiaryDeleteResponseDto;
 import com.knu.fromnow.api.domain.diary.dto.response.DiaryInviteResponseDto;
 import com.knu.fromnow.api.domain.diary.dto.response.DiaryMenuResponseDto;
 import com.knu.fromnow.api.domain.diary.dto.response.DiaryOverViewResponseDto;
+import com.knu.fromnow.api.domain.diary.dto.response.DiaryReadRowResponseDto;
 import com.knu.fromnow.api.domain.diary.dto.response.DiaryRequestsReceivedDto;
 import com.knu.fromnow.api.domain.diary.service.DiaryService;
 import com.knu.fromnow.api.domain.member.entity.PrincipalDetails;
@@ -26,6 +27,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
@@ -55,17 +57,6 @@ public class ApiDiaryController implements SwaggerDiaryApi {
         ApiDataResponse<List<DiaryOverViewResponseDto>> diaryOverView = diaryService.getDiaryOverView(principalDetails);
 
         return ResponseEntity.status(diaryOverView.getCode()).body(diaryOverView);
-    }
-
-    @GetMapping("/{diaryId}/menu")
-    @PreAuthorize("isAuthenticated()")
-    public ResponseEntity<ApiDataResponse<List<DiaryMenuResponseDto>>> getDiaryMenu(
-            @PathVariable("diaryId") Long id,
-            @AuthenticationPrincipal PrincipalDetails principalDetails
-    ){
-        ApiDataResponse<List<DiaryMenuResponseDto>> response = diaryService.getDiaryMenu(id, principalDetails);
-
-        return ResponseEntity.status(response.getCode()).body(response);
     }
 
     @PostMapping("/invite")
@@ -110,6 +101,33 @@ public class ApiDiaryController implements SwaggerDiaryApi {
             @AuthenticationPrincipal PrincipalDetails principalDetails
     ) {
         ApiDataResponse<DiaryDeleteResponseDto> response = diaryService.deleteDiary(principalDetails, diaryId);
+
+        return ResponseEntity.status(response.getCode()).body(response);
+    }
+
+    @GetMapping("/{diaryId}/menu")
+    @PreAuthorize("isAuthenticated()")
+    public ResponseEntity<ApiDataResponse<List<DiaryMenuResponseDto>>> getDiaryMenu(
+            @PathVariable("diaryId") Long id,
+            @AuthenticationPrincipal PrincipalDetails principalDetails
+    ){
+        ApiDataResponse<List<DiaryMenuResponseDto>> response = diaryService.getDiaryMenu(id, principalDetails);
+
+        return ResponseEntity.status(response.getCode()).body(response);
+    }
+
+    /**
+     * 가로 스크롤 Api
+     */
+    @GetMapping("/diaries/{diaryId}/scroll/row")
+    @PreAuthorize("isAuthenticated()")
+    public ResponseEntity<ApiDataResponse<List<DiaryReadRowResponseDto>>> getRowScroll(
+            @PathVariable("diaryId") Long id,
+            @RequestParam("year") Long year,
+            @RequestParam("month") Long month,
+            @AuthenticationPrincipal PrincipalDetails principalDetails
+    ){
+        ApiDataResponse<List<DiaryReadRowResponseDto>> response = diaryService.getRowScroll(id, year, month, principalDetails);
 
         return ResponseEntity.status(response.getCode()).body(response);
     }

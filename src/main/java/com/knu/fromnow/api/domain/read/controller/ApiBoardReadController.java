@@ -17,7 +17,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/board/read")
-public class ApiBoardReadController {
+public class ApiBoardReadController implements SwaggerBoardReadApi{
 
     private final BoardReadService boardReadService;
 
@@ -30,6 +30,4 @@ public class ApiBoardReadController {
 
        return ResponseEntity.status(response.getCode()).body(response);
     }
-
-
 }

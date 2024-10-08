@@ -44,6 +44,8 @@ public class BoardReadService {
                 .build();
 
         boardReadRepository.save(boardRead);
+        board.getBoardReadList().add(boardRead);
+        member.getBoardReadList().add(boardRead);
 
         return ApiDataResponse.<BoardReadResponseDto>builder()
                 .status(true)

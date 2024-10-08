@@ -7,6 +7,7 @@ import com.knu.fromnow.api.domain.board.dto.response.BoardCreateResponseDto;
 import com.knu.fromnow.api.domain.board.dto.response.DiaryChooseResponseDto;
 import com.knu.fromnow.api.domain.board.service.BoardService;
 import com.knu.fromnow.api.domain.board.dto.response.BoardOverViewResponseDto;
+import com.knu.fromnow.api.domain.diary.dto.response.DiaryReadRowResponseDto;
 import com.knu.fromnow.api.domain.member.entity.PrincipalDetails;
 import com.knu.fromnow.api.global.spec.ApiDataResponse;
 import lombok.RequiredArgsConstructor;
@@ -58,18 +59,23 @@ public class ApiBoardController implements SwaggerBoardApi {
         return ResponseEntity.status(response.getCode()).body(response);
     }
 
+    /**
+     * 하루 치 글 불러오기
+     */
     @GetMapping("/diaries/{diaryId}")
     @PreAuthorize("isAuthenticated()")
     public ResponseEntity<ApiDataResponse<List<BoardOverViewResponseDto>>> getBoardOverviews(
             @RequestParam("year") Long year,
             @RequestParam("month") Long month,
+            @RequestParam("day") Long day,
             @PathVariable("diaryId") Long id,
             @AuthenticationPrincipal PrincipalDetails principalDetails
     ) {
-        ApiDataResponse<List<BoardOverViewResponseDto>> boardOverviews = boardService.getBoardOverviews(id, year, month, principalDetails);
+        ApiDataResponse<List<BoardOverViewResponseDto>> boardOverviews = boardService.getBoardOverviews(id, year, month, day, principalDetails);
 
         return ResponseEntity.status(boardOverviews.getCode()).body(boardOverviews);
     }
+
 
     @PostMapping("/{boardId}/like")
     @PreAuthorize("isAuthenticated()")

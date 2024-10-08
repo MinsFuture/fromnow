@@ -7,7 +7,9 @@ import com.knu.fromnow.api.domain.diary.dto.request.UpdateDiaryDto;
 import com.knu.fromnow.api.domain.diary.dto.response.DiaryCreateResponseDto;
 import com.knu.fromnow.api.domain.diary.dto.response.DiaryDeleteResponseDto;
 import com.knu.fromnow.api.domain.diary.dto.response.DiaryInviteResponseDto;
+import com.knu.fromnow.api.domain.diary.dto.response.DiaryMenuResponseDto;
 import com.knu.fromnow.api.domain.diary.dto.response.DiaryOverViewResponseDto;
+import com.knu.fromnow.api.domain.diary.dto.response.DiaryReadRowResponseDto;
 import com.knu.fromnow.api.domain.diary.dto.response.DiaryRequestsReceivedDto;
 import com.knu.fromnow.api.domain.member.entity.PrincipalDetails;
 import com.knu.fromnow.api.global.spec.ApiBasicResponse;
@@ -100,7 +102,30 @@ public interface SwaggerDiaryApi {
             @Parameter(description = "Bearer ey...") PrincipalDetails principalDetails);
 
     //////////////////////////////////////////////////////////////////////////////////////////////
+    @ApiResponses(
+            value = {
+                    @ApiResponse(responseCode = "200", description = "다이어리 메뉴 가져오기 성공"),
+                    @ApiResponse(responseCode = "4XX", description = "요청 형식이 잘못되었습니다"),
+            }
+    )
+    @Operation(summary = "다이어리 메뉴 가져오기", description = "다이어리 사이드 메뉴 바 정보")
+    ResponseEntity<ApiDataResponse<List<DiaryMenuResponseDto>>> getDiaryMenu(
+            @Parameter(description = "다이어리 id") Long diaryId,
+            @Parameter(description = "Bearer ey...") PrincipalDetails principalDetails);
 
-
+    //////////////////////////////////////////////////////////////////////////////////////////////
+    @ApiResponses(
+            value = {
+                    @ApiResponse(responseCode = "200", description = "가로 스크롤 Api - 한달 치"),
+                    @ApiResponse(responseCode = "4XX", description = "요청 형식이 잘못되었습니다"),
+            }
+    )
+    @Operation(summary = "가로 스크롤 Api - 한달 치", description = "가로 스크롤 Api - 한달 치")
+    ResponseEntity<ApiDataResponse<List<DiaryReadRowResponseDto>>> getRowScroll(
+            @Parameter(description = "다이어리 id") Long diaryId,
+            @Parameter(description = "불러올 년도") Long year,
+            @Parameter(description = "불러올 달") Long month,
+            @Parameter(description = "Bearer ey...") PrincipalDetails principalDetails)
+    ;
 
 }

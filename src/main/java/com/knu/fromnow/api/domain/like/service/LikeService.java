@@ -34,7 +34,7 @@ public class LikeService {
         List<Long> boardIds = likeCustomRepository.findAllBoardsWithMyLikes(member.getId());
         List<Board> boards = boardRepository.findByIdIn(boardIds);
 
-        List<BoardOverViewResponseDto> responseDtos = boardService.getBoardOverViewResponseDtos(boards);
+        List<BoardOverViewResponseDto> responseDtos = boardService.getBoardOverViewResponseDtos(boards, member);
 
         return ApiDataResponse.<List<BoardOverViewResponseDto>>builder()
                 .status(true)
