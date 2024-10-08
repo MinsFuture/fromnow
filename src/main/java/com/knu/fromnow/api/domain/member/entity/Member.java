@@ -4,6 +4,7 @@ import com.knu.fromnow.api.domain.board.entity.Board;
 import com.knu.fromnow.api.domain.diary.entity.Diary;
 import com.knu.fromnow.api.domain.diary.entity.DiaryMember;
 import com.knu.fromnow.api.domain.mission.entity.Mission;
+import com.knu.fromnow.api.domain.read.entity.BoardRead;
 import com.knu.fromnow.api.global.BaseEntity;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -54,6 +55,9 @@ public class Member extends BaseEntity {
 
     @OneToMany(mappedBy = "owner")
     private List<Diary> diaryList = new ArrayList<>();
+
+    @OneToMany(mappedBy = "member")
+    private List<BoardRead> boardReadList = new ArrayList<>();
 
     @Builder
     public Member(Role role, String email, String profileName, String refreshToken) {
