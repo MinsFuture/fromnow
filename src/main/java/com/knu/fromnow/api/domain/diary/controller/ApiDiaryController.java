@@ -10,12 +10,14 @@ import com.knu.fromnow.api.domain.diary.dto.response.DiaryDeleteResponseDto;
 import com.knu.fromnow.api.domain.diary.dto.response.DiaryInviteResponseDto;
 import com.knu.fromnow.api.domain.diary.dto.response.DiaryMenuResponseDto;
 import com.knu.fromnow.api.domain.diary.dto.response.DiaryOverViewResponseDto;
+import com.knu.fromnow.api.domain.diary.dto.response.DiaryReadCompleteResponseDto;
 import com.knu.fromnow.api.domain.diary.dto.response.DiaryReadRowResponseDto;
 import com.knu.fromnow.api.domain.diary.dto.response.DiaryRequestsReceivedDto;
 import com.knu.fromnow.api.domain.diary.service.DiaryService;
 import com.knu.fromnow.api.domain.member.entity.PrincipalDetails;
-import com.knu.fromnow.api.global.spec.ApiBasicResponse;
 import com.knu.fromnow.api.global.spec.ApiDataResponse;
+import com.knu.fromnow.api.global.spec.date.request.DateRequestDto;
+import com.knu.fromnow.api.global.spec.date.request.YearMonthRequestDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -27,7 +29,6 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
@@ -122,12 +123,25 @@ public class ApiDiaryController implements SwaggerDiaryApi {
     @GetMapping("/diaries/{diaryId}/scroll/row")
     @PreAuthorize("isAuthenticated()")
     public ResponseEntity<ApiDataResponse<List<DiaryReadRowResponseDto>>> getRowScroll(
-            @PathVariable("diaryId") Long id,
-            @RequestParam("year") Long year,
-            @RequestParam("month") Long month,
+            @PathVariable("diaryId") Long diaryId,
+            @RequestBody YearMonthRequestDto yearMonthRequestDto,
             @AuthenticationPrincipal PrincipalDetails principalDetails
     ){
-        ApiDataResponse<List<DiaryReadRowResponseDto>> response = diaryService.getRowScroll(id, year, month, principalDetails);
+        ApiDataResponse<List<DiaryReadRowResponseDto>> response = diaryService.getRowScroll(diaryId, yearMonthRequestDto, principalDetails);
+
+        return ResponseEntity.status(response.getCode()).body(response);
+    }
+
+    /**
+     * 읽음 처리 Api
+     */
+    @PostMapping("/{diaryId}/read")
+    @PreAuthorize("isAuthenticated()")
+    public ResponseEntity<ApiDataResponse<DiaryReadCompleteResponseDto>> readAllBoardInDiary(
+            @PathVariable("diaryId") Long diaryId,
+            @RequestBody DateRequestDto dateRequestDto,
+            @AuthenticationPrincipal PrincipalDetails principalDetails){
+        ApiDataResponse<DiaryReadCompleteResponseDto> response = diaryService.readAllPostsByDate(diaryId, dateRequestDto, principalDetails);
 
         return ResponseEntity.status(response.getCode()).body(response);
     }

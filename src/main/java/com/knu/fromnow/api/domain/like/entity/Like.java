@@ -2,7 +2,7 @@ package com.knu.fromnow.api.domain.like.entity;
 
 import com.knu.fromnow.api.domain.board.entity.Board;
 import com.knu.fromnow.api.domain.member.entity.Member;
-import com.knu.fromnow.api.global.BaseEntity;
+import com.knu.fromnow.api.global.spec.BaseEntity;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;

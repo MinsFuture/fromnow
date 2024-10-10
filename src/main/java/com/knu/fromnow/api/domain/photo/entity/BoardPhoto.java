@@ -1,7 +1,7 @@
 package com.knu.fromnow.api.domain.photo.entity;
 
 import com.knu.fromnow.api.domain.board.entity.Board;
-import com.knu.fromnow.api.global.BaseEntity;
+import com.knu.fromnow.api.global.spec.BaseEntity;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
@@ -9,7 +9,6 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToOne;
 import lombok.AccessLevel;
 import lombok.Builder;

@@ -1,4 +1,4 @@
-package com.knu.fromnow.api.global;
+package com.knu.fromnow.api.global.spec;
 
 
 import jakarta.persistence.Column;

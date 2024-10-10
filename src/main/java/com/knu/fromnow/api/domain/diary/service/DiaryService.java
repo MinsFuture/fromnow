@@ -11,10 +11,13 @@ import com.knu.fromnow.api.domain.diary.dto.response.DiaryDeleteResponseDto;
 import com.knu.fromnow.api.domain.diary.dto.response.DiaryInviteResponseDto;
 import com.knu.fromnow.api.domain.diary.dto.response.DiaryMenuResponseDto;
 import com.knu.fromnow.api.domain.diary.dto.response.DiaryOverViewResponseDto;
+import com.knu.fromnow.api.domain.diary.dto.response.DiaryReadCompleteResponseDto;
 import com.knu.fromnow.api.domain.diary.dto.response.DiaryReadRowResponseDto;
 import com.knu.fromnow.api.domain.diary.dto.response.DiaryRequestsReceivedDto;
+import com.knu.fromnow.api.domain.diary.entity.DateReadTracking;
 import com.knu.fromnow.api.domain.diary.entity.Diary;
 import com.knu.fromnow.api.domain.diary.entity.DiaryMember;
+import com.knu.fromnow.api.domain.diary.repository.DateReadTrackingRepository;
 import com.knu.fromnow.api.domain.diary.repository.DiaryMemberCustomRepository;
 import com.knu.fromnow.api.domain.diary.repository.DiaryMemberRepository;
 import com.knu.fromnow.api.domain.diary.repository.DiaryRepository;
@@ -22,26 +25,24 @@ import com.knu.fromnow.api.domain.friend.repository.FriendCustomRepository;
 import com.knu.fromnow.api.domain.member.entity.Member;
 import com.knu.fromnow.api.domain.member.entity.PrincipalDetails;
 import com.knu.fromnow.api.domain.member.repository.MemberRepository;
-import com.knu.fromnow.api.domain.read.entity.BoardRead;
-import com.knu.fromnow.api.domain.read.repository.BoardReadRepository;
-import com.knu.fromnow.api.global.error.custom.BoardException;
+import com.knu.fromnow.api.global.error.custom.DateReadTrackingException;
 import com.knu.fromnow.api.global.error.custom.DiaryException;
 import com.knu.fromnow.api.global.error.custom.DiaryMemberException;
 import com.knu.fromnow.api.global.error.custom.MemberException;
-import com.knu.fromnow.api.global.error.errorcode.custom.BoardErrorCode;
+import com.knu.fromnow.api.global.error.errorcode.custom.DateReadTrackingErrorCode;
 import com.knu.fromnow.api.global.error.errorcode.custom.DiaryErrorCode;
 import com.knu.fromnow.api.global.error.errorcode.custom.DiaryMemberErrorCode;
 import com.knu.fromnow.api.global.error.errorcode.custom.MemberErrorCode;
-import com.knu.fromnow.api.global.spec.ApiBasicResponse;
 import com.knu.fromnow.api.global.spec.ApiDataResponse;
+import com.knu.fromnow.api.global.spec.date.request.DateRequestDto;
+import com.knu.fromnow.api.global.spec.date.request.YearMonthRequestDto;
 import lombok.RequiredArgsConstructor;
-import org.checkerframework.checker.units.qual.A;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -62,7 +63,7 @@ public class DiaryService {
     private final DiaryMemberRepository diaryMemberRepository;
     private final DiaryMemberCustomRepository diaryMemberCustomRepository;
     private final FriendCustomRepository friendCustomRepository;
-    private final BoardReadRepository boardReadRepository;
+    private final DateReadTrackingRepository dateReadTrackingRepository;
 
     public ApiDataResponse<DiaryCreateResponseDto> createDiary(CreateDiaryDto createDiaryDto, PrincipalDetails principalDetails) {
 
@@ -265,66 +266,73 @@ public class DiaryService {
     }
 
 
-    public ApiDataResponse<List<DiaryReadRowResponseDto>> getRowScroll(Long id, Long year, Long month, PrincipalDetails principalDetails) {
+    public ApiDataResponse<List<DiaryReadRowResponseDto>> getRowScroll(Long id, YearMonthRequestDto yearMonthRequestDto, PrincipalDetails principalDetails) {
         Diary diary= diaryRepository.findById(id)
                 .orElseThrow(() -> new DiaryException(DiaryErrorCode.NO_EXIST_DIARY_EXCEPTION));
 
         Member member = memberRepository.findByEmail(principalDetails.getEmail())
                 .orElseThrow(() -> new MemberException(MemberErrorCode.No_EXIST_EMAIL_MEMBER_EXCEPTION));
 
-
-        LocalDate startDate = LocalDate.of(year.intValue(), month.intValue(), 1); // 해당 월의 1일
+        LocalDate startDate = LocalDate.of(yearMonthRequestDto.getYear(), yearMonthRequestDto.getMonth(), 1); // 해당 월의 1일
         LocalDate endDate = startDate.withDayOfMonth(startDate.lengthOfMonth()); // 해당 월의 마지막 날
 
-        // 시간 범위 설정 (해당 월의 첫째 날 00:00부터 마지막 날 23:59까지)
-        LocalDateTime startDateTime = startDate.atStartOfDay(); // 해당 월의 1일 00:00:00
-        LocalDateTime endDateTime = endDate.plusDays(1).atStartOfDay(); // 다음 달 1일 00:00:00 (exclusive)
+        List<DateReadTracking> dateReadTrackingList = dateReadTrackingRepository.findByMemberIdAndDiaryIdAndDateBetweenOrderByDateAsc(diary.getId(), member.getId(), startDate, endDate);
+        List<DiaryReadRowResponseDto> data = new ArrayList<>();
 
-        // 해당 기간에 속하는 모든 Board를 조회
-        List<Board> boards = boardRepository.findByDiaryIdAndCreatedAtBetween(diary.getId(), startDateTime, endDateTime);
-        List<BoardRead> boardReads = boardReadRepository.findByMemberAndBoardIn(member, boards); // 해당 사용자가 읽은 게시글
+        for (DateReadTracking dateReadTracking : dateReadTrackingList) {
+            LocalDateTime lastedPostTime = dateReadTracking.getLastedPostTime();
+            LocalDateTime lastedMemberReadTime = dateReadTracking.getLastedMemberReadTime();
+            // 글이 있고, 읽은 적이 없거나 , 읽은 후에 새로운 글이 올라 온 경우
+            boolean isNew = (lastedPostTime != null || lastedMemberReadTime == null || lastedPostTime.isAfter(lastedMemberReadTime));
+            boolean hasPosts = dateReadTracking.getLastedPostTime() == null;
+            LocalDate date = dateReadTracking.getDate();
 
-        // 각 날짜에 글이 있는지 여부와 읽었는지 여부를 저장할 맵 (key: 날짜, value: 읽기 상태)
-        Map<LocalDate, DiaryReadRowResponseDto> diaryReadRowResponseDtoMap = new HashMap<>();
-
-        // 게시글 리스트를 날짜별로 분류
-        Map<LocalDate, List<Board>> boardsByDate = boards.stream()
-                .collect(Collectors.groupingBy(board -> board.getCreatedAt().toLocalDate()));
-
-        // 사용자가 읽은 게시글 ID 리스트 추출
-        Set<Long> readBoardIds = boardReads.stream()
-                .map(boardRead -> boardRead.getBoard().getId())
-                .collect(Collectors.toSet());
-
-        List<DiaryReadRowResponseDto> list = new ArrayList<>();
-
-        // 해당 달의 각 날짜를 순회하며 게시글이 있는지 확인하고, 사용자가 읽었는지도 확인
-        for (LocalDate date = startDate; !date.isAfter(endDate); date = date.plusDays(1)) {
-            // 해당 날짜의 게시글 리스트 가져오기
-            List<Board> boardsForDate = boardsByDate.getOrDefault(date, Collections.emptyList());
-
-            // 해당 날짜에 게시글이 존재하는지 확인
-            boolean hasBoard = !boardsForDate.isEmpty();
-
-            // 해당 날짜의 게시글 중 하나라도 사용자가 읽었는지 확인
-            boolean hasRead = boardsForDate.stream()
-                    .anyMatch(board -> readBoardIds.contains(board.getId()));
-
-            // 해당 날짜에 대한 상태를 저장 (글 존재 여부와 읽기 여부)
-            list.add(DiaryReadRowResponseDto.builder()
-                            .hasPosts(hasBoard)
-                            .isNew(!hasRead)
-                            .year(date.getYear())
-                            .month(date.getMonthValue())
-                            .day(date.getDayOfMonth())
+            data.add(DiaryReadRowResponseDto.builder()
+                            .isNew(isNew)
+                            .hasPosts(hasPosts)
+                            .date(date.toString())
                     .build());
         }
 
         return ApiDataResponse.<List<DiaryReadRowResponseDto>>builder()
                 .status(true)
                 .code(200)
-                .message(month + "월에 해당하는 날짜별 게시글 확인 및 읽기 상태 조회 성공!")
-                .data(list)
+                .message("가로 스크롤 Api 불러오기 성공")
+                .data(data)
                 .build();
+    }
+
+    public ApiDataResponse<DiaryReadCompleteResponseDto> readAllPostsByDate(Long diaryId, DateRequestDto dateRequestDto, PrincipalDetails principalDetails) {
+
+        Diary diary = diaryRepository.findById(diaryId)
+                .orElseThrow(() -> new DiaryException(DiaryErrorCode.NO_EXIST_DIARY_EXCEPTION));
+
+        Member member = memberRepository.findByEmail(principalDetails.getEmail())
+                .orElseThrow(() -> new MemberException(MemberErrorCode.No_EXIST_EMAIL_MEMBER_EXCEPTION));
+
+        LocalDate date = LocalDate.of(dateRequestDto.getYear(), dateRequestDto.getMonth(), dateRequestDto.getDay());
+
+        DateReadTracking dateReadTracking = dateReadTrackingRepository.findByMemberIdAndDiaryIdAndDate(member.getId(), diary.getId(), date)
+                .orElseThrow(() -> new DateReadTrackingException(DateReadTrackingErrorCode.NO_DATE_READ_TRACKING_EXIST_EXCEPTION));
+
+        dateReadTracking.updateLastedMemberReadTime(LocalDateTime.now());
+        dateReadTrackingRepository.save(dateReadTracking);
+
+        return ApiDataResponse.<DiaryReadCompleteResponseDto>builder()
+                .status(true)
+                .code(200)
+                .message("해당 날짜 읽음 처리 성공!")
+                .data( DiaryReadCompleteResponseDto
+                        .builder()
+                        .diaryId(diary.getId())
+                        .date(makeDateToString(date))
+                        .isRead(true)
+                        .build())
+                .build();
+    }
+
+    public static String makeDateToString(LocalDate date) {
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+        return date.format(formatter);
     }
 }

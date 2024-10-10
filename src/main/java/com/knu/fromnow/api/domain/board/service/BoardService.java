@@ -8,7 +8,6 @@ import com.knu.fromnow.api.domain.board.dto.response.DiaryChooseResponseDto;
 import com.knu.fromnow.api.domain.board.entity.Board;
 import com.knu.fromnow.api.domain.board.repository.BoardRepository;
 import com.knu.fromnow.api.domain.board.dto.response.BoardOverViewResponseDto;
-import com.knu.fromnow.api.domain.diary.dto.response.DiaryReadRowResponseDto;
 import com.knu.fromnow.api.domain.diary.entity.Diary;
 import com.knu.fromnow.api.domain.diary.entity.DiaryMember;
 import com.knu.fromnow.api.domain.diary.repository.DiaryRepository;
@@ -17,7 +16,6 @@ import com.knu.fromnow.api.domain.like.repository.LikeRepository;
 import com.knu.fromnow.api.domain.member.entity.Member;
 import com.knu.fromnow.api.domain.member.entity.PrincipalDetails;
 import com.knu.fromnow.api.domain.member.repository.MemberRepository;
-import com.knu.fromnow.api.domain.photo.entity.BoardPhoto;
 import com.knu.fromnow.api.domain.photo.service.BoardPhotoService;
 import com.knu.fromnow.api.global.error.custom.BoardException;
 import com.knu.fromnow.api.global.error.custom.DiaryException;
@@ -113,9 +111,6 @@ public class BoardService {
         List<BoardOverViewResponseDto> boardOverViewResponseDtos = new ArrayList<>();
 
         for (Board board : contents) {
-
-            boolean isRead = board.getBoardReadList().stream().anyMatch(boardRead -> boardRead.getMember().getId().equals(member.getId()));
-
             BoardOverViewResponseDto boardOverViewResponseDto =
                     BoardOverViewResponseDto.builder()
                             .boardId(board.getId())
@@ -124,9 +119,7 @@ public class BoardService {
                             .profilePhotoUrl(board.getMember().getPhotoUrl())
                             .content(board.getContent())
                             .contentPhotoUrl(board.getBoardPhoto().getPhotoUrl())
-                            .isRead(isRead)
                             .build();
-
             boardOverViewResponseDtos.add(boardOverViewResponseDto);
         }
         return boardOverViewResponseDtos;

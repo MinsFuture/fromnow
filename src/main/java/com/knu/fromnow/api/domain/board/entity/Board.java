@@ -3,8 +3,7 @@ package com.knu.fromnow.api.domain.board.entity;
 import com.knu.fromnow.api.domain.diary.entity.Diary;
 import com.knu.fromnow.api.domain.member.entity.Member;
 import com.knu.fromnow.api.domain.photo.entity.BoardPhoto;
-import com.knu.fromnow.api.domain.read.entity.BoardRead;
-import com.knu.fromnow.api.global.BaseEntity;
+import com.knu.fromnow.api.global.spec.BaseEntity;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
@@ -19,9 +18,7 @@ import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import org.springframework.security.core.parameters.P;
 
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -49,9 +46,6 @@ public class Board extends BaseEntity {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "member_id")
     private Member member;
-
-    @OneToMany(mappedBy = "board")
-    private List<BoardRead> boardReadList = new ArrayList<>();
 
     @Builder
     public Board(String content, int like, Diary diary, Member member) {

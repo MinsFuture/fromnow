@@ -13,16 +13,14 @@ public class BoardOverViewResponseDto {
     private String profileName;
     private String contentPhotoUrl;
     private String content;
-    private boolean isRead;
 
     @Builder
-    public BoardOverViewResponseDto(Long boardId, String createdDate, String profilePhotoUrl, String profileName, String contentPhotoUrl, String content, boolean isRead) {
+    public BoardOverViewResponseDto(Long boardId, String createdDate, String profilePhotoUrl, String profileName, String contentPhotoUrl, String content) {
         this.boardId = boardId;
         this.createdDate = createdDate;
         this.profilePhotoUrl = profilePhotoUrl;
         this.profileName = profileName;
         this.contentPhotoUrl = contentPhotoUrl;
         this.content = content;
-        this.isRead = isRead;
     }
 }

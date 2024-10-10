@@ -1,7 +1,6 @@
 package com.knu.fromnow.api.domain.friend.entity;
 
-import com.knu.fromnow.api.domain.member.entity.Member;
-import com.knu.fromnow.api.global.BaseEntity;
+import com.knu.fromnow.api.global.spec.BaseEntity;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -11,8 +10,6 @@ import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-
-import java.time.LocalDateTime;
 
 @Entity(name = "friends")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)

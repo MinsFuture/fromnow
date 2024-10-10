@@ -8,16 +8,12 @@ public class DiaryReadRowResponseDto {
 
     private boolean isNew;
     private boolean hasPosts;
-    private int year;
-    private int month;
-    private int day;
+    private String date;
 
     @Builder
-    public DiaryReadRowResponseDto(boolean isNew, boolean hasPosts, int year, int month, int day) {
+    public DiaryReadRowResponseDto(boolean isNew, boolean hasPosts, String date) {
         this.isNew = isNew;
         this.hasPosts = hasPosts;
-        this.year = year;
-        this.month = month;
-        this.day = day;
+        this.date = date;
     }
 }
