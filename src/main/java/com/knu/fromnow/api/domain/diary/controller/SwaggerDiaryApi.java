@@ -22,6 +22,7 @@ import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.RequestParam;
 
 import java.util.List;
 
@@ -126,7 +127,8 @@ public interface SwaggerDiaryApi {
     @Operation(summary = "가로 스크롤 Api - 한달 치", description = "가로 스크롤 Api - 한달 치")
     ResponseEntity<ApiDataResponse<List<DiaryReadRowResponseDto>>> getRowScroll(
             @Parameter(description = "다이어리 id") Long diaryId,
-            @Parameter(description = "불러올 년 월") YearMonthRequestDto yearMonthRequestDto,
+            @Parameter(description = "불러올 년도") int year,
+            @Parameter(description = "불러올 월") int month,
             @Parameter(description = "Bearer ey...") PrincipalDetails principalDetails)
     ;
 

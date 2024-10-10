@@ -29,6 +29,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
@@ -124,10 +125,11 @@ public class ApiDiaryController implements SwaggerDiaryApi {
     @PreAuthorize("isAuthenticated()")
     public ResponseEntity<ApiDataResponse<List<DiaryReadRowResponseDto>>> getRowScroll(
             @PathVariable("diaryId") Long diaryId,
-            @RequestBody YearMonthRequestDto yearMonthRequestDto,
+            @RequestParam("year") int year,
+            @RequestParam("month") int month,
             @AuthenticationPrincipal PrincipalDetails principalDetails
     ){
-        ApiDataResponse<List<DiaryReadRowResponseDto>> response = diaryService.getRowScroll(diaryId, yearMonthRequestDto, principalDetails);
+        ApiDataResponse<List<DiaryReadRowResponseDto>> response = diaryService.getRowScroll(diaryId, year, month, principalDetails);
 
         return ResponseEntity.status(response.getCode()).body(response);
     }

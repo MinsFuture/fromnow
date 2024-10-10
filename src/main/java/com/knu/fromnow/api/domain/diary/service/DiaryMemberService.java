@@ -29,6 +29,19 @@ public class DiaryMemberService {
     private final DiaryMemberCustomRepository diaryMemberCustomRepository;
     private final DiaryRepository diaryRepository;
 
+    public void initMemberToDiary(Diary diary, Member member){
+        DiaryMember diaryMember = DiaryMember.builder()
+                .diary(diary)
+                .member(member)
+                .acceptedInvite(true)
+                .build();
+
+        member.getDiaryMembers().add(diaryMember);
+        diary.getDiaryMembers().add(diaryMember);
+
+        diaryMemberRepository.save(diaryMember);
+    }
+
     public void inviteMemberToDiary(Diary diary, Member member){
         DiaryMember diaryMember = DiaryMember.builder()
                 .diary(diary)

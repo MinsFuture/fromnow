@@ -1,4 +1,4 @@
-package com.knu.fromnow.api.domain.diary.entity;
+package com.knu.fromnow.api.domain.tracking.entity;
 
 import com.knu.fromnow.api.global.spec.BaseEntity;
 import jakarta.persistence.Column;
@@ -29,17 +29,17 @@ public class DateReadTracking extends BaseEntity {
 
     private LocalDate date;
 
-    private LocalDateTime lastedPostTime;
+    private boolean isWrite;
 
     private LocalDateTime lastedMemberReadTime;
 
     @Builder
-    public DateReadTracking(Long id, Long memberId, Long diaryId, LocalDate date, LocalDateTime lastedPostTime, LocalDateTime lastedMemberReadTime) {
+    public DateReadTracking(Long id, Long memberId, Long diaryId, LocalDate date, boolean isWrite, LocalDateTime lastedMemberReadTime) {
         this.id = id;
         this.memberId = memberId;
         this.diaryId = diaryId;
         this.date = date;
-        this.lastedPostTime = lastedPostTime;
+        this.isWrite = isWrite;
         this.lastedMemberReadTime = lastedMemberReadTime;
     }
 

@@ -1,6 +1,5 @@
 package com.knu.fromnow.api.domain.diary.service;
 
-import com.knu.fromnow.api.domain.board.entity.Board;
 import com.knu.fromnow.api.domain.board.repository.BoardRepository;
 import com.knu.fromnow.api.domain.diary.dto.request.AcceptDiaryDto;
 import com.knu.fromnow.api.domain.diary.dto.request.CreateDiaryDto;
@@ -14,10 +13,14 @@ import com.knu.fromnow.api.domain.diary.dto.response.DiaryOverViewResponseDto;
 import com.knu.fromnow.api.domain.diary.dto.response.DiaryReadCompleteResponseDto;
 import com.knu.fromnow.api.domain.diary.dto.response.DiaryReadRowResponseDto;
 import com.knu.fromnow.api.domain.diary.dto.response.DiaryRequestsReceivedDto;
-import com.knu.fromnow.api.domain.diary.entity.DateReadTracking;
+import com.knu.fromnow.api.domain.tracking.entity.DateLatestPostTime;
+import com.knu.fromnow.api.domain.tracking.entity.DateReadTracking;
 import com.knu.fromnow.api.domain.diary.entity.Diary;
 import com.knu.fromnow.api.domain.diary.entity.DiaryMember;
-import com.knu.fromnow.api.domain.diary.repository.DateReadTrackingRepository;
+import com.knu.fromnow.api.domain.tracking.repository.DateLatestPostTimeRepository;
+import com.knu.fromnow.api.domain.tracking.repository.DateReadTrackingCustomRepository;
+import com.knu.fromnow.api.domain.tracking.repository.DateReadTrackingCustomRepositoryImpl;
+import com.knu.fromnow.api.domain.tracking.repository.DateReadTrackingRepository;
 import com.knu.fromnow.api.domain.diary.repository.DiaryMemberCustomRepository;
 import com.knu.fromnow.api.domain.diary.repository.DiaryMemberRepository;
 import com.knu.fromnow.api.domain.diary.repository.DiaryRepository;
@@ -25,6 +28,8 @@ import com.knu.fromnow.api.domain.friend.repository.FriendCustomRepository;
 import com.knu.fromnow.api.domain.member.entity.Member;
 import com.knu.fromnow.api.domain.member.entity.PrincipalDetails;
 import com.knu.fromnow.api.domain.member.repository.MemberRepository;
+import com.knu.fromnow.api.domain.tracking.service.DateLatestPostTimeService;
+import com.knu.fromnow.api.domain.tracking.service.DateReadTrackingService;
 import com.knu.fromnow.api.global.error.custom.DateReadTrackingException;
 import com.knu.fromnow.api.global.error.custom.DiaryException;
 import com.knu.fromnow.api.global.error.custom.DiaryMemberException;
@@ -44,11 +49,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
-import java.util.Set;
 import java.util.stream.Collectors;
 
 @Service
@@ -64,8 +65,14 @@ public class DiaryService {
     private final DiaryMemberCustomRepository diaryMemberCustomRepository;
     private final FriendCustomRepository friendCustomRepository;
     private final DateReadTrackingRepository dateReadTrackingRepository;
+    private final DateLatestPostTimeRepository dateLatestPostTimeRepository;
+    private final DateLatestPostTimeService dateLatestPostTimeService;
+    private final DateReadTrackingService dateReadTrackingService;
+    private final DateReadTrackingCustomRepository dateReadTrackingCustomRepository;
 
     public ApiDataResponse<DiaryCreateResponseDto> createDiary(CreateDiaryDto createDiaryDto, PrincipalDetails principalDetails) {
+        LocalDateTime now = LocalDateTime.now();
+        LocalDate today = now.toLocalDate();
 
         Member member = memberRepository.findByEmail(principalDetails.getEmail())
                 .orElseThrow(() -> new MemberException(MemberErrorCode.No_EXIST_EMAIL_MEMBER_EXCEPTION));
@@ -74,21 +81,11 @@ public class DiaryService {
                 .title(createDiaryDto.getTitle())
                 .owner(member)
                 .build();
-
         diaryRepository.save(diary);
 
-        DiaryMember diaryMember = DiaryMember.builder()
-                .diary(diary)
-                .member(member)
-                .acceptedInvite(true)
-                .build();
-
-        member.getDiaryMembers().add(diaryMember);
-        diary.getDiaryMembers().add(diaryMember);
-
-        diaryMemberRepository.save(diaryMember);
-
-        List<String> photoUrls = diaryMemberCustomRepository.fetchMemberPhotoUrlsByDiary(diary);
+        diaryMemberService.initMemberToDiary(diary, member);
+        dateReadTrackingService.initDateReadTracking(diary, member, now);
+        dateLatestPostTimeService.initDateLatestPostTime(diary, today);
 
         return ApiDataResponse.<DiaryCreateResponseDto>builder()
                 .status(true)
@@ -152,6 +149,8 @@ public class DiaryService {
         }
 
         diaryRepository.delete(diary);
+        dateReadTrackingRepository.deleteAllByDiaryId(diary.getId());
+        dateLatestPostTimeRepository.deleteAllByDiaryId(diary.getId());
 
         return ApiDataResponse.<DiaryDeleteResponseDto>builder()
                 .status(true)
@@ -204,8 +203,10 @@ public class DiaryService {
 
         diaryMember.acceptInvitation();
         diaryMemberRepository.save(diaryMember);
-
         List<String> photoUrls = diaryMemberCustomRepository.fetchMemberPhotoUrlsByDiary(diary);
+
+        // tracking 정보 추가하기
+        createTrackingWhenAcceptedDiary(member, diary);
 
         return ApiDataResponse.<DiaryOverViewResponseDto>builder()
                 .status(true)
@@ -219,7 +220,21 @@ public class DiaryService {
                 .build();
     }
 
-    public ApiDataResponse<List<DiaryMenuResponseDto>> getDiaryMenu(Long id, PrincipalDetails principalDetails){
+    public void createTrackingWhenAcceptedDiary(Member member, Diary diary){
+        List<LocalDate> dateListByDiaryId = dateReadTrackingCustomRepository.findDistinctDateByDiaryId(diary.getId());
+        List<DateReadTracking> trackingList = dateListByDiaryId.stream()
+                .map(date -> DateReadTracking.builder()
+                        .diaryId(diary.getId())
+                        .memberId(member.getId())
+                        .isWrite(false)
+                        .date(date)
+                        .build())
+                .collect(Collectors.toList());
+
+        dateReadTrackingRepository.saveAll(trackingList);
+    }
+
+    public ApiDataResponse<List<DiaryMenuResponseDto>> getDiaryMenu(Long id, PrincipalDetails principalDetails) {
         Diary diary = diaryRepository.findById(id)
                 .orElseThrow(() -> new DiaryException(DiaryErrorCode.NO_EXIST_DIARY_EXCEPTION));
 
@@ -239,12 +254,12 @@ public class DiaryService {
             Member findMember = diaryMember.getMember();
 
             boolean isOwner = false;
-            if(findMember.getId().equals(owner.getId())){
+            if (findMember.getId().equals(owner.getId())) {
                 isOwner = true;
             }
 
             boolean isFriend = false;
-            if(friendsAmongSpecificMembers.contains(findMember.getId())){
+            if (friendsAmongSpecificMembers.contains(findMember.getId())) {
                 isFriend = true;
             }
 
@@ -266,31 +281,36 @@ public class DiaryService {
     }
 
 
-    public ApiDataResponse<List<DiaryReadRowResponseDto>> getRowScroll(Long id, YearMonthRequestDto yearMonthRequestDto, PrincipalDetails principalDetails) {
-        Diary diary= diaryRepository.findById(id)
+    public ApiDataResponse<List<DiaryReadRowResponseDto>> getRowScroll(Long id, int year, int month, PrincipalDetails principalDetails) {
+        Diary diary = diaryRepository.findById(id)
                 .orElseThrow(() -> new DiaryException(DiaryErrorCode.NO_EXIST_DIARY_EXCEPTION));
 
         Member member = memberRepository.findByEmail(principalDetails.getEmail())
                 .orElseThrow(() -> new MemberException(MemberErrorCode.No_EXIST_EMAIL_MEMBER_EXCEPTION));
 
-        LocalDate startDate = LocalDate.of(yearMonthRequestDto.getYear(), yearMonthRequestDto.getMonth(), 1); // 해당 월의 1일
+        LocalDate startDate = LocalDate.of(year, month, 1); // 해당 월의 1일
         LocalDate endDate = startDate.withDayOfMonth(startDate.lengthOfMonth()); // 해당 월의 마지막 날
 
         List<DateReadTracking> dateReadTrackingList = dateReadTrackingRepository.findByMemberIdAndDiaryIdAndDateBetweenOrderByDateAsc(diary.getId(), member.getId(), startDate, endDate);
+        List<DateLatestPostTime> dateLatestPostTimeList = dateLatestPostTimeRepository.findByDiaryIdAndDateBetween(diary.getId(), startDate, endDate);
         List<DiaryReadRowResponseDto> data = new ArrayList<>();
 
-        for (DateReadTracking dateReadTracking : dateReadTrackingList) {
-            LocalDateTime lastedPostTime = dateReadTracking.getLastedPostTime();
+        for (int i = 0; i < dateLatestPostTimeList.size(); i++) {
+
+            DateLatestPostTime dateLatestPostTime = dateLatestPostTimeList.get(i);
+            DateReadTracking dateReadTracking = dateReadTrackingList.get(i);
+
+            LocalDateTime lastedPostTime = dateLatestPostTime.getLatestPostTime();
             LocalDateTime lastedMemberReadTime = dateReadTracking.getLastedMemberReadTime();
             // 글이 있고, 읽은 적이 없거나 , 읽은 후에 새로운 글이 올라 온 경우
             boolean isNew = (lastedPostTime != null || lastedMemberReadTime == null || lastedPostTime.isAfter(lastedMemberReadTime));
-            boolean hasPosts = dateReadTracking.getLastedPostTime() == null;
+            boolean hasPosts = dateLatestPostTime.getLatestPostTime() == null;
             LocalDate date = dateReadTracking.getDate();
 
             data.add(DiaryReadRowResponseDto.builder()
-                            .isNew(isNew)
-                            .hasPosts(hasPosts)
-                            .date(date.toString())
+                    .isNew(isNew)
+                    .hasPosts(hasPosts)
+                    .date(date.toString())
                     .build());
         }
 
@@ -322,7 +342,7 @@ public class DiaryService {
                 .status(true)
                 .code(200)
                 .message("해당 날짜 읽음 처리 성공!")
-                .data( DiaryReadCompleteResponseDto
+                .data(DiaryReadCompleteResponseDto
                         .builder()
                         .diaryId(diary.getId())
                         .date(makeDateToString(date))
