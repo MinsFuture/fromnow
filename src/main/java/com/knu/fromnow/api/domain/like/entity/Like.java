@@ -33,9 +33,16 @@ public class Like extends BaseEntity {
     @JoinColumn(name = "board_id")
     private Board board;
 
+    private boolean isLiked;
+
     @Builder
-    public Like(Member member, Board board) {
+    public Like(Member member, Board board, boolean isLiked) {
         this.member = member;
         this.board = board;
+        this.isLiked = isLiked;
+    }
+
+    public void disLike(){
+        this.isLiked = false;
     }
 }

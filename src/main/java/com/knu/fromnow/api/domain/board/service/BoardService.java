@@ -5,6 +5,7 @@ import com.knu.fromnow.api.domain.board.dto.request.DiaryChooseRequestDto;
 import com.knu.fromnow.api.domain.board.dto.response.BoardLikeResponseDto;
 import com.knu.fromnow.api.domain.board.dto.response.BoardCreateResponseDto;
 import com.knu.fromnow.api.domain.board.dto.response.DiaryChooseResponseDto;
+import com.knu.fromnow.api.domain.board.dto.response.TodayBoardResponseDto;
 import com.knu.fromnow.api.domain.board.entity.Board;
 import com.knu.fromnow.api.domain.board.repository.BoardRepository;
 import com.knu.fromnow.api.domain.board.dto.response.BoardOverViewResponseDto;
@@ -17,10 +18,18 @@ import com.knu.fromnow.api.domain.member.entity.Member;
 import com.knu.fromnow.api.domain.member.entity.PrincipalDetails;
 import com.knu.fromnow.api.domain.member.repository.MemberRepository;
 import com.knu.fromnow.api.domain.photo.service.BoardPhotoService;
+import com.knu.fromnow.api.domain.tracking.entity.DateLatestPostTime;
+import com.knu.fromnow.api.domain.tracking.entity.DateReadTracking;
+import com.knu.fromnow.api.domain.tracking.repository.DateLatestPostTimeRepository;
+import com.knu.fromnow.api.domain.tracking.repository.DateReadTrackingRepository;
 import com.knu.fromnow.api.global.error.custom.BoardException;
+import com.knu.fromnow.api.global.error.custom.DateLatestPostTimeException;
+import com.knu.fromnow.api.global.error.custom.DateReadTrackingException;
 import com.knu.fromnow.api.global.error.custom.DiaryException;
 import com.knu.fromnow.api.global.error.custom.MemberException;
 import com.knu.fromnow.api.global.error.errorcode.custom.BoardErrorCode;
+import com.knu.fromnow.api.global.error.errorcode.custom.DateLatestPostTimeErrorCode;
+import com.knu.fromnow.api.global.error.errorcode.custom.DateReadTrackingErrorCode;
 import com.knu.fromnow.api.global.error.errorcode.custom.DiaryErrorCode;
 import com.knu.fromnow.api.global.error.errorcode.custom.MemberErrorCode;
 import com.knu.fromnow.api.global.spec.ApiDataResponse;
@@ -31,8 +40,12 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -44,8 +57,12 @@ public class BoardService {
     private final MemberRepository memberRepository;
     private final DiaryRepository diaryRepository;
     private final LikeRepository likeRepository;
+    private final DateReadTrackingRepository dateReadTrackingRepository;
+    private final DateLatestPostTimeRepository dateLatestPostTimeRepository;
 
     public ApiDataResponse<BoardCreateResponseDto> createBoard(MultipartFile file, BoardCreateRequestDto boardCreateRequestDto, Long diaryId, PrincipalDetails principalDetails) {
+        LocalDateTime now = LocalDateTime.now();
+        LocalDate today = now.toLocalDate();
 
         Member member = memberRepository.findByEmail(principalDetails.getEmail())
                 .orElseThrow(() -> new MemberException(MemberErrorCode.No_EXIST_EMAIL_MEMBER_EXCEPTION));
@@ -60,9 +77,20 @@ public class BoardService {
                 .build();
 
         boardPhotoService.uploadToBoardPhotos(file, board);
-
         member.getBoardList().add(board);
         boardRepository.save(board);
+
+        // DateReadTracking 및 DateLatestPostTime 엔티티 업데이트
+        DateReadTracking dateReadTracking = dateReadTrackingRepository.findByMemberIdAndDiaryIdAndDate(member.getId(), diaryId, today)
+                .orElseThrow(() -> new DateReadTrackingException(DateReadTrackingErrorCode.NO_DATE_READ_TRACKING_EXIST_EXCEPTION));
+        dateReadTracking.updateIsWrite();
+        dateReadTracking.updateLastedMemberReadTime(now);
+        dateReadTrackingRepository.save(dateReadTracking);
+
+        DateLatestPostTime dateLatestPostTime = dateLatestPostTimeRepository.findByDiaryIdAndDate(diaryId, today)
+                .orElseThrow(() -> new DateLatestPostTimeException(DateLatestPostTimeErrorCode.NO_DATE_LATEST_POST_TIME_EXCEPTION));
+        dateLatestPostTime.updateLatestPostTime(now);
+        dateLatestPostTimeRepository.save(dateLatestPostTime);
 
         return ApiDataResponse.<BoardCreateResponseDto>builder()
                 .status(true)
@@ -72,8 +100,9 @@ public class BoardService {
                 .build();
     }
 
-    public ApiDataResponse<List<BoardOverViewResponseDto>> getBoardOverviews(Long diaryId, Long year, Long month, Long day, PrincipalDetails principalDetails) {
-        LocalDate currentDate = LocalDate.of(year.intValue(), month.intValue(), day.intValue());
+    public ApiDataResponse<TodayBoardResponseDto> getTodayBoards(Long diaryId, String date, PrincipalDetails principalDetails) {
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+        LocalDate currentDate = LocalDate.parse(date, formatter);
 
         // 오늘의 시작과 끝 시간
         LocalDateTime startDateTime = currentDate.atStartOfDay(); // 오늘 00:00:00
@@ -89,15 +118,33 @@ public class BoardService {
         boolean hasMatchingMember = diaryMembers.stream()
                 .anyMatch(diaryMember -> diaryMember.getMember().equals(member));
 
+        // 내가 마지막으로 읽은 시점과 글 씀 여부 확인
+        DateReadTracking dateReadTracking = dateReadTrackingRepository.findByMemberIdAndDiaryIdAndDate(member.getId(), diaryId, currentDate)
+                .orElseThrow(() -> new DateReadTrackingException(DateReadTrackingErrorCode.NO_DATE_READ_TRACKING_EXIST_EXCEPTION));
+        LocalDateTime lastedMemberReadTime = dateReadTracking.getLastedMemberReadTime();
+        boolean isWrite = dateReadTracking.isWrite();
+
+        // 해당 날짜의 다이어리에 마지막으로 글이 써진 시점
+        DateLatestPostTime dateLatestPostTime = dateLatestPostTimeRepository.findByDiaryIdAndDate(diaryId, currentDate)
+                .orElseThrow(() -> new DateLatestPostTimeException(DateLatestPostTimeErrorCode.NO_DATE_LATEST_POST_TIME_EXCEPTION));
+        LocalDateTime lastedPostTime = dateLatestPostTime.getLatestPostTime();
+
+        // 글이 있고, 읽은 적이 없거나 , 읽은 후에 새로운 글이 올라 온 경우
+        boolean isRead = lastedPostTime != null || lastedMemberReadTime == null || lastedPostTime.isAfter(lastedMemberReadTime);
+
         if (!hasMatchingMember) {
             throw new MemberException(MemberErrorCode.NO_MATCHING_MEMBER_EXCEPTION);
         }
 
-        return ApiDataResponse.<List<BoardOverViewResponseDto>>builder()
+        return ApiDataResponse.<TodayBoardResponseDto>builder()
                 .status(true)
                 .code(200)
-                .message(year + "-" + month + "-" + day + "에 해당하는 글은 다음과 같습니다")
-                .data(boardOverViewResponseDtos)
+                .message(date + " 에 해당하는 글은 다음과 같습니다")
+                .data(TodayBoardResponseDto.builder()
+                        .isRead(isRead)
+                        .isWrite(isWrite)
+                        .boardOverViewResponseDtoList(boardOverViewResponseDtos)
+                        .build())
                 .build();
     }
 
@@ -110,7 +157,23 @@ public class BoardService {
     public List<BoardOverViewResponseDto> getBoardOverViewResponseDtos(List<Board> contents, Member member) {
         List<BoardOverViewResponseDto> boardOverViewResponseDtos = new ArrayList<>();
 
+        List<Long> boardIds = contents.stream()
+                .map(Board::getId)
+                .toList();
+
+        List<Like> likes = likeRepository.findByMemberAndBoardIdIn(member, boardIds);
+        Map<Long, Like> likeMap = likes.stream()
+                .collect(Collectors.toMap(like -> like.getBoard().getId(), Function.identity()));
+
         for (Board board : contents) {
+            boolean isLiked = false;
+
+            // 해당 게시물에 대한 좋아요 여부 확인
+            Like like = likeMap.get(board.getId());
+            if (like != null && like.isLiked()) {
+                isLiked = true;
+            }
+
             BoardOverViewResponseDto boardOverViewResponseDto =
                     BoardOverViewResponseDto.builder()
                             .boardId(board.getId())
@@ -119,6 +182,8 @@ public class BoardService {
                             .profilePhotoUrl(board.getMember().getPhotoUrl())
                             .content(board.getContent())
                             .contentPhotoUrl(board.getBoardPhoto().getPhotoUrl())
+                            .likes(board.getLike())
+                            .isLiked(isLiked)
                             .build();
             boardOverViewResponseDtos.add(boardOverViewResponseDto);
         }
@@ -139,6 +204,7 @@ public class BoardService {
         Like like = Like.builder()
                 .board(board)
                 .member(member)
+                .isLiked(true)
                 .build();
         likeRepository.save(like);
 
@@ -163,7 +229,8 @@ public class BoardService {
 
         Like like = likeRepository.findByMemberAndBoard(member, board)
                 .orElseThrow(() -> new RuntimeException());
-        likeRepository.delete(like);
+        like.disLike();
+        likeRepository.save(like);
 
         return ApiDataResponse.<BoardLikeResponseDto>builder()
                 .status(true)
@@ -174,27 +241,46 @@ public class BoardService {
     }
 
     public ApiDataResponse<DiaryChooseResponseDto> createBoardAndChooseDiary(MultipartFile file, DiaryChooseRequestDto diaryChooseRequestDto, PrincipalDetails principalDetails) {
+        LocalDateTime now = LocalDateTime.now();
+        LocalDate today = now.toLocalDate();
+
         Member member = memberRepository.findByEmail(principalDetails.getEmail())
                 .orElseThrow(() -> new MemberException(MemberErrorCode.No_EXIST_EMAIL_MEMBER_EXCEPTION));
         List<Diary> diaryList = diaryRepository.findByIdIn(diaryChooseRequestDto.getDiaryIds());
-        Board board = null;
+        List<Long> diaryIds = diaryList.stream().map(Diary::getId).toList();
+
+        List<Board> boardList = new ArrayList<>();
         for (Diary diary : diaryList) {
-            board = Board.builder()
+            Board board = Board.builder()
                     .member(member)
                     .content(diaryChooseRequestDto.getContent())
                     .like(0)
                     .diary(diary)
                     .build();
-            boardPhotoService.uploadToBoardPhotos(file, board);
-            member.getBoardList().add(board);
-            boardRepository.save(board);
+            boardList.add(board);
+            boardPhotoService.uploadToBoardPhotos(file, board);  // 파일 업로드
         }
+
+        // Batch Insert 처리
+        boardRepository.saveAll(boardList);
+
+        // DateReadTracking 및 DateLatestPostTime 엔티티 업데이트
+        List<DateReadTracking> dateReadTrackingList = dateReadTrackingRepository.findByMemberIdAndDiaryIdInAndDate(member.getId(), diaryIds, today);
+        List<DateLatestPostTime> dateLatestPostTimeList = dateLatestPostTimeRepository.findByDiaryIdInAndDate(diaryIds, today);
+
+        // DateReadTracking 업데이트
+        dateReadTrackingList.forEach(DateReadTracking::updateIsWrite);
+        dateReadTrackingRepository.saveAll(dateReadTrackingList);
+
+        // DateLatestPostTime 업데이트
+        dateLatestPostTimeList.forEach(dateLatestPostTime -> dateLatestPostTime.updateLatestPostTime(now));
+        dateLatestPostTimeRepository.saveAll(dateLatestPostTimeList);
 
         return ApiDataResponse.<DiaryChooseResponseDto>builder()
                 .status(true)
                 .code(200)
                 .message("일상 등록 성공!")
-                .data(DiaryChooseResponseDto.fromBoard(board, diaryList))
+                .data(DiaryChooseResponseDto.fromBoard(boardList.get(0), diaryList))
                 .build();
     }
 

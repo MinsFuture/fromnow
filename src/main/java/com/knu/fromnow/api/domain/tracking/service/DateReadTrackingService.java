@@ -8,6 +8,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 @Service
@@ -16,13 +17,13 @@ import java.time.LocalDateTime;
 public class DateReadTrackingService {
     private final DateReadTrackingRepository dateReadTrackingRepository;
 
-    public void initDateReadTracking(Diary diary, Member member, LocalDateTime now){
+    public void initDateReadTracking(Diary diary, Member member, LocalDate today){
         DateReadTracking dateReadTracking = DateReadTracking.builder()
                 .diaryId(diary.getId())
                 .memberId(member.getId())
-                .date(now.toLocalDate())
+                .date(today)
                 .isWrite(false)
-                .lastedMemberReadTime(now)
+                .lastedMemberReadTime(today.atStartOfDay())
                 .build();
 
         dateReadTrackingRepository.save(dateReadTracking);

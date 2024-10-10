@@ -50,6 +50,7 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 @Service
@@ -84,7 +85,7 @@ public class DiaryService {
         diaryRepository.save(diary);
 
         diaryMemberService.initMemberToDiary(diary, member);
-        dateReadTrackingService.initDateReadTracking(diary, member, now);
+        dateReadTrackingService.initDateReadTracking(diary, member, today);
         dateLatestPostTimeService.initDateLatestPostTime(diary, today);
 
         return ApiDataResponse.<DiaryCreateResponseDto>builder()
@@ -102,6 +103,7 @@ public class DiaryService {
         List<Long> diaryIds = diaryMemberRepository.findDiaryIdsByMemberId(member.getId());
         List<Diary> diaryList = diaryRepository.findByIdIn(diaryIds);
         List<DiaryOverViewResponseDto> responseDtoList = diaryMemberCustomRepository.fetchDiaryOverviewDtosByDiaryMembers(diaryList);
+
 
         return ApiDataResponse.<List<DiaryOverViewResponseDto>>builder()
                 .status(true)
@@ -300,11 +302,14 @@ public class DiaryService {
             DateLatestPostTime dateLatestPostTime = dateLatestPostTimeList.get(i);
             DateReadTracking dateReadTracking = dateReadTrackingList.get(i);
 
+            LocalDateTime startOfDay = dateLatestPostTime.getDate().atStartOfDay();
+
             LocalDateTime lastedPostTime = dateLatestPostTime.getLatestPostTime();
             LocalDateTime lastedMemberReadTime = dateReadTracking.getLastedMemberReadTime();
-            // 글이 있고, 읽은 적이 없거나 , 읽은 후에 새로운 글이 올라 온 경우
-            boolean isNew = (lastedPostTime != null || lastedMemberReadTime == null || lastedPostTime.isAfter(lastedMemberReadTime));
-            boolean hasPosts = dateLatestPostTime.getLatestPostTime() == null;
+            // 마지막으로 글이 써진 시간이, 내가 읽은 시점보다 더 지났을때
+            boolean isNew = lastedPostTime.isAfter(lastedMemberReadTime);
+            // 마지막으로 글이 써진 시간이, 자정 00:00:00이 아니면
+            boolean hasPosts = !lastedPostTime.equals(startOfDay);
             LocalDate date = dateReadTracking.getDate();
 
             data.add(DiaryReadRowResponseDto.builder()
@@ -345,14 +350,10 @@ public class DiaryService {
                 .data(DiaryReadCompleteResponseDto
                         .builder()
                         .diaryId(diary.getId())
-                        .date(makeDateToString(date))
+                        .date(date.toString())
                         .isRead(true)
                         .build())
                 .build();
     }
 
-    public static String makeDateToString(LocalDate date) {
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
-        return date.format(formatter);
-    }
 }

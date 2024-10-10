@@ -1,9 +1,12 @@
 package com.knu.fromnow.api.global.spec.date.request;
 
 import lombok.Builder;
+import lombok.Data;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 @Getter
+@NoArgsConstructor
 public class DateRequestDto {
     private int year;
     private int month;

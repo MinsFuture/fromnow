@@ -4,8 +4,8 @@ import com.knu.fromnow.api.domain.board.dto.request.BoardCreateRequestDto;
 import com.knu.fromnow.api.domain.board.dto.request.DiaryChooseRequestDto;
 import com.knu.fromnow.api.domain.board.dto.response.BoardLikeResponseDto;
 import com.knu.fromnow.api.domain.board.dto.response.BoardCreateResponseDto;
-import com.knu.fromnow.api.domain.board.dto.response.BoardOverViewResponseDto;
 import com.knu.fromnow.api.domain.board.dto.response.DiaryChooseResponseDto;
+import com.knu.fromnow.api.domain.board.dto.response.TodayBoardResponseDto;
 import com.knu.fromnow.api.domain.member.entity.PrincipalDetails;
 import com.knu.fromnow.api.global.spec.ApiDataResponse;
 import io.swagger.v3.oas.annotations.Operation;
@@ -14,9 +14,6 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.multipart.MultipartFile;
-
-import java.time.LocalDate;
-import java.util.List;
 
 public interface SwaggerBoardApi {
     @ApiResponses(
@@ -53,11 +50,9 @@ public interface SwaggerBoardApi {
             }
     )
     @Operation(summary = "하루 치 일기 내용들 조회", description = "다이어리 안에서 하루 치 날짜에 해당하는 일기들의 내용을 반환")
-    ResponseEntity<ApiDataResponse<List<BoardOverViewResponseDto>>> getBoardOverviews(
-            @Parameter(description = "년도") Long year,
-            @Parameter(description = "월") Long month,
-            @Parameter(description = "일") Long day,
+    ResponseEntity<ApiDataResponse<TodayBoardResponseDto>> getTodayBoards(
             @Parameter(description = "일기 id") Long id,
+            @Parameter(description = "년월일") String date,
             @Parameter PrincipalDetails principalDetails);
 
     @ApiResponses(

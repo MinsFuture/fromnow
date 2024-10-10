@@ -19,7 +19,7 @@ public class DateLatestPostTimeService {
         DateLatestPostTime dateLatestPostTime = DateLatestPostTime.builder()
                 .diaryId(diary.getId())
                 .date(today)
-                .latestPostTime(null)
+                .latestPostTime(today.atStartOfDay())
                 .build();
 
         dateLatestPostTimeRepository.save(dateLatestPostTime);

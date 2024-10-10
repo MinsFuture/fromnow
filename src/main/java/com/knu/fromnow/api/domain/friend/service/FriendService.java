@@ -155,7 +155,7 @@ public class FriendService {
                 .code(200)
                 .message("수락한 친구 데이터는 다음과 같습니다")
                 .data(FriendAcceptResponseDto.builder()
-                        .id(toMember.getId())
+                        .memberId(toMember.getId())
                         .photoUrl(toMember.getPhotoUrl())
                         .profileName(toMember.getProfileName())
                         .isFriend(true)

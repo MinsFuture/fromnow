@@ -1,6 +1,5 @@
 package com.knu.fromnow.api.domain.diary.dto.response;
 
-import com.knu.fromnow.api.global.spec.date.request.DateRequestDto;
 import lombok.Builder;
 import lombok.Getter;
 

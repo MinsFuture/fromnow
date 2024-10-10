@@ -5,9 +5,8 @@ import com.knu.fromnow.api.domain.board.dto.request.DiaryChooseRequestDto;
 import com.knu.fromnow.api.domain.board.dto.response.BoardLikeResponseDto;
 import com.knu.fromnow.api.domain.board.dto.response.BoardCreateResponseDto;
 import com.knu.fromnow.api.domain.board.dto.response.DiaryChooseResponseDto;
+import com.knu.fromnow.api.domain.board.dto.response.TodayBoardResponseDto;
 import com.knu.fromnow.api.domain.board.service.BoardService;
-import com.knu.fromnow.api.domain.board.dto.response.BoardOverViewResponseDto;
-import com.knu.fromnow.api.domain.diary.dto.response.DiaryReadRowResponseDto;
 import com.knu.fromnow.api.domain.member.entity.PrincipalDetails;
 import com.knu.fromnow.api.global.spec.ApiDataResponse;
 import lombok.RequiredArgsConstructor;
@@ -23,9 +22,6 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
-
-import java.time.LocalDate;
-import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
@@ -64,14 +60,12 @@ public class ApiBoardController implements SwaggerBoardApi {
      */
     @GetMapping("/diaries/{diaryId}")
     @PreAuthorize("isAuthenticated()")
-    public ResponseEntity<ApiDataResponse<List<BoardOverViewResponseDto>>> getBoardOverviews(
-            @RequestParam("year") Long year,
-            @RequestParam("month") Long month,
-            @RequestParam("day") Long day,
-            @PathVariable("diaryId") Long id,
+    public ResponseEntity<ApiDataResponse<TodayBoardResponseDto>> getTodayBoards(
+            @PathVariable("diaryId") Long diaryId,
+            @RequestParam("date") String date,
             @AuthenticationPrincipal PrincipalDetails principalDetails
     ) {
-        ApiDataResponse<List<BoardOverViewResponseDto>> boardOverviews = boardService.getBoardOverviews(id, year, month, day, principalDetails);
+        ApiDataResponse<TodayBoardResponseDto> boardOverviews = boardService.getTodayBoards(diaryId, date, principalDetails);
 
         return ResponseEntity.status(boardOverviews.getCode()).body(boardOverviews);
     }

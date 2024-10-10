@@ -12,4 +12,5 @@ public interface DateReadTrackingRepository extends JpaRepository<DateReadTracki
     Optional<DateReadTracking> findByMemberIdAndDiaryIdAndDate(Long memberId, Long diaryId, LocalDate date);
     List<DateReadTracking> findByMemberIdAndDiaryIdAndDateBetweenOrderByDateAsc(Long memberId, Long diaryId, LocalDate startDate, LocalDate endDate);
     void deleteAllByDiaryId(Long diaryId);
+    List<DateReadTracking> findByMemberIdAndDiaryIdInAndDate(Long memberId, List<Long> diaryIds, LocalDate date);
 }

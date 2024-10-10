@@ -46,4 +46,8 @@ public class DateReadTracking extends BaseEntity {
     public void updateLastedMemberReadTime(LocalDateTime now) {
         this.lastedMemberReadTime = now;
     }
+
+    public void updateIsWrite(){
+        this.isWrite = true;
+    }
 }

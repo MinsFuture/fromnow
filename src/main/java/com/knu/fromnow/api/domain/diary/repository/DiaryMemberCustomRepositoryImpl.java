@@ -44,6 +44,7 @@ public class DiaryMemberCustomRepositoryImpl implements DiaryMemberCustomReposit
                     .id(d.getId())
                     .title(d.getTitle())
                     .photoUrls(photoUrls)
+                    .date(d.getCreatedAt().toString())
                     .build();
         }).collect(Collectors.toList());
     }
