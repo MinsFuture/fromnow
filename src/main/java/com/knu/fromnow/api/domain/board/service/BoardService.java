@@ -130,7 +130,7 @@ public class BoardService {
         LocalDateTime lastedPostTime = dateLatestPostTime.getLatestPostTime();
 
         // 글이 있고, 읽은 적이 없거나 , 읽은 후에 새로운 글이 올라 온 경우
-        boolean isRead = lastedPostTime != null || lastedMemberReadTime == null || lastedPostTime.isAfter(lastedMemberReadTime);
+        boolean isRead = lastedPostTime.isAfter(lastedMemberReadTime);
 
         if (!hasMatchingMember) {
             throw new MemberException(MemberErrorCode.NO_MATCHING_MEMBER_EXCEPTION);
