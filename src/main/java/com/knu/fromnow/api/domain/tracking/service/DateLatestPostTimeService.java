@@ -16,6 +16,7 @@ public class DateLatestPostTimeService {
     private final DateLatestPostTimeRepository dateLatestPostTimeRepository;
 
     public void initDateLatestPostTime(Diary diary, LocalDate today){
+        System.out.println("today.atStartOfDay() = " + today.atStartOfDay());
         DateLatestPostTime dateLatestPostTime = DateLatestPostTime.builder()
                 .diaryId(diary.getId())
                 .date(today)

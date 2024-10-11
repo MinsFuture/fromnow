@@ -293,8 +293,11 @@ public class DiaryService {
         LocalDate startDate = LocalDate.of(year, month, 1); // 해당 월의 1일
         LocalDate endDate = startDate.withDayOfMonth(startDate.lengthOfMonth()); // 해당 월의 마지막 날
 
-        List<DateReadTracking> dateReadTrackingList = dateReadTrackingRepository.findByMemberIdAndDiaryIdAndDateBetweenOrderByDateAsc(diary.getId(), member.getId(), startDate, endDate);
+        List<DateReadTracking> dateReadTrackingList = dateReadTrackingRepository.findByMemberIdAndDiaryIdAndDateBetweenOrderByDateAsc(member.getId(), diary.getId(), startDate, endDate);
+        System.out.println(dateReadTrackingList.size());
         List<DateLatestPostTime> dateLatestPostTimeList = dateLatestPostTimeRepository.findByDiaryIdAndDateBetween(diary.getId(), startDate, endDate);
+        System.out.println(dateLatestPostTimeList.size());
+
         List<DiaryReadRowResponseDto> data = new ArrayList<>();
 
         for (int i = 0; i < dateLatestPostTimeList.size(); i++) {
