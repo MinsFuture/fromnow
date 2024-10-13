@@ -291,6 +291,11 @@ public class DiaryService {
         Member member = memberRepository.findByEmail(principalDetails.getEmail())
                 .orElseThrow(() -> new MemberException(MemberErrorCode.No_EXIST_EMAIL_MEMBER_EXCEPTION));
 
+        // 다이어리의 멤버인지 확인
+        if(!diaryMemberRepository.existsByDiaryAndMember(diary, member)){
+            throw new DiaryMemberException(DiaryMemberErrorCode.NO_EXIST_DIARY_MEMBER_EXCEPTION);
+        }
+
         LocalDate startDate = LocalDate.of(year, month, 1); // 해당 월의 1일
         LocalDate endDate = startDate.withDayOfMonth(startDate.lengthOfMonth()); // 해당 월의 마지막 날
 
@@ -339,6 +344,10 @@ public class DiaryService {
         Member member = memberRepository.findByEmail(principalDetails.getEmail())
                 .orElseThrow(() -> new MemberException(MemberErrorCode.No_EXIST_EMAIL_MEMBER_EXCEPTION));
 
+        if(!diaryMemberRepository.existsByDiaryAndMember(diary, member)){
+            throw new DiaryMemberException(DiaryMemberErrorCode.NO_EXIST_DIARY_MEMBER_EXCEPTION);
+        }
+
         LocalDate date = LocalDate.of(dateRequestDto.getYear(), dateRequestDto.getMonth(), dateRequestDto.getDay());
 
         DateReadTracking dateReadTracking = dateReadTrackingRepository.findByMemberIdAndDiaryIdAndDate(member.getId(), diary.getId(), date)
@@ -362,8 +371,11 @@ public class DiaryService {
 
     public ApiDataResponse<List<DiarySearchResponseDto>> searchMember(Long diaryId, String profileName) {
         List<Long> memberIds = diaryMemberRepository.findMemberIdsByDiaryId(diaryId);
-        List<Member> members = memberCustomRepository.findMembersByProfileNameContainingIgnoreCase(profileName);
+        if(memberIds.isEmpty()){
+            throw new DiaryException(DiaryErrorCode.NO_EXIST_DIARY_EXCEPTION);
+        }
 
+        List<Member> members = memberCustomRepository.findMembersByProfileNameContainingIgnoreCase(profileName);
         List<DiarySearchResponseDto> list = new ArrayList<>();
 
         for (Member member : members) {

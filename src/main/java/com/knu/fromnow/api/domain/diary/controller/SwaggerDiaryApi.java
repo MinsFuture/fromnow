@@ -159,4 +159,6 @@ public interface SwaggerDiaryApi {
             @Parameter(description = "프로필 이름") String profileName,
             @Parameter(description = "다이어리 id") Long diaryId
     );
+
+
 }

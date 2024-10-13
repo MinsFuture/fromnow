@@ -1,8 +1,12 @@
 package com.knu.fromnow.api.domain.friend.controller;
 
 import com.knu.fromnow.api.domain.friend.dto.request.AcceptFriendDto;
+import com.knu.fromnow.api.domain.friend.dto.request.FriendDeleteRequestDto;
+import com.knu.fromnow.api.domain.friend.dto.request.FriendRejectRequestDto;
 import com.knu.fromnow.api.domain.friend.dto.request.SentFriendDto;
 import com.knu.fromnow.api.domain.friend.dto.response.FriendAcceptResponseDto;
+import com.knu.fromnow.api.domain.friend.dto.response.FriendDeleteResponseDto;
+import com.knu.fromnow.api.domain.friend.dto.response.FriendRejectResponseDto;
 import com.knu.fromnow.api.domain.friend.dto.response.FriendSearchResponseDto;
 import com.knu.fromnow.api.domain.member.entity.PrincipalDetails;
 import com.knu.fromnow.api.global.spec.ApiBasicResponse;
@@ -54,6 +58,30 @@ public interface SwaggerFriendApi {
     @Operation(summary = "친구 수락 하기", description = "친구 요청을 수락합니다")
     ResponseEntity<ApiDataResponse<FriendAcceptResponseDto>> acceptFriend(
             @Parameter AcceptFriendDto acceptFriendDto,
+            @Parameter PrincipalDetails principalDetails
+    );
+
+    @ApiResponses(
+            value = {
+                    @ApiResponse(responseCode = "200", description = "친구 거절 성공!"),
+                    @ApiResponse(responseCode = "4XX", description = "요청 형식이 잘못되었습니다"),
+            }
+    )
+    @Operation(summary = "친구 거절 하기", description = "친구의 id로 거절합니다")
+    ResponseEntity<ApiDataResponse<FriendRejectResponseDto>> rejectFriend(
+            @Parameter FriendRejectRequestDto friendRejectRequestDto,
+            @Parameter PrincipalDetails principalDetails
+    );
+
+    @ApiResponses(
+            value = {
+                    @ApiResponse(responseCode = "200", description = "친구 삭제 성공!"),
+                    @ApiResponse(responseCode = "4XX", description = "요청 형식이 잘못되었습니다"),
+            }
+    )
+    @Operation(summary = "친구 삭제 하기", description = "친구의 id로 삭제합니다")
+    ResponseEntity<ApiDataResponse<FriendDeleteResponseDto>> deleteFriend(
+            @Parameter FriendDeleteRequestDto friendDeleteRequestDto,
             @Parameter PrincipalDetails principalDetails
     );
 }

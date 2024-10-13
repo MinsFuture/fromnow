@@ -1,5 +1,8 @@
 package com.knu.fromnow.api.global.error;
 
+import com.knu.fromnow.api.global.error.custom.DateLatestPostTimeException;
+import com.knu.fromnow.api.global.error.custom.DateReadTrackingException;
+import com.knu.fromnow.api.global.error.custom.DiaryException;
 import com.knu.fromnow.api.global.error.custom.DiaryMemberException;
 import com.knu.fromnow.api.global.error.custom.FriendException;
 import com.knu.fromnow.api.global.error.custom.MemberException;
@@ -53,6 +56,27 @@ public class ExControllerAdvice {
     @ExceptionHandler(MemberException.class)
     public ResponseEntity<ApiErrorResponse> handleMemberException(MemberException e) {
         ApiErrorResponse apiErrorResponse = buildErrorResponseWithCustomException(e.getMemberErrorCode());
+        return buildResponseEntity(apiErrorResponse);
+    }
+
+    // DiaryException 처리
+    @ExceptionHandler(DiaryException.class)
+    public ResponseEntity<ApiErrorResponse> handleDiaryException(DiaryException e) {
+        ApiErrorResponse apiErrorResponse = buildErrorResponseWithCustomException(e.getDiaryErrorCode());
+        return buildResponseEntity(apiErrorResponse);
+    }
+
+    // DateReadTrackingException 처리
+    @ExceptionHandler(DateReadTrackingException.class)
+    public ResponseEntity<ApiErrorResponse> handleDateReadTrackingException(DateReadTrackingException e){
+        ApiErrorResponse apiErrorResponse = buildErrorResponseWithCustomException(e.getDateReadTrackingErrorCode());
+        return buildResponseEntity(apiErrorResponse);
+    }
+
+    // DateLatestPostTimeException 처리
+    @ExceptionHandler(DateLatestPostTimeException.class)
+    public ResponseEntity<ApiErrorResponse> handleDateLatestPostTimeException(DateLatestPostTimeException e){
+        ApiErrorResponse apiErrorResponse = buildErrorResponseWithCustomException(e.getDateLatestPostTimeErrorCode());
         return buildResponseEntity(apiErrorResponse);
     }
 
