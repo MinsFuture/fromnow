@@ -2,10 +2,12 @@ package com.knu.fromnow.api.domain.friend.controller;
 
 import com.knu.fromnow.api.domain.friend.dto.request.AcceptFriendDto;
 import com.knu.fromnow.api.domain.friend.dto.request.FriendDeleteRequestDto;
+import com.knu.fromnow.api.domain.friend.dto.request.FriendRejectRequestDto;
 import com.knu.fromnow.api.domain.friend.dto.request.SentFriendDto;
 import com.knu.fromnow.api.domain.friend.dto.response.FriendAcceptResponseDto;
 import com.knu.fromnow.api.domain.friend.dto.response.FriendBasicResponseDto;
 import com.knu.fromnow.api.domain.friend.dto.response.FriendDeleteResponseDto;
+import com.knu.fromnow.api.domain.friend.dto.response.FriendRejectResponseDto;
 import com.knu.fromnow.api.domain.friend.dto.response.FriendSearchResponseDto;
 import com.knu.fromnow.api.domain.friend.service.FriendService;
 import com.knu.fromnow.api.domain.member.entity.PrincipalDetails;
@@ -59,6 +61,16 @@ public class ApiFriendController implements SwaggerFriendApi{
             @RequestBody AcceptFriendDto acceptFriendDto,
             @AuthenticationPrincipal PrincipalDetails principalDetails){
         ApiDataResponse<FriendAcceptResponseDto> response = friendService.acceptFriend(acceptFriendDto, principalDetails);
+
+        return ResponseEntity.status(response.getCode()).body(response);
+    }
+
+    @PostMapping("/reject")
+    @PreAuthorize("isAuthenticated()")
+    public ResponseEntity<ApiDataResponse<FriendRejectResponseDto>> rejectFriend(
+            @RequestBody FriendRejectRequestDto friendRejectRequestDto,
+            @AuthenticationPrincipal PrincipalDetails principalDetails){
+        ApiDataResponse<FriendRejectResponseDto> response = friendService.rejectFriend(friendRejectRequestDto, principalDetails);
 
         return ResponseEntity.status(response.getCode()).body(response);
     }

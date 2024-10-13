@@ -14,5 +14,8 @@ public interface DiaryMemberRepository extends JpaRepository<DiaryMember, Long> 
     @Query("SELECT dm.diary.id FROM Diary_Member dm WHERE dm.member.id = :memberId")
     List<Long> findDiaryIdsByMemberId(@Param("memberId") Long memberId);
 
+    @Query("SELECT dm.member.id FROM Diary_Member dm WHERE dm.diary.id = :diaryId")
+    List<Long> findMemberIdsByDiaryId(@Param("diaryId") Long diaryId);
+
     Optional<DiaryMember> findByDiaryAndMember(Diary diary, Member member);
 }

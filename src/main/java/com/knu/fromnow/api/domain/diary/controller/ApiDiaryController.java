@@ -7,6 +7,7 @@ import com.knu.fromnow.api.domain.diary.dto.request.InviteToDiaryDto;
 import com.knu.fromnow.api.domain.diary.dto.request.UpdateDiaryDto;
 import com.knu.fromnow.api.domain.diary.dto.response.DiaryCreateResponseDto;
 import com.knu.fromnow.api.domain.diary.dto.response.DiaryDeleteResponseDto;
+import com.knu.fromnow.api.domain.diary.dto.response.DiarySearchResponseDto;
 import com.knu.fromnow.api.domain.diary.dto.response.DiaryInviteResponseDto;
 import com.knu.fromnow.api.domain.diary.dto.response.DiaryMenuResponseDto;
 import com.knu.fromnow.api.domain.diary.dto.response.DiaryOverViewResponseDto;
@@ -17,7 +18,6 @@ import com.knu.fromnow.api.domain.diary.service.DiaryService;
 import com.knu.fromnow.api.domain.member.entity.PrincipalDetails;
 import com.knu.fromnow.api.global.spec.ApiDataResponse;
 import com.knu.fromnow.api.global.spec.date.request.DateRequestDto;
-import com.knu.fromnow.api.global.spec.date.request.YearMonthRequestDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -63,11 +63,11 @@ public class ApiDiaryController implements SwaggerDiaryApi {
 
     @PostMapping("/invite")
     @PreAuthorize("isAuthenticated()")
-    public ResponseEntity<ApiDataResponse<DiaryInviteResponseDto>> inviteToDiary(
+    public ResponseEntity<ApiDataResponse<List<DiaryInviteResponseDto>>> inviteToDiary(
             @RequestBody InviteToDiaryDto inviteToDiaryDto,
             @AuthenticationPrincipal PrincipalDetails principalDetails
     ) {
-        ApiDataResponse<DiaryInviteResponseDto> response = diaryService.inviteToDiary(inviteToDiaryDto, principalDetails);
+        ApiDataResponse<List<DiaryInviteResponseDto>> response = diaryService.inviteToDiary(inviteToDiaryDto, principalDetails);
 
         return ResponseEntity.status(response.getCode()).body(response);
     }
@@ -144,6 +144,17 @@ public class ApiDiaryController implements SwaggerDiaryApi {
             @RequestBody DateRequestDto dateRequestDto,
             @AuthenticationPrincipal PrincipalDetails principalDetails){
         ApiDataResponse<DiaryReadCompleteResponseDto> response = diaryService.readAllPostsByDate(diaryId, dateRequestDto, principalDetails);
+
+        return ResponseEntity.status(response.getCode()).body(response);
+    }
+
+    @GetMapping("/{diaryId}/search")
+    @PreAuthorize("isAuthenticated()")
+    public ResponseEntity<ApiDataResponse<List<DiarySearchResponseDto>>> searchToInviteDiary(
+            @RequestParam(required = true) String profileName,
+            @PathVariable("diaryId") Long diaryId
+    ){
+        ApiDataResponse<List<DiarySearchResponseDto>> response = diaryService.searchMember(diaryId, profileName);
 
         return ResponseEntity.status(response.getCode()).body(response);
     }

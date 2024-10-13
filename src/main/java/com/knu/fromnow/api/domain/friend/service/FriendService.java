@@ -2,10 +2,12 @@ package com.knu.fromnow.api.domain.friend.service;
 
 import com.knu.fromnow.api.domain.friend.dto.request.AcceptFriendDto;
 import com.knu.fromnow.api.domain.friend.dto.request.FriendDeleteRequestDto;
+import com.knu.fromnow.api.domain.friend.dto.request.FriendRejectRequestDto;
 import com.knu.fromnow.api.domain.friend.dto.request.SentFriendDto;
 import com.knu.fromnow.api.domain.friend.dto.response.FriendAcceptResponseDto;
 import com.knu.fromnow.api.domain.friend.dto.response.FriendBasicResponseDto;
 import com.knu.fromnow.api.domain.friend.dto.response.FriendDeleteResponseDto;
+import com.knu.fromnow.api.domain.friend.dto.response.FriendRejectResponseDto;
 import com.knu.fromnow.api.domain.friend.dto.response.FriendSearchResponseDto;
 import com.knu.fromnow.api.domain.friend.entity.Friend;
 import com.knu.fromnow.api.domain.friend.repository.FriendCustomRepository;
@@ -28,13 +30,13 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
 @Transactional
 public class FriendService {
 
-    private static final Logger log = LoggerFactory.getLogger(FriendService.class);
     private final FriendCustomRepository friendCustomRepository;
     private final FriendRepository friendRepository;
     private final MemberCustomRepository memberCustomRepository;
@@ -210,11 +212,35 @@ public class FriendService {
                 .code(200)
                 .message("삭제 한 친구의 데이터는 다음과 같습니다")
                 .data(FriendDeleteResponseDto.builder()
-                        .id(deleteFriend.getId())
+                        .memberId(deleteFriend.getId())
                         .profileName(deleteFriend.getProfileName())
                         .photoUrl(deleteFriend.getPhotoUrl())
                         .isFriend(false)
                         .build())
+                .build();
+    }
+
+    public ApiDataResponse<FriendRejectResponseDto> rejectFriend(FriendRejectRequestDto friendRejectRequestDto, PrincipalDetails principalDetails) {
+        Member me = memberRepository.findByEmail(principalDetails.getEmail())
+                .orElseThrow(() -> new MemberException(MemberErrorCode.No_EXIST_EMAIL_MEMBER_EXCEPTION));
+
+        Member rejectedMember = memberRepository.findById(friendRejectRequestDto.getRejectedMemberId())
+                .orElseThrow(() -> new MemberException(MemberErrorCode.NO_EXIST_MEMBER_ID_EXCEPTION));
+
+        Friend deletedFriend1 = friendRepository.findByFromMemberIdAndToMemberIdAndAreWeFriendTrue(rejectedMember.getId(), me.getId())
+                .orElseThrow(() -> new FriendException(FriendErrorCode.NO_REQUEST_EXIST_FRIEND_EXCEPTION));
+
+        Friend deletedFriend2 = friendRepository.findByFromMemberIdAndToMemberIdAndAreWeFriendFalse(me.getId(), rejectedMember.getId())
+                .orElseThrow(() -> new FriendException(FriendErrorCode.NO_INVITED_EXIST_FREIND_EXCEPTION));
+
+        friendRepository.delete(deletedFriend1);
+        friendRepository.delete(deletedFriend2);
+
+        return ApiDataResponse.<FriendRejectResponseDto>builder()
+                .status(true)
+                .code(200)
+                .message("친구 요청을 거절하였습니다. 거절 한 친구의 데이터는 다음과 같아요")
+                .data(FriendRejectResponseDto.makeFrom(rejectedMember))
                 .build();
     }
 }

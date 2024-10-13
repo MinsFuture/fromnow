@@ -12,6 +12,7 @@ import com.knu.fromnow.api.domain.diary.dto.response.DiaryOverViewResponseDto;
 import com.knu.fromnow.api.domain.diary.dto.response.DiaryReadCompleteResponseDto;
 import com.knu.fromnow.api.domain.diary.dto.response.DiaryReadRowResponseDto;
 import com.knu.fromnow.api.domain.diary.dto.response.DiaryRequestsReceivedDto;
+import com.knu.fromnow.api.domain.diary.dto.response.DiarySearchResponseDto;
 import com.knu.fromnow.api.domain.member.entity.PrincipalDetails;
 import com.knu.fromnow.api.global.spec.ApiBasicResponse;
 import com.knu.fromnow.api.global.spec.ApiDataResponse;
@@ -60,8 +61,8 @@ public interface SwaggerDiaryApi {
             }
     )
     @Operation(summary = "다이어리에 초대하는 api", description = "다이어리에 초대하는 api")
-    ResponseEntity<ApiDataResponse<DiaryInviteResponseDto>> inviteToDiary(
-            @Parameter(description = "초대 할 다이어리 id와, 초대 받을 사람의 profileName") InviteToDiaryDto inviteToDiaryDto,
+    ResponseEntity<ApiDataResponse<List<DiaryInviteResponseDto>>> inviteToDiary(
+            @Parameter(description = "초대 할 다이어리 id와, 초대 받을 사람들의 profileNames") InviteToDiaryDto inviteToDiaryDto,
             @Parameter(description = "Bearer ey...") PrincipalDetails principalDetails);
 
     //////////////////////////////////////////////////////////////////////////////////////////////
@@ -144,5 +145,18 @@ public interface SwaggerDiaryApi {
             @Parameter(description = "다이어리 id") Long diaryId,
             @Parameter(description = "읽음 처리 할 날짜") DateRequestDto dateRequestDto,
             @Parameter(description = "Bearer ey...") PrincipalDetails principalDetails
+    );
+
+    /////////////////////////////////////////////////////////////////////////////////////////////
+    @ApiResponses(
+            value = {
+                    @ApiResponse(responseCode = "200", description = "다이어리 초대 검색 APi"),
+                    @ApiResponse(responseCode = "4XX", description = "요청 형식이 잘못되었습니다"),
+            }
+    )
+    @Operation(summary = "다이어리 초대 검색 APi", description = "다이어리 초대 검색 APi")
+    ResponseEntity<ApiDataResponse<List<DiarySearchResponseDto>>> searchToInviteDiary(
+            @Parameter(description = "프로필 이름") String profileName,
+            @Parameter(description = "다이어리 id") Long diaryId
     );
 }

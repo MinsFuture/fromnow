@@ -13,6 +13,8 @@ import com.knu.fromnow.api.domain.diary.dto.response.DiaryOverViewResponseDto;
 import com.knu.fromnow.api.domain.diary.dto.response.DiaryReadCompleteResponseDto;
 import com.knu.fromnow.api.domain.diary.dto.response.DiaryReadRowResponseDto;
 import com.knu.fromnow.api.domain.diary.dto.response.DiaryRequestsReceivedDto;
+import com.knu.fromnow.api.domain.diary.dto.response.DiarySearchResponseDto;
+import com.knu.fromnow.api.domain.member.repository.MemberCustomRepository;
 import com.knu.fromnow.api.domain.tracking.entity.DateLatestPostTime;
 import com.knu.fromnow.api.domain.tracking.entity.DateReadTracking;
 import com.knu.fromnow.api.domain.diary.entity.Diary;
@@ -58,7 +60,7 @@ import java.util.stream.Collectors;
 @Transactional
 public class DiaryService {
 
-    private final BoardRepository boardRepository;
+    private final MemberCustomRepository memberCustomRepository;
     private final DiaryMemberService diaryMemberService;
     private final DiaryRepository diaryRepository;
     private final MemberRepository memberRepository;
@@ -165,7 +167,7 @@ public class DiaryService {
     }
 
 
-    public ApiDataResponse<DiaryInviteResponseDto> inviteToDiary(InviteToDiaryDto inviteToDiaryDto, PrincipalDetails principalDetails) {
+    public ApiDataResponse<List<DiaryInviteResponseDto>> inviteToDiary(InviteToDiaryDto inviteToDiaryDto, PrincipalDetails principalDetails) {
         Diary diary = diaryRepository.findById(inviteToDiaryDto.getDiaryId())
                 .orElseThrow(() -> new DiaryException(DiaryErrorCode.NO_EXIST_DIARY_EXCEPTION));
 
@@ -176,16 +178,15 @@ public class DiaryService {
             throw new MemberException(MemberErrorCode.NO_OWNER_EXCEPTION);
         }
 
-        Member invitedMember = memberRepository.findByProfileName(inviteToDiaryDto.getProfileName())
-                .orElseThrow(() -> new MemberException(MemberErrorCode.NO_EXIST_PROFILE_NAME_MEMBER_EXCEPTION));
+        List<Member> invitedMembers = memberRepository.findByProfileNameIn(inviteToDiaryDto.getProfileNames());
 
-        diaryMemberService.inviteMemberToDiary(diary, invitedMember);
+        diaryMemberService.inviteMemberToDiary(diary, invitedMembers);
 
-        return ApiDataResponse.<DiaryInviteResponseDto>builder()
+        return ApiDataResponse.<List<DiaryInviteResponseDto>>builder()
                 .status(true)
                 .code(200)
                 .message("모임 요청을 성공적으로 보냈습니다. 초대를 받은 멤버 데이터는 아래와 같습니다.")
-                .data(DiaryInviteResponseDto.makeFrom(invitedMember))
+                .data(DiaryInviteResponseDto.makeFrom(invitedMembers))
                 .build();
     }
 
@@ -222,7 +223,7 @@ public class DiaryService {
                 .build();
     }
 
-    public void createTrackingWhenAcceptedDiary(Member member, Diary diary){
+    public void createTrackingWhenAcceptedDiary(Member member, Diary diary) {
         List<LocalDate> dateListByDiaryId = dateReadTrackingCustomRepository.findDistinctDateByDiaryId(diary.getId());
         List<DateReadTracking> trackingList = dateListByDiaryId.stream()
                 .map(date -> DateReadTracking.builder()
@@ -359,4 +360,28 @@ public class DiaryService {
                 .build();
     }
 
+    public ApiDataResponse<List<DiarySearchResponseDto>> searchMember(Long diaryId, String profileName) {
+        List<Long> memberIds = diaryMemberRepository.findMemberIdsByDiaryId(diaryId);
+        List<Member> members = memberCustomRepository.findMembersByProfileNameContainingIgnoreCase(profileName);
+
+        List<DiarySearchResponseDto> list = new ArrayList<>();
+
+        for (Member member : members) {
+            boolean isTeam = memberIds.contains(member.getId());
+
+            list.add(DiarySearchResponseDto.builder()
+                    .memberId(member.getId())
+                    .profilePhotoUrl(member.getPhotoUrl())
+                    .profileName(member.getProfileName())
+                    .isTeam(isTeam)
+                    .build());
+        }
+
+        return ApiDataResponse.<List<DiarySearchResponseDto>>builder()
+                .status(true)
+                .code(200)
+                .message("다이어리에서 친구 검색 하는 Api 응답 성공")
+                .data(list)
+                .build();
+    }
 }

@@ -4,6 +4,9 @@ import com.knu.fromnow.api.domain.member.entity.Member;
 import lombok.Builder;
 import lombok.Getter;
 
+import java.util.ArrayList;
+import java.util.List;
+
 @Getter
 public class DiaryInviteResponseDto {
 
@@ -18,11 +21,18 @@ public class DiaryInviteResponseDto {
         this.profileName = profileName;
     }
 
-    public static DiaryInviteResponseDto makeFrom(Member member){
-        return DiaryInviteResponseDto.builder()
-                .memberId(member.getId())
-                .photoUrl(member.getPhotoUrl())
-                .profileName(member.getProfileName())
-                .build();
+    public static List<DiaryInviteResponseDto> makeFrom(List<Member> members){
+
+        List<DiaryInviteResponseDto> list = new ArrayList<>();
+
+        for (Member member : members) {
+            list.add(DiaryInviteResponseDto.builder()
+                    .memberId(member.getId())
+                    .photoUrl(member.getPhotoUrl())
+                    .profileName(member.getProfileName())
+                    .build());
+        }
+
+        return list;
     }
 }

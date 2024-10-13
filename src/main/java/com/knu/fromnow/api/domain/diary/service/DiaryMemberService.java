@@ -42,14 +42,21 @@ public class DiaryMemberService {
         diaryMemberRepository.save(diaryMember);
     }
 
-    public void inviteMemberToDiary(Diary diary, Member member){
-        DiaryMember diaryMember = DiaryMember.builder()
-                .diary(diary)
-                .member(member)
-                .acceptedInvite(false)
-                .build();
+    public void inviteMemberToDiary(Diary diary, List<Member> invitedMembers){
 
-        diaryMemberRepository.save(diaryMember);
+        List<DiaryMember> diaryMembers = new ArrayList<>();
+
+        for (Member invitedMember : invitedMembers) {
+            DiaryMember diaryMember = DiaryMember.builder()
+                    .diary(diary)
+                    .member(invitedMember)
+                    .acceptedInvite(false)
+                    .build();
+
+            diaryMembers.add(diaryMember);
+        }
+
+       diaryMemberRepository.saveAll(diaryMembers);
     }
 
     public ApiDataResponse<List<DiaryRequestsReceivedDto>> getDiaryRequestsReceived(PrincipalDetails principalDetails) {
