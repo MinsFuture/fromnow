@@ -39,6 +39,7 @@ out/
 ### VS Code ###
 .vscode/
 
-src/main/resources/application-dev.yml
+/src/main/resources/application-dev.yml
 /src/main/resources/linen-radio-438510-m9-5b0964e71e0a.json
 /linen-radio-438510-m9-5b0964e71e0a.json
+/src/main/resources/fromnow-34d51-firebase-adminsdk-fiy84-7b40c25669.json

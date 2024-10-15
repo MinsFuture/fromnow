@@ -29,6 +29,7 @@ dependencies {
 
     // Spring Web
     implementation 'org.springframework.boot:spring-boot-starter-web'
+    implementation 'org.springframework.boot:spring-boot-starter-web-services'
 
     // Spring Jpa
     implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
@@ -66,12 +67,11 @@ dependencies {
     // Swagger
     implementation("org.springdoc:springdoc-openapi-starter-webmvc-ui:2.0.4")
 
-    // firebase
+    // Firebase Admin SDK (1.32.0 버전 추가)
     implementation 'com.google.firebase:firebase-admin:9.3.0'
 
     // Google Cloud Storage
     implementation 'com.google.cloud:google-cloud-storage:2.12.0'
-
     // Json Parser
     implementation group: 'com.googlecode.json-simple', name: 'json-simple', version: '1.1.1'
 
