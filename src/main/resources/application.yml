@@ -26,14 +26,14 @@ spring:
     gcp:
       storage:
         credentials:
-          location: classpath:sunny-wavelet-429609-t9-5d820b98637e.json
-        project-id: sunny-wavelet-429609-t9-5d820b98637e
-        bucket: fromnow-bucket
+          location: classpath:linen-radio-438510-m9-5b0964e71e0a.json
+        project-id: linen-radio-438510-m9
+        bucket: fromnow-dev-bucket
 
 google:
   cloud:
     credentials:
-      path: sunny-wavelet-429609-t9-5d820b98637e.json
+      path: linen-radio-438510-m9-5b0964e71e0a.json
 
 logging:
   level:

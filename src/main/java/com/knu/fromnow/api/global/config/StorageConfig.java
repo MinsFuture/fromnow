@@ -23,7 +23,7 @@ public class StorageConfig {
             FileInputStream inputStream = new FileInputStream(credentialsPath);
 
             GoogleCredentials credentials = GoogleCredentials.fromStream(inputStream);
-            String projectId = "sunny-wavelet-429609-t9";
+            String projectId = "linen-radio-438510-m9";
 
             return StorageOptions.newBuilder()
                     .setProjectId(projectId)
@@ -31,9 +31,9 @@ public class StorageConfig {
                     .build()
                     .getService();
         } catch (FileNotFoundException e) {
-            throw new RuntimeException("File not found at path: /config/sunny-wavelet-429609-t9-5d820b98637e.json", e);
+            throw new RuntimeException("File not found at path: /config/linen-radio-438510-m9-5b0964e71e0a.json", e);
         } catch (IOException e) {
-            throw new RuntimeException("Error reading file at path: /config/sunny-wavelet-429609-t9-5d820b98637e.json", e);
+            throw new RuntimeException("Error reading file at path: /config/linen-radio-438510-m9-5b0964e71e0a.json", e);
         }
     }
 }
