@@ -65,6 +65,6 @@ jobs:
             sudo docker rm fromnow-backend || true
             sudo docker pull ${{ secrets.DOCKER_USERNAME }}/fromnow
             sudo docker run --name fromnow-backend -d -p 8080:8080 \
-              -v /home/helloaway214/bucket/linen-radio-438510-m9-5b0964e71e0a.json:/config/linen-radio-438510-m9-5b0964e71e0a.json \
+              -v /home/iamgroot240516/bucket/linen-radio-438510-m9-5b0964e71e0a.json:/config/linen-radio-438510-m9-5b0964e71e0a.json \
               ${{ secrets.DOCKER_USERNAME }}/fromnow
             sudo docker image prune -f
