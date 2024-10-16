@@ -13,7 +13,7 @@ import java.io.InputStream;
 public class FirebaseConfig {
     @PostConstruct
     public void firestore() throws IOException {
-        InputStream serviceAccount = getClass().getResourceAsStream("/linen-radio-438510-m9-5b0964e71e0a.json");
+        InputStream serviceAccount = getClass().getResourceAsStream("/fromnow-34d51-firebase-adminsdk-fiy84-7b40c25669.json");
         //다운받은 비공개 키 이름
 
         FirebaseOptions options = new FirebaseOptions.Builder()
