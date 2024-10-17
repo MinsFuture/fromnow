@@ -54,6 +54,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -111,6 +112,7 @@ public class DiaryService {
         List<Diary> diaryList = diaryRepository.findByIdIn(diaryIds);
         List<DiaryOverViewResponseDto> responseDtoList = diaryMemberCustomRepository.fetchDiaryOverviewDtosByDiaryMembers(diaryList);
 
+        responseDtoList.sort(Comparator.comparing(DiaryOverViewResponseDto::getDate).reversed());
 
         return ApiDataResponse.<List<DiaryOverViewResponseDto>>builder()
                 .status(true)
