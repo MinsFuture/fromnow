@@ -7,6 +7,7 @@ import jakarta.annotation.PostConstruct;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Configuration;
 
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 
@@ -18,11 +19,11 @@ public class FirebaseConfig {
 
     @PostConstruct
     public void firestore() throws IOException {
-        InputStream serviceAccount = getClass().getResourceAsStream(firebaseFileUrl);
+        FileInputStream inputStream = new FileInputStream(firebaseFileUrl);
         //다운받은 비공개 키 이름
 
         FirebaseOptions options = new FirebaseOptions.Builder()
-                .setCredentials(GoogleCredentials.fromStream(serviceAccount))
+                .setCredentials(GoogleCredentials.fromStream(inputStream))
                 .setDatabaseUrl("https://project-test-383014-default-rtdb.firebaseio.com")
                 .build();
 
