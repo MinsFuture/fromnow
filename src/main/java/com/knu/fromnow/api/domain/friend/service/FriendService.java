@@ -58,14 +58,15 @@ public class FriendService {
         List<FriendSearchResponseDto> friendsDtos = new ArrayList<>();
 
         for (Member member : members) {
-            boolean isFriend = friendsAmongSpecificMembers.contains(member.getId());
-
-            friendsDtos.add(FriendSearchResponseDto.builder()
-                    .memberId(member.getId())
-                    .profileName(member.getProfileName())
-                    .profilePhotoUrl(member.getPhotoUrl())
-                    .isFriend(isFriend)
-                    .build());
+            if(!member.getId().equals(me.getId())){
+                boolean isFriend = friendsAmongSpecificMembers.contains(member.getId());
+                friendsDtos.add(FriendSearchResponseDto.builder()
+                        .memberId(member.getId())
+                        .profileName(member.getProfileName())
+                        .profilePhotoUrl(member.getPhotoUrl())
+                        .isFriend(isFriend)
+                        .build());
+            }
         }
 
         return ApiDataResponse.<List<FriendSearchResponseDto>>builder()

@@ -305,9 +305,7 @@ public class DiaryService {
         LocalDate endDate = startDate.withDayOfMonth(startDate.lengthOfMonth()); // 해당 월의 마지막 날
 
         List<DateReadTracking> dateReadTrackingList = dateReadTrackingRepository.findByMemberIdAndDiaryIdAndDateBetweenOrderByDateAsc(member.getId(), diary.getId(), startDate, endDate);
-        System.out.println(dateReadTrackingList.size());
         List<DateLatestPostTime> dateLatestPostTimeList = dateLatestPostTimeRepository.findByDiaryIdAndDateBetween(diary.getId(), startDate, endDate);
-        System.out.println(dateLatestPostTimeList.size());
 
         List<DiaryReadRowResponseDto> data = new ArrayList<>();
 
