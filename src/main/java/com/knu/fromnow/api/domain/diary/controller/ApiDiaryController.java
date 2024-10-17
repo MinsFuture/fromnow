@@ -7,6 +7,7 @@ import com.knu.fromnow.api.domain.diary.dto.request.InviteToDiaryDto;
 import com.knu.fromnow.api.domain.diary.dto.request.UpdateDiaryDto;
 import com.knu.fromnow.api.domain.diary.dto.response.DiaryCreateResponseDto;
 import com.knu.fromnow.api.domain.diary.dto.response.DiaryDeleteResponseDto;
+import com.knu.fromnow.api.domain.diary.dto.response.DiaryReadColResponseDto;
 import com.knu.fromnow.api.domain.diary.dto.response.DiarySearchResponseDto;
 import com.knu.fromnow.api.domain.diary.dto.response.DiaryInviteResponseDto;
 import com.knu.fromnow.api.domain.diary.dto.response.DiaryMenuResponseDto;
@@ -130,6 +131,20 @@ public class ApiDiaryController implements SwaggerDiaryApi {
             @AuthenticationPrincipal PrincipalDetails principalDetails
     ){
         ApiDataResponse<List<DiaryReadRowResponseDto>> response = diaryService.getRowScroll(diaryId, year, month, principalDetails);
+
+        return ResponseEntity.status(response.getCode()).body(response);
+    }
+
+    @GetMapping("/diaries/{diaryId}/scroll/col")
+    @PreAuthorize("isAuthenticated()")
+    public ResponseEntity<ApiDataResponse<List<DiaryReadColResponseDto>>> getColScroll(
+            @PathVariable("diaryId") Long diaryId,
+            @RequestParam("year") int year,
+            @RequestParam("month") int month,
+            @RequestParam("num") int num,
+            @AuthenticationPrincipal PrincipalDetails principalDetails
+    ){
+        ApiDataResponse<List<DiaryReadColResponseDto>> response = diaryService.getColScroll(diaryId, year, month, num, principalDetails);
 
         return ResponseEntity.status(response.getCode()).body(response);
     }

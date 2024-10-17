@@ -1,5 +1,6 @@
 package com.knu.fromnow.api.domain.diary.service;
 
+import com.knu.fromnow.api.domain.board.entity.Board;
 import com.knu.fromnow.api.domain.board.repository.BoardRepository;
 import com.knu.fromnow.api.domain.diary.dto.request.AcceptDiaryDto;
 import com.knu.fromnow.api.domain.diary.dto.request.CreateDiaryDto;
@@ -10,6 +11,8 @@ import com.knu.fromnow.api.domain.diary.dto.response.DiaryDeleteResponseDto;
 import com.knu.fromnow.api.domain.diary.dto.response.DiaryInviteResponseDto;
 import com.knu.fromnow.api.domain.diary.dto.response.DiaryMenuResponseDto;
 import com.knu.fromnow.api.domain.diary.dto.response.DiaryOverViewResponseDto;
+import com.knu.fromnow.api.domain.diary.dto.response.DiaryPhotoUrlWithBlurDto;
+import com.knu.fromnow.api.domain.diary.dto.response.DiaryReadColResponseDto;
 import com.knu.fromnow.api.domain.diary.dto.response.DiaryReadCompleteResponseDto;
 import com.knu.fromnow.api.domain.diary.dto.response.DiaryReadRowResponseDto;
 import com.knu.fromnow.api.domain.diary.dto.response.DiaryRequestsReceivedDto;
@@ -52,6 +55,7 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
@@ -72,6 +76,7 @@ public class DiaryService {
     private final DateLatestPostTimeService dateLatestPostTimeService;
     private final DateReadTrackingService dateReadTrackingService;
     private final DateReadTrackingCustomRepository dateReadTrackingCustomRepository;
+    private final BoardRepository boardRepository;
 
     public ApiDataResponse<DiaryCreateResponseDto> createDiary(CreateDiaryDto createDiaryDto, PrincipalDetails principalDetails) {
         LocalDateTime now = LocalDateTime.now();
@@ -394,6 +399,57 @@ public class DiaryService {
                 .code(200)
                 .message("다이어리에서 친구 검색 하는 Api 응답 성공")
                 .data(list)
+                .build();
+    }
+
+    public ApiDataResponse<List<DiaryReadColResponseDto>> getColScroll(Long diaryId, int year, int month, int num, PrincipalDetails principalDetails) {
+        Diary diary = diaryRepository.findById(diaryId)
+                .orElseThrow(() -> new DiaryException(DiaryErrorCode.NO_EXIST_DIARY_EXCEPTION));
+
+        Member member = memberRepository.findByEmail(principalDetails.getEmail())
+                .orElseThrow(() -> new MemberException(MemberErrorCode.No_EXIST_EMAIL_MEMBER_EXCEPTION));
+
+        if(!diaryMemberRepository.existsByDiaryAndMember(diary, member)){
+            throw new DiaryMemberException(DiaryMemberErrorCode.NO_EXIST_DIARY_MEMBER_EXCEPTION);
+        }
+
+        // 조회 기간의 시작 날짜와 종료 날짜 계산
+        LocalDate endDate = LocalDate.of(year, month, 1).withDayOfMonth(1);
+        LocalDate startDate = endDate.minusMonths(num - 1).withDayOfMonth(1);
+
+        List<Board> boards = boardRepository.findByDiaryIdAndCreatedAtBetween(
+                diaryId, startDate.atStartOfDay(), endDate.withDayOfMonth(endDate.lengthOfMonth()).atTime(23, 59, 59)
+        );
+
+        Map<Object, List<Board>> boardsByDate = boards.stream()
+                .collect(Collectors.groupingBy(board -> board.getCreatedAt().toLocalDate()));
+
+
+        // 날짜별로 DiaryReadColResponseDto 생성
+        List<DiaryReadColResponseDto> diaryReadColResponseDtos = boardsByDate.entrySet().stream()
+                .map(entry -> {
+                    LocalDate date = (LocalDate) entry.getKey();
+                    List<DiaryPhotoUrlWithBlurDto> photoUrlWithBlurDtos = entry.getValue().stream()
+                            .map(board -> {
+                                // 각 Board에서 DiaryPhotoUrlWithBlurDto를 생성하는 로직 작성
+                                return DiaryPhotoUrlWithBlurDto.builder()
+                                        .photoUrl(board.getBoardPhoto().getPhotoUrl())
+                                        .isBlur(false)
+                                        .build();
+                            })
+                            .collect(Collectors.toList());
+
+                    return DiaryReadColResponseDto.builder()
+                            .date(date.toString())
+                            .photoUrlWithBlurDtos(photoUrlWithBlurDtos)
+                            .build();
+                })
+                .collect(Collectors.toList());
+
+        return ApiDataResponse.<List<DiaryReadColResponseDto>>builder()
+                .status(true)
+                .code(200)
+                .data(diaryReadColResponseDtos)
                 .build();
     }
 }
