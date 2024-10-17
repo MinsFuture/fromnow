@@ -5,6 +5,7 @@ import com.knu.fromnow.api.domain.tracking.entity.DateReadTracking;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.time.LocalDate;
+import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 
@@ -13,4 +14,5 @@ public interface DateReadTrackingRepository extends JpaRepository<DateReadTracki
     List<DateReadTracking> findByMemberIdAndDiaryIdAndDateBetweenOrderByDateAsc(Long memberId, Long diaryId, LocalDate startDate, LocalDate endDate);
     void deleteAllByDiaryId(Long diaryId);
     List<DateReadTracking> findByMemberIdAndDiaryIdInAndDate(Long memberId, List<Long> diaryIds, LocalDate date);
+    List<DateReadTracking> findByMemberIdAndDiaryIdAndDateIn(Long memberId, Long diaryId, List<LocalDate> dateList);
 }

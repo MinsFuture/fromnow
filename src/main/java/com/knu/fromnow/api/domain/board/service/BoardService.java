@@ -122,7 +122,7 @@ public class BoardService {
         DateReadTracking dateReadTracking = dateReadTrackingRepository.findByMemberIdAndDiaryIdAndDate(member.getId(), diaryId, currentDate)
                 .orElseThrow(() -> new DateReadTrackingException(DateReadTrackingErrorCode.NO_DATE_READ_TRACKING_EXIST_EXCEPTION));
         LocalDateTime lastedMemberReadTime = dateReadTracking.getLastedMemberReadTime();
-        boolean isWrite = dateReadTracking.isWrite();
+        boolean isBlur = !dateReadTracking.isWrite();
 
         // 해당 날짜의 다이어리에 마지막으로 글이 써진 시점
         DateLatestPostTime dateLatestPostTime = dateLatestPostTimeRepository.findByDiaryIdAndDate(diaryId, currentDate)
@@ -142,7 +142,7 @@ public class BoardService {
                 .message(date + " 에 해당하는 글은 다음과 같습니다")
                 .data(TodayBoardResponseDto.builder()
                         .isRead(isRead)
-                        .isWrite(isWrite)
+                        .isBlur(isBlur)
                         .boardOverViewResponseDtoList(boardOverViewResponseDtos)
                         .build())
                 .build();

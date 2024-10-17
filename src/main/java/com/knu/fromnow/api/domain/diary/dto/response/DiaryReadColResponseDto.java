@@ -9,11 +9,13 @@ import java.util.List;
 public class DiaryReadColResponseDto {
 
     private String date;
-    private List<DiaryPhotoUrlWithBlurDto> photoUrlWithBlurDtos;
+    private boolean isBlur;
+    private List<String> photoUrls;
 
     @Builder
-    public DiaryReadColResponseDto(String date, List<DiaryPhotoUrlWithBlurDto> photoUrlWithBlurDtos) {
+    public DiaryReadColResponseDto(String date, boolean isBlur, List<String> photoUrls) {
         this.date = date;
-        this.photoUrlWithBlurDtos = photoUrlWithBlurDtos;
+        this.isBlur = isBlur;
+        this.photoUrls = photoUrls;
     }
 }

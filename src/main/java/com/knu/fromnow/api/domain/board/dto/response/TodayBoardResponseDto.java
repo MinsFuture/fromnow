@@ -9,13 +9,13 @@ import java.util.List;
 public class TodayBoardResponseDto {
 
     private boolean isRead;
-    private boolean isWrite;
+    private boolean isBlur;
     private List<BoardOverViewResponseDto> boardOverViewResponseDtoList;
 
     @Builder
-    public TodayBoardResponseDto(boolean isRead, boolean isWrite, List<BoardOverViewResponseDto> boardOverViewResponseDtoList) {
+    public TodayBoardResponseDto(boolean isRead, boolean isBlur, List<BoardOverViewResponseDto> boardOverViewResponseDtoList) {
         this.isRead = isRead;
-        this.isWrite = isWrite;
+        this.isBlur = isBlur;
         this.boardOverViewResponseDtoList = boardOverViewResponseDtoList;
     }
 }

@@ -402,14 +402,16 @@ public class DiaryService {
                 .build();
     }
 
-    public ApiDataResponse<List<DiaryReadColResponseDto>> getColScroll(Long diaryId, int year, int month, int num, PrincipalDetails principalDetails) {
+    public ApiDataResponse<List<DiaryReadColResponseDto>> getColScroll(
+            Long diaryId, int year, int month, int num, PrincipalDetails principalDetails) {
+
         Diary diary = diaryRepository.findById(diaryId)
                 .orElseThrow(() -> new DiaryException(DiaryErrorCode.NO_EXIST_DIARY_EXCEPTION));
 
         Member member = memberRepository.findByEmail(principalDetails.getEmail())
                 .orElseThrow(() -> new MemberException(MemberErrorCode.No_EXIST_EMAIL_MEMBER_EXCEPTION));
 
-        if(!diaryMemberRepository.existsByDiaryAndMember(diary, member)){
+        if (!diaryMemberRepository.existsByDiaryAndMember(diary, member)) {
             throw new DiaryMemberException(DiaryMemberErrorCode.NO_EXIST_DIARY_MEMBER_EXCEPTION);
         }
 
@@ -417,31 +419,46 @@ public class DiaryService {
         LocalDate endDate = LocalDate.of(year, month, 1).withDayOfMonth(1);
         LocalDate startDate = endDate.minusMonths(num - 1).withDayOfMonth(1);
 
+        // 해당 기간 동안의 모든 게시물을 가져옵니다.
         List<Board> boards = boardRepository.findByDiaryIdAndCreatedAtBetween(
-                diaryId, startDate.atStartOfDay(), endDate.withDayOfMonth(endDate.lengthOfMonth()).atTime(23, 59, 59)
+                diaryId,
+                startDate.atStartOfDay(),
+                endDate.withDayOfMonth(endDate.lengthOfMonth()).atTime(23, 59, 59)
         );
 
-        Map<Object, List<Board>> boardsByDate = boards.stream()
+        // 게시물을 날짜별로 그룹화합니다.
+        Map<LocalDate, List<Board>> boardsByDate = boards.stream()
                 .collect(Collectors.groupingBy(board -> board.getCreatedAt().toLocalDate()));
 
+        // 기간 내의 모든 날짜 리스트를 가져옵니다.
+        List<LocalDate> dateList = new ArrayList<>(boardsByDate.keySet());
+
+        // 회원의 해당 기간 내 작성 여부 데이터를 한 번에 가져옵니다.
+        List<DateReadTracking> trackingList = dateReadTrackingRepository.findByMemberIdAndDiaryIdAndDateIn(
+                member.getId(), diaryId, dateList);
+
+        // DateReadTracking 데이터를 맵으로 변환합니다.
+        Map<LocalDate, Boolean> isWriteMap = trackingList.stream()
+                .collect(Collectors.toMap(
+                        DateReadTracking::getDate,
+                        DateReadTracking::isWrite
+                ));
 
         // 날짜별로 DiaryReadColResponseDto 생성
         List<DiaryReadColResponseDto> diaryReadColResponseDtos = boardsByDate.entrySet().stream()
                 .map(entry -> {
-                    LocalDate date = (LocalDate) entry.getKey();
-                    List<DiaryPhotoUrlWithBlurDto> photoUrlWithBlurDtos = entry.getValue().stream()
-                            .map(board -> {
-                                // 각 Board에서 DiaryPhotoUrlWithBlurDto를 생성하는 로직 작성
-                                return DiaryPhotoUrlWithBlurDto.builder()
-                                        .photoUrl(board.getBoardPhoto().getPhotoUrl())
-                                        .isBlur(false)
-                                        .build();
-                            })
-                            .collect(Collectors.toList());
+                    LocalDate date = entry.getKey();
+
+                    // 회원의 작성 여부를 맵에서 조회, 없으면 false
+                    boolean hasWritten = isWriteMap.getOrDefault(date, false);
+                    List<String> photoUrls = entry.getValue().stream()
+                            .map(board -> board.getBoardPhoto().getPhotoUrl())
+                            .toList();
 
                     return DiaryReadColResponseDto.builder()
                             .date(date.toString())
-                            .photoUrlWithBlurDtos(photoUrlWithBlurDtos)
+                            .isBlur(!hasWritten)
+                            .photoUrls(photoUrls)
                             .build();
                 })
                 .collect(Collectors.toList());
@@ -452,4 +469,5 @@ public class DiaryService {
                 .data(diaryReadColResponseDtos)
                 .build();
     }
+
 }

@@ -9,6 +9,7 @@ import com.knu.fromnow.api.domain.diary.dto.response.DiaryDeleteResponseDto;
 import com.knu.fromnow.api.domain.diary.dto.response.DiaryInviteResponseDto;
 import com.knu.fromnow.api.domain.diary.dto.response.DiaryMenuResponseDto;
 import com.knu.fromnow.api.domain.diary.dto.response.DiaryOverViewResponseDto;
+import com.knu.fromnow.api.domain.diary.dto.response.DiaryReadColResponseDto;
 import com.knu.fromnow.api.domain.diary.dto.response.DiaryReadCompleteResponseDto;
 import com.knu.fromnow.api.domain.diary.dto.response.DiaryReadRowResponseDto;
 import com.knu.fromnow.api.domain.diary.dto.response.DiaryRequestsReceivedDto;
@@ -23,6 +24,8 @@ import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import java.util.List;
@@ -134,6 +137,24 @@ public interface SwaggerDiaryApi {
     ;
 
     //////////////////////////////////////////////////////////////////////////////////////////////
+
+    @ApiResponses(
+            value = {
+                    @ApiResponse(responseCode = "200", description = "세로 스크롤 Api - X달 치"),
+                    @ApiResponse(responseCode = "4XX", description = "요청 형식이 잘못되었습니다"),
+            }
+    )
+    @Operation(summary = "세로 스크롤 Api - X달 치", description = "세로 스크롤 Api - X달 치")
+    ResponseEntity<ApiDataResponse<List<DiaryReadColResponseDto>>> getColScroll(
+            @Parameter(description = "다이어리 id") Long diaryId,
+            @Parameter(description = "불러올 년도") int year,
+            @Parameter(description = "불러올 월") int month,
+            @Parameter(description = "불러올 월 갯수") int num,
+            @Parameter(description = "Bearer ey...") PrincipalDetails principalDetails);
+
+
+    //////////////////////////////////////////////////////////////////////////////////////////////
+
     @ApiResponses(
             value = {
                     @ApiResponse(responseCode = "200", description = "읽음 처리 APi"),
