@@ -43,6 +43,8 @@ public class Member extends BaseEntity {
 
     private String refreshToken;
 
+    private String fcmToken;
+
     @OneToOne(mappedBy = "member")
     private Mission mission;
 
@@ -59,11 +61,12 @@ public class Member extends BaseEntity {
     private List<Like> likeList = new ArrayList<>();
 
     @Builder
-    public Member(Role role, String email, String profileName, String refreshToken) {
+    public Member(Role role, String email, String profileName, String refreshToken, String fcmToken) {
         this.role = role;
         this.email = email;
         this.profileName = profileName;
         this.refreshToken = refreshToken;
+        this.fcmToken = fcmToken;
     }
 
     public void setRefreshToken(String refreshToken) {
@@ -88,4 +91,7 @@ public class Member extends BaseEntity {
        }
     }
 
+    public void updateFcmToken(String fcmToken) {
+        this.fcmToken = fcmToken;
+    }
 }

@@ -52,7 +52,7 @@ public class BoardPhotoService {
             Random random = new Random();
             int number = random.nextInt(4) + 1;
 
-            return "https://storage.googleapis.com/fromnow-bucket/basic_image_00" + number + ".png";
+            return "https://storage.googleapis.com/fromnow-dev-bucket/basic_image_00" + number + ".png";
         }
 
         String uniqueFileName = createPhotoName(file);

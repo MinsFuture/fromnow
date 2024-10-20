@@ -2,6 +2,8 @@ package com.knu.fromnow.api.domain.member.service;
 
 import com.knu.fromnow.api.auth.jwt.service.JwtService;
 import com.knu.fromnow.api.domain.member.dto.request.CreateMemberDto;
+import com.knu.fromnow.api.domain.member.dto.request.FcmRequestDto;
+import com.knu.fromnow.api.domain.member.dto.response.FcmResponseDto;
 import com.knu.fromnow.api.domain.member.dto.response.PhotoUrlResponseDto;
 import com.knu.fromnow.api.domain.member.dto.response.ProfileMemberDto;
 import com.knu.fromnow.api.domain.member.dto.response.ProfileNameResponseDto;
@@ -61,7 +63,7 @@ public class MemberService {
         return ApiDataResponse.<ProfileNameResponseDto>builder()
                 .status(true)
                 .code(200)
-                .message("프로필 사진 설정 성공!")
+                .message("프로필 이름 설정 성공!")
                 .data(ProfileNameResponseDto.builder()
                         .profileName(createMemberDto.getProfileName())
                         .build())
@@ -104,6 +106,24 @@ public class MemberService {
                 .code(200)
                 .message("마이페이지 프로필 불러오기 성공!")
                 .data(profileMemberDto)
+                .build();
+    }
+
+    public ApiDataResponse<FcmResponseDto> updateFcmToken(FcmRequestDto fcmRequestDto, PrincipalDetails principalDetails) {
+        Member member = memberRepository.findByEmail(principalDetails.getEmail())
+                .orElseThrow(() -> new MemberException(MemberErrorCode.No_EXIST_EMAIL_MEMBER_EXCEPTION));
+        String fcmToken = fcmRequestDto.getFcmToken();
+
+        member.updateFcmToken(fcmToken);
+        memberRepository.save(member);
+
+        return ApiDataResponse.<FcmResponseDto>builder()
+                .status(true)
+                .code(200)
+                .message("FCM 토큰 갱신 성공!")
+                .data(FcmResponseDto.builder()
+                        .fcmToken(fcmToken)
+                        .build())
                 .build();
     }
 }

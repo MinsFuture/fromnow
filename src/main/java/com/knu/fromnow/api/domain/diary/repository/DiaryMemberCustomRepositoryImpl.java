@@ -13,6 +13,7 @@ import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -25,12 +26,11 @@ public class DiaryMemberCustomRepositoryImpl implements DiaryMemberCustomReposit
     private final JPAQueryFactory jpaQueryFactory;
 
     @Override
-    public List<DiaryOverViewResponseDto> fetchDiaryOverviewDtosByDiaryMembers(List<Diary> diaryList) {
-        QDiary diary = QDiary.diary;
+    public List<DiaryOverViewResponseDto> fetchDiaryOverviewDtosByDiaryMembers(List<Diary> diaryList, Member me) {
         QMember member = QMember.member;
         QDiaryMember diaryMember = QDiaryMember.diaryMember;
 
-        // 다이어리마다 멤버들의 photoUrl을 리스트로 수집
+        // 다이어리마다 멤버들의 photoUrl과 recivedAt을 리스트로 수집
         return diaryList.stream().map(d -> {
             List<String> photoUrls = jpaQueryFactory
                     .select(member.photoUrl)
@@ -39,12 +39,21 @@ public class DiaryMemberCustomRepositoryImpl implements DiaryMemberCustomReposit
                     .where(diaryMember.diary.eq(d))
                     .fetch();
 
+            // recivedAt을 조회
+            LocalDateTime recivedAt = jpaQueryFactory
+                    .select(diaryMember.recievedAt)
+                    .from(diaryMember)
+                    .where(diaryMember.diary.eq(d),
+                            diaryMember.member.eq(me))
+                    .fetchOne();
+
             // DiaryOverViewResponseDto로 변환
             return DiaryOverViewResponseDto.builder()
                     .id(d.getId())
                     .title(d.getTitle())
                     .photoUrls(photoUrls)
-                    .date(d.getCreatedAt().toString())
+                    .createdAt(d.getCreatedAt().toString())
+                    .recivedAt(String.valueOf(recivedAt))  // recivedAt 값 추가
                     .build();
         }).collect(Collectors.toList());
     }

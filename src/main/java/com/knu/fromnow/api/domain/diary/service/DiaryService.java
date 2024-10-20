@@ -11,7 +11,6 @@ import com.knu.fromnow.api.domain.diary.dto.response.DiaryDeleteResponseDto;
 import com.knu.fromnow.api.domain.diary.dto.response.DiaryInviteResponseDto;
 import com.knu.fromnow.api.domain.diary.dto.response.DiaryMenuResponseDto;
 import com.knu.fromnow.api.domain.diary.dto.response.DiaryOverViewResponseDto;
-import com.knu.fromnow.api.domain.diary.dto.response.DiaryPhotoUrlWithBlurDto;
 import com.knu.fromnow.api.domain.diary.dto.response.DiaryReadColResponseDto;
 import com.knu.fromnow.api.domain.diary.dto.response.DiaryReadCompleteResponseDto;
 import com.knu.fromnow.api.domain.diary.dto.response.DiaryReadRowResponseDto;
@@ -24,7 +23,6 @@ import com.knu.fromnow.api.domain.diary.entity.Diary;
 import com.knu.fromnow.api.domain.diary.entity.DiaryMember;
 import com.knu.fromnow.api.domain.tracking.repository.DateLatestPostTimeRepository;
 import com.knu.fromnow.api.domain.tracking.repository.DateReadTrackingCustomRepository;
-import com.knu.fromnow.api.domain.tracking.repository.DateReadTrackingCustomRepositoryImpl;
 import com.knu.fromnow.api.domain.tracking.repository.DateReadTrackingRepository;
 import com.knu.fromnow.api.domain.diary.repository.DiaryMemberCustomRepository;
 import com.knu.fromnow.api.domain.diary.repository.DiaryMemberRepository;
@@ -45,19 +43,16 @@ import com.knu.fromnow.api.global.error.errorcode.custom.DiaryMemberErrorCode;
 import com.knu.fromnow.api.global.error.errorcode.custom.MemberErrorCode;
 import com.knu.fromnow.api.global.spec.ApiDataResponse;
 import com.knu.fromnow.api.global.spec.date.request.DateRequestDto;
-import com.knu.fromnow.api.global.spec.date.request.YearMonthRequestDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.stream.Collectors;
 
 @Service
@@ -92,7 +87,8 @@ public class DiaryService {
                 .build();
         diaryRepository.save(diary);
 
-        diaryMemberService.initMemberToDiary(diary, member);
+        LocalDateTime createdAt = diary.getCreatedAt();
+        diaryMemberService.initMemberToDiary(diary, member, createdAt);
         dateReadTrackingService.initDateReadTracking(diary, member, today);
         dateLatestPostTimeService.initDateLatestPostTime(diary, today);
 
@@ -110,9 +106,8 @@ public class DiaryService {
 
         List<Long> diaryIds = diaryMemberRepository.findDiaryIdsByMemberId(member.getId());
         List<Diary> diaryList = diaryRepository.findByIdIn(diaryIds);
-        List<DiaryOverViewResponseDto> responseDtoList = diaryMemberCustomRepository.fetchDiaryOverviewDtosByDiaryMembers(diaryList);
-
-        responseDtoList.sort(Comparator.comparing(DiaryOverViewResponseDto::getDate).reversed());
+        List<DiaryOverViewResponseDto> responseDtoList = diaryMemberCustomRepository.fetchDiaryOverviewDtosByDiaryMembers(diaryList, member);
+        responseDtoList.sort(Comparator.comparing(DiaryOverViewResponseDto::getCreatedAt).reversed());
 
         return ApiDataResponse.<List<DiaryOverViewResponseDto>>builder()
                 .status(true)
@@ -198,6 +193,9 @@ public class DiaryService {
     }
 
     public ApiDataResponse<DiaryOverViewResponseDto> acceptInvite(AcceptDiaryDto acceptDiaryDto, PrincipalDetails principalDetails) {
+        LocalDateTime now = LocalDateTime.now();
+        LocalDate today = now.toLocalDate();
+
         Diary diary = diaryRepository.findById(acceptDiaryDto.getDiaryId())
                 .orElseThrow(() -> new DiaryException(DiaryErrorCode.NO_EXIST_DIARY_EXCEPTION));
 
@@ -212,11 +210,12 @@ public class DiaryService {
         }
 
         diaryMember.acceptInvitation();
+        diaryMember.updateRecievedAt(now);
         diaryMemberRepository.save(diaryMember);
         List<String> photoUrls = diaryMemberCustomRepository.fetchMemberPhotoUrlsByDiary(diary);
 
         // tracking 정보 추가하기
-        createTrackingWhenAcceptedDiary(member, diary);
+        createTrackingWhenAcceptedDiary(member, diary, today);
 
         return ApiDataResponse.<DiaryOverViewResponseDto>builder()
                 .status(true)
@@ -226,22 +225,22 @@ public class DiaryService {
                         .id(diary.getId())
                         .title(diary.getTitle())
                         .photoUrls(photoUrls)
+                        .createdAt(diary.getCreatedAt().toString())
+                        .recivedAt(now.toString())
                         .build())
                 .build();
     }
 
-    public void createTrackingWhenAcceptedDiary(Member member, Diary diary) {
-        List<LocalDate> dateListByDiaryId = dateReadTrackingCustomRepository.findDistinctDateByDiaryId(diary.getId());
-        List<DateReadTracking> trackingList = dateListByDiaryId.stream()
-                .map(date -> DateReadTracking.builder()
-                        .diaryId(diary.getId())
-                        .memberId(member.getId())
-                        .isWrite(false)
-                        .date(date)
-                        .build())
-                .collect(Collectors.toList());
+    public void createTrackingWhenAcceptedDiary(Member member, Diary diary, LocalDate today) {
+        DateReadTracking dateReadTracking = DateReadTracking.builder()
+                .diaryId(diary.getId())
+                .memberId(member.getId())
+                .isWrite(false)
+                .date(today)
+                .lastedMemberReadTime(today.atStartOfDay())
+                .build();
 
-        dateReadTrackingRepository.saveAll(trackingList);
+        dateReadTrackingRepository.save(dateReadTracking);
     }
 
     public ApiDataResponse<List<DiaryMenuResponseDto>> getDiaryMenu(Long id, PrincipalDetails principalDetails) {

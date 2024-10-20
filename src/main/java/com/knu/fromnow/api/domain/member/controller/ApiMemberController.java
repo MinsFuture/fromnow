@@ -1,6 +1,8 @@
 package com.knu.fromnow.api.domain.member.controller;
 
 import com.knu.fromnow.api.domain.member.dto.request.CreateMemberDto;
+import com.knu.fromnow.api.domain.member.dto.request.FcmRequestDto;
+import com.knu.fromnow.api.domain.member.dto.response.FcmResponseDto;
 import com.knu.fromnow.api.domain.member.dto.response.PhotoUrlResponseDto;
 import com.knu.fromnow.api.domain.member.dto.response.ProfileNameResponseDto;
 import com.knu.fromnow.api.domain.member.entity.PrincipalDetails;
@@ -53,6 +55,16 @@ public class ApiMemberController implements MemberApi {
             @AuthenticationPrincipal PrincipalDetails principalDetails) {
 
         ApiDataResponse<PhotoUrlResponseDto> response = memberService.setMemberPhoto(file, principalDetails);
+
+        return ResponseEntity.status(response.getCode()).body(response);
+    }
+
+    @PostMapping("/fcm")
+    @PreAuthorize("isAuthenticated()")
+    public ResponseEntity<ApiDataResponse<FcmResponseDto>> updateFcmToken(
+            @RequestBody FcmRequestDto fcmRequestDto,
+            @AuthenticationPrincipal PrincipalDetails principalDetails){
+        ApiDataResponse<FcmResponseDto> response = memberService.updateFcmToken(fcmRequestDto, principalDetails);
 
         return ResponseEntity.status(response.getCode()).body(response);
     }

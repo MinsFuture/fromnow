@@ -17,6 +17,7 @@ import org.checkerframework.checker.units.qual.A;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -29,10 +30,11 @@ public class DiaryMemberService {
     private final DiaryMemberCustomRepository diaryMemberCustomRepository;
     private final DiaryRepository diaryRepository;
 
-    public void initMemberToDiary(Diary diary, Member member){
+    public void initMemberToDiary(Diary diary, Member member, LocalDateTime createdAt){
         DiaryMember diaryMember = DiaryMember.builder()
                 .diary(diary)
                 .member(member)
+                .recievedAt(createdAt)
                 .acceptedInvite(true)
                 .build();
 

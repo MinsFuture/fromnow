@@ -15,6 +15,8 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+import java.time.LocalDateTime;
+
 @Entity(name = "Diary_Member")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Getter
@@ -32,16 +34,23 @@ public class DiaryMember extends BaseEntity {
     @JoinColumn(name = "member_id")
     private Member member;
 
+    private LocalDateTime recievedAt;
+
     private boolean acceptedInvite;
 
     @Builder
-    public DiaryMember(Diary diary, Member member, boolean acceptedInvite) {
+    public DiaryMember(Diary diary, Member member, LocalDateTime recievedAt, boolean acceptedInvite) {
         this.diary = diary;
         this.member = member;
+        this.recievedAt = recievedAt;
         this.acceptedInvite = acceptedInvite;
     }
 
     public void acceptInvitation(){
         this.acceptedInvite = true;
+    }
+
+    public void updateRecievedAt(LocalDateTime now) {
+        this.recievedAt = now;
     }
 }

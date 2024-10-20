@@ -20,4 +20,5 @@ public interface DiaryMemberRepository extends JpaRepository<DiaryMember, Long> 
     Optional<DiaryMember> findByDiaryAndMember(Diary diary, Member member);
 
     boolean existsByDiaryAndMember(Diary diary, Member member);
+    List<DiaryMember> findByAcceptedInviteTrue();
 }
