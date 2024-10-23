@@ -26,11 +26,13 @@ import com.knu.fromnow.api.global.error.custom.BoardException;
 import com.knu.fromnow.api.global.error.custom.DateLatestPostTimeException;
 import com.knu.fromnow.api.global.error.custom.DateReadTrackingException;
 import com.knu.fromnow.api.global.error.custom.DiaryException;
+import com.knu.fromnow.api.global.error.custom.LikeException;
 import com.knu.fromnow.api.global.error.custom.MemberException;
 import com.knu.fromnow.api.global.error.errorcode.custom.BoardErrorCode;
 import com.knu.fromnow.api.global.error.errorcode.custom.DateLatestPostTimeErrorCode;
 import com.knu.fromnow.api.global.error.errorcode.custom.DateReadTrackingErrorCode;
 import com.knu.fromnow.api.global.error.errorcode.custom.DiaryErrorCode;
+import com.knu.fromnow.api.global.error.errorcode.custom.LikeErrorCode;
 import com.knu.fromnow.api.global.error.errorcode.custom.MemberErrorCode;
 import com.knu.fromnow.api.global.spec.ApiDataResponse;
 import lombok.RequiredArgsConstructor;
@@ -228,7 +230,7 @@ public class BoardService {
         boardRepository.save(board);
 
         Like like = likeRepository.findByMemberAndBoard(member, board)
-                .orElseThrow(() -> new RuntimeException());
+                .orElseThrow(() -> new LikeException(LikeErrorCode.NEVER_CLICK_THE_LIKE_BUTTON_EXCEPTION));
         like.disLike();
         likeRepository.save(like);
 

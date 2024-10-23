@@ -13,6 +13,7 @@ import com.knu.fromnow.api.global.error.custom.MemberException;
 import com.knu.fromnow.api.global.error.errorcode.custom.MemberErrorCode;
 import com.knu.fromnow.api.global.spec.ApiDataResponse;
 import lombok.RequiredArgsConstructor;
+import org.aspectj.weaver.ast.Literal;
 import org.checkerframework.checker.units.qual.A;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -68,27 +69,26 @@ public class DiaryMemberService {
         List<Long> diaryIds = diaryMemberCustomRepository.getUnacceptedDiaryIdsByMember(member);
         List<Diary> diaryList = diaryRepository.findByIdIn(diaryIds);
 
-        List<DiaryRequestsReceivedDto> diaryRequestsReceivedDtos = getDiaryRequestsReceivedDtos(diaryList);
+        List<DiaryRequestsReceivedDto> list = new ArrayList<>();
+
+        for (Diary diary : diaryList) {
+            List<String> photoUrls = diaryMemberCustomRepository.fetchMemberPhotoUrlsByDiary(diary);
+
+            DiaryRequestsReceivedDto diaryRequestsReceivedDto = DiaryRequestsReceivedDto.builder()
+                    .diaryTitle(diary.getTitle())
+                    .diaryId(diary.getId())
+                    .photoUrls(photoUrls)
+                    .build();
+
+            list.add(diaryRequestsReceivedDto);
+        }
 
         return ApiDataResponse.<List<DiaryRequestsReceivedDto>>builder()
                 .status(true)
                 .code(200)
                 .message("내가 받은 모임 요청 리스트 반환 성공!")
-                .data(diaryRequestsReceivedDtos)
+                .data(list)
                 .build();
     }
 
-
-
-    private static List<DiaryRequestsReceivedDto> getDiaryRequestsReceivedDtos(List<Diary> diaryList) {
-        List<DiaryRequestsReceivedDto> diaryRequestsReceivedDtos = new ArrayList<>();
-        for (Diary diary : diaryList) {
-            DiaryRequestsReceivedDto diaryRequestsReceivedDto = DiaryRequestsReceivedDto.builder()
-                    .diaryId(diary.getId())
-                    .diaryTitle(diary.getTitle())
-                    .build();
-            diaryRequestsReceivedDtos.add(diaryRequestsReceivedDto);
-        }
-        return diaryRequestsReceivedDtos;
-    }
 }

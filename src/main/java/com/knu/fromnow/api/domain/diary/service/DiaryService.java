@@ -107,7 +107,7 @@ public class DiaryService {
         List<Long> diaryIds = diaryMemberRepository.findDiaryIdsByMemberId(member.getId());
         List<Diary> diaryList = diaryRepository.findByIdIn(diaryIds);
         List<DiaryOverViewResponseDto> responseDtoList = diaryMemberCustomRepository.fetchDiaryOverviewDtosByDiaryMembers(diaryList, member);
-        responseDtoList.sort(Comparator.comparing(DiaryOverViewResponseDto::getCreatedAt).reversed());
+        responseDtoList.sort(Comparator.comparing(DiaryOverViewResponseDto::getRecivedAt).reversed());
 
         return ApiDataResponse.<List<DiaryOverViewResponseDto>>builder()
                 .status(true)

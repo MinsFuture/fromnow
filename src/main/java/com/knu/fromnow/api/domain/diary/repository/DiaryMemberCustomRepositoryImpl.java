@@ -36,7 +36,8 @@ public class DiaryMemberCustomRepositoryImpl implements DiaryMemberCustomReposit
                     .select(member.photoUrl)
                     .from(diaryMember)
                     .join(diaryMember.member, member)
-                    .where(diaryMember.diary.eq(d))
+                    .where(diaryMember.diary.eq(d),
+                            diaryMember.acceptedInvite.isTrue())
                     .fetch();
 
             // recivedAt을 조회
