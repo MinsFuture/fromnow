@@ -2,8 +2,7 @@ package com.knu.fromnow.api.auth.oauth2.controller;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.knu.fromnow.api.auth.oauth2.dto.response.Oauth2ProfileResponseDto;
-import com.knu.fromnow.api.global.spec.ApiBasicResponse;
-import com.knu.fromnow.api.global.spec.ApiDataResponse;
+import com.knu.fromnow.api.global.spec.api.ApiDataResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;

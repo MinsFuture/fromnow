@@ -7,7 +7,7 @@ import com.knu.fromnow.api.global.error.custom.DiaryMemberException;
 import com.knu.fromnow.api.global.error.custom.FriendException;
 import com.knu.fromnow.api.global.error.custom.MemberException;
 import com.knu.fromnow.api.global.error.custom.JwtTokenException;
-import com.knu.fromnow.api.global.spec.ApiErrorResponse;
+import com.knu.fromnow.api.global.spec.api.ApiErrorResponse;
 import com.knu.fromnow.api.global.error.errorcode.ErrorCode;
 import lombok.extern.slf4j.Slf4j;
 import org.slf4j.MDC;

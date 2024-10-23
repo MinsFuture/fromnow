@@ -20,17 +20,16 @@ import com.knu.fromnow.api.global.error.custom.FriendException;
 import com.knu.fromnow.api.global.error.custom.MemberException;
 import com.knu.fromnow.api.global.error.errorcode.custom.FriendErrorCode;
 import com.knu.fromnow.api.global.error.errorcode.custom.MemberErrorCode;
-import com.knu.fromnow.api.global.spec.ApiBasicResponse;
-import com.knu.fromnow.api.global.spec.ApiDataResponse;
+import com.knu.fromnow.api.global.firebase.service.FirebaseService;
+import com.knu.fromnow.api.global.spec.api.ApiBasicResponse;
+import com.knu.fromnow.api.global.spec.api.ApiDataResponse;
+import com.knu.fromnow.api.global.spec.firebase.MemberNotificationStatusDto;
 import lombok.RequiredArgsConstructor;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -41,6 +40,7 @@ public class FriendService {
     private final FriendRepository friendRepository;
     private final MemberCustomRepository memberCustomRepository;
     private final MemberRepository memberRepository;
+    private final FirebaseService firebaseService;
 
     public ApiDataResponse<List<FriendSearchResponseDto>> searchFriend(String profileName, PrincipalDetails principalDetails) {
         Member me = memberRepository.findByEmail(principalDetails.getEmail())
@@ -103,7 +103,7 @@ public class FriendService {
                 .build();
     }
 
-    public ApiBasicResponse inviteFriend(SentFriendDto sentFriendDto, PrincipalDetails principalDetails) {
+    public ApiDataResponse<MemberNotificationStatusDto> inviteFriend(SentFriendDto sentFriendDto, PrincipalDetails principalDetails){
         Member fromMember = memberRepository.findByEmail(principalDetails.getEmail())
                 .orElseThrow(() -> new MemberException(MemberErrorCode.No_EXIST_EMAIL_MEMBER_EXCEPTION));
 
@@ -125,11 +125,14 @@ public class FriendService {
 
         friendRepository.save(sentFriendRequest);
         friendRepository.save(receivedFriendRequest);
+        MemberNotificationStatusDto responseDto
+                = firebaseService.sendFriendNotificationToInvitedMember(fromMember, toMember);
 
-        return ApiBasicResponse.builder()
+        return ApiDataResponse.<MemberNotificationStatusDto>builder()
                 .status(true)
                 .code(200)
-                .message("친구 요청 보내기 성공!")
+                .message("친구 요청 보내기 성공")
+                .data(responseDto)
                 .build();
     }
 

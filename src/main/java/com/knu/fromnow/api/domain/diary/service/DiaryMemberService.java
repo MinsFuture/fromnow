@@ -11,10 +11,8 @@ import com.knu.fromnow.api.domain.member.entity.PrincipalDetails;
 import com.knu.fromnow.api.domain.member.repository.MemberRepository;
 import com.knu.fromnow.api.global.error.custom.MemberException;
 import com.knu.fromnow.api.global.error.errorcode.custom.MemberErrorCode;
-import com.knu.fromnow.api.global.spec.ApiDataResponse;
+import com.knu.fromnow.api.global.spec.api.ApiDataResponse;
 import lombok.RequiredArgsConstructor;
-import org.aspectj.weaver.ast.Literal;
-import org.checkerframework.checker.units.qual.A;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 

@@ -1,7 +1,7 @@
 package com.knu.fromnow.api.auth.jwt.controller;
 
 import com.knu.fromnow.api.auth.jwt.service.JwtService;
-import com.knu.fromnow.api.global.spec.ApiBasicResponse;
+import com.knu.fromnow.api.global.spec.api.ApiBasicResponse;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

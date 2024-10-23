@@ -10,7 +10,7 @@ import com.knu.fromnow.api.domain.like.service.LikeService;
 import com.knu.fromnow.api.domain.member.dto.response.ProfileMemberDto;
 import com.knu.fromnow.api.domain.member.entity.PrincipalDetails;
 import com.knu.fromnow.api.domain.member.service.MemberService;
-import com.knu.fromnow.api.global.spec.ApiDataResponse;
+import com.knu.fromnow.api.global.spec.api.ApiDataResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;

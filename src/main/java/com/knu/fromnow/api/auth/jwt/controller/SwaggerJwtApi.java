@@ -1,6 +1,6 @@
 package com.knu.fromnow.api.auth.jwt.controller;
 
-import com.knu.fromnow.api.global.spec.ApiBasicResponse;
+import com.knu.fromnow.api.global.spec.api.ApiBasicResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;

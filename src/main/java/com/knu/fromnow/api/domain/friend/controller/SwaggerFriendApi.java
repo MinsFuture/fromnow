@@ -9,17 +9,14 @@ import com.knu.fromnow.api.domain.friend.dto.response.FriendDeleteResponseDto;
 import com.knu.fromnow.api.domain.friend.dto.response.FriendRejectResponseDto;
 import com.knu.fromnow.api.domain.friend.dto.response.FriendSearchResponseDto;
 import com.knu.fromnow.api.domain.member.entity.PrincipalDetails;
-import com.knu.fromnow.api.global.spec.ApiBasicResponse;
-import com.knu.fromnow.api.global.spec.ApiDataResponse;
+import com.knu.fromnow.api.global.spec.api.ApiBasicResponse;
+import com.knu.fromnow.api.global.spec.api.ApiDataResponse;
+import com.knu.fromnow.api.global.spec.firebase.MemberNotificationStatusDto;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestParam;
 
 import java.util.List;
 
@@ -44,7 +41,7 @@ public interface SwaggerFriendApi {
             }
     )
     @Operation(summary = "친구 요청 하기", description = "친구의 profileName으로 요청합니다")
-    ResponseEntity<ApiBasicResponse> inviteFriend(
+    ResponseEntity<ApiDataResponse<MemberNotificationStatusDto>> inviteFriend(
             @Parameter SentFriendDto sentFriendDto,
             @Parameter PrincipalDetails principalDetails
     );

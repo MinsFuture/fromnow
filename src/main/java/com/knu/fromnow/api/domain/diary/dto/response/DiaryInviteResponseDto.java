@@ -13,12 +13,14 @@ public class DiaryInviteResponseDto {
     private Long memberId;
     private String photoUrl;
     private String profileName;
+    private boolean isNotificationSuccess;
 
     @Builder
-    public DiaryInviteResponseDto(Long memberId, String photoUrl, String profileName) {
+    public DiaryInviteResponseDto(Long memberId, String photoUrl, String profileName, boolean isNotificationSuccess) {
         this.memberId = memberId;
         this.photoUrl = photoUrl;
         this.profileName = profileName;
+        this.isNotificationSuccess = isNotificationSuccess;
     }
 
     public static List<DiaryInviteResponseDto> makeFrom(List<Member> members){

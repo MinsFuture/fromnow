@@ -8,7 +8,7 @@ import com.knu.fromnow.api.domain.board.dto.response.DiaryChooseResponseDto;
 import com.knu.fromnow.api.domain.board.dto.response.TodayBoardResponseDto;
 import com.knu.fromnow.api.domain.board.service.BoardService;
 import com.knu.fromnow.api.domain.member.entity.PrincipalDetails;
-import com.knu.fromnow.api.global.spec.ApiDataResponse;
+import com.knu.fromnow.api.global.spec.api.ApiDataResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;

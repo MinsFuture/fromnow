@@ -5,14 +5,14 @@ import com.knu.fromnow.api.domain.friend.dto.request.FriendDeleteRequestDto;
 import com.knu.fromnow.api.domain.friend.dto.request.FriendRejectRequestDto;
 import com.knu.fromnow.api.domain.friend.dto.request.SentFriendDto;
 import com.knu.fromnow.api.domain.friend.dto.response.FriendAcceptResponseDto;
-import com.knu.fromnow.api.domain.friend.dto.response.FriendBasicResponseDto;
 import com.knu.fromnow.api.domain.friend.dto.response.FriendDeleteResponseDto;
 import com.knu.fromnow.api.domain.friend.dto.response.FriendRejectResponseDto;
 import com.knu.fromnow.api.domain.friend.dto.response.FriendSearchResponseDto;
 import com.knu.fromnow.api.domain.friend.service.FriendService;
 import com.knu.fromnow.api.domain.member.entity.PrincipalDetails;
-import com.knu.fromnow.api.global.spec.ApiBasicResponse;
-import com.knu.fromnow.api.global.spec.ApiDataResponse;
+import com.knu.fromnow.api.global.spec.api.ApiBasicResponse;
+import com.knu.fromnow.api.global.spec.api.ApiDataResponse;
+import com.knu.fromnow.api.global.spec.firebase.MemberNotificationStatusDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -47,10 +47,10 @@ public class ApiFriendController implements SwaggerFriendApi{
 
     @PostMapping("/sent")
     @PreAuthorize("isAuthenticated()")
-    public ResponseEntity<ApiBasicResponse> inviteFriend(
+    public ResponseEntity<ApiDataResponse<MemberNotificationStatusDto>> inviteFriend(
             @RequestBody SentFriendDto sentFriendDto,
             @AuthenticationPrincipal PrincipalDetails principalDetails){
-        ApiBasicResponse response = friendService.inviteFriend(sentFriendDto, principalDetails);
+        ApiDataResponse<MemberNotificationStatusDto> response = friendService.inviteFriend(sentFriendDto, principalDetails);
 
         return ResponseEntity.status(response.getCode()).body(response);
     }

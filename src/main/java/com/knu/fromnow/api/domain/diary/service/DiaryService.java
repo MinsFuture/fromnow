@@ -41,7 +41,8 @@ import com.knu.fromnow.api.global.error.errorcode.custom.DateReadTrackingErrorCo
 import com.knu.fromnow.api.global.error.errorcode.custom.DiaryErrorCode;
 import com.knu.fromnow.api.global.error.errorcode.custom.DiaryMemberErrorCode;
 import com.knu.fromnow.api.global.error.errorcode.custom.MemberErrorCode;
-import com.knu.fromnow.api.global.spec.ApiDataResponse;
+import com.knu.fromnow.api.global.firebase.service.FirebaseService;
+import com.knu.fromnow.api.global.spec.api.ApiDataResponse;
 import com.knu.fromnow.api.global.spec.date.request.DateRequestDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -71,6 +72,7 @@ public class DiaryService {
     private final DateLatestPostTimeRepository dateLatestPostTimeRepository;
     private final DateLatestPostTimeService dateLatestPostTimeService;
     private final DateReadTrackingService dateReadTrackingService;
+    private final FirebaseService firebaseService;
     private final DateReadTrackingCustomRepository dateReadTrackingCustomRepository;
     private final BoardRepository boardRepository;
 
@@ -184,11 +186,13 @@ public class DiaryService {
 
         diaryMemberService.inviteMemberToDiary(diary, invitedMembers);
 
+        List<DiaryInviteResponseDto> data = firebaseService.sendDiaryNotificationToInvitedMembers(owner, invitedMembers, diary);
+
         return ApiDataResponse.<List<DiaryInviteResponseDto>>builder()
                 .status(true)
                 .code(200)
                 .message("모임 요청을 성공적으로 보냈습니다. 초대를 받은 멤버 데이터는 아래와 같습니다.")
-                .data(DiaryInviteResponseDto.makeFrom(invitedMembers))
+                .data(data)
                 .build();
     }
 

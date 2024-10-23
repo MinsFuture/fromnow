@@ -7,7 +7,7 @@ import com.knu.fromnow.api.domain.board.dto.response.BoardCreateResponseDto;
 import com.knu.fromnow.api.domain.board.dto.response.DiaryChooseResponseDto;
 import com.knu.fromnow.api.domain.board.dto.response.TodayBoardResponseDto;
 import com.knu.fromnow.api.domain.member.entity.PrincipalDetails;
-import com.knu.fromnow.api.global.spec.ApiDataResponse;
+import com.knu.fromnow.api.global.spec.api.ApiDataResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;

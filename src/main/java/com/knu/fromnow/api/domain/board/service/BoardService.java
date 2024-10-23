@@ -11,6 +11,7 @@ import com.knu.fromnow.api.domain.board.repository.BoardRepository;
 import com.knu.fromnow.api.domain.board.dto.response.BoardOverViewResponseDto;
 import com.knu.fromnow.api.domain.diary.entity.Diary;
 import com.knu.fromnow.api.domain.diary.entity.DiaryMember;
+import com.knu.fromnow.api.domain.diary.repository.DiaryMemberRepository;
 import com.knu.fromnow.api.domain.diary.repository.DiaryRepository;
 import com.knu.fromnow.api.domain.like.entity.Like;
 import com.knu.fromnow.api.domain.like.repository.LikeRepository;
@@ -34,7 +35,9 @@ import com.knu.fromnow.api.global.error.errorcode.custom.DateReadTrackingErrorCo
 import com.knu.fromnow.api.global.error.errorcode.custom.DiaryErrorCode;
 import com.knu.fromnow.api.global.error.errorcode.custom.LikeErrorCode;
 import com.knu.fromnow.api.global.error.errorcode.custom.MemberErrorCode;
-import com.knu.fromnow.api.global.spec.ApiDataResponse;
+import com.knu.fromnow.api.global.firebase.service.FirebaseService;
+import com.knu.fromnow.api.global.spec.api.ApiDataResponse;
+import com.knu.fromnow.api.global.spec.firebase.MemberNotificationStatusDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -61,29 +64,33 @@ public class BoardService {
     private final LikeRepository likeRepository;
     private final DateReadTrackingRepository dateReadTrackingRepository;
     private final DateLatestPostTimeRepository dateLatestPostTimeRepository;
+    private final FirebaseService firebaseService;
+    private final DiaryMemberRepository diaryMemberRepository;
 
     public ApiDataResponse<BoardCreateResponseDto> createBoard(MultipartFile file, BoardCreateRequestDto boardCreateRequestDto, Long diaryId, PrincipalDetails principalDetails) {
         LocalDateTime now = LocalDateTime.now();
         LocalDate today = now.toLocalDate();
 
-        Member member = memberRepository.findByEmail(principalDetails.getEmail())
+        Member me = memberRepository.findByEmail(principalDetails.getEmail())
                 .orElseThrow(() -> new MemberException(MemberErrorCode.No_EXIST_EMAIL_MEMBER_EXCEPTION));
 
         Diary diary = diaryRepository.findById(diaryId)
                 .orElseThrow(() -> new DiaryException(DiaryErrorCode.NO_EXIST_DIARY_EXCEPTION));
+        List<Long> memberIds = diaryMemberRepository.findMemberIdsByDiaryId(diaryId);
+        List<Member> members = memberRepository.findByIdIn(memberIds);
 
         Board board = Board.builder()
                 .content(boardCreateRequestDto.getContent())
                 .diary(diary)
-                .member(member)
+                .member(me)
                 .build();
 
         boardPhotoService.uploadToBoardPhotos(file, board);
-        member.getBoardList().add(board);
+        me.getBoardList().add(board);
         boardRepository.save(board);
 
         // DateReadTracking 및 DateLatestPostTime 엔티티 업데이트
-        DateReadTracking dateReadTracking = dateReadTrackingRepository.findByMemberIdAndDiaryIdAndDate(member.getId(), diaryId, today)
+        DateReadTracking dateReadTracking = dateReadTrackingRepository.findByMemberIdAndDiaryIdAndDate(me.getId(), diaryId, today)
                 .orElseThrow(() -> new DateReadTrackingException(DateReadTrackingErrorCode.NO_DATE_READ_TRACKING_EXIST_EXCEPTION));
         dateReadTracking.updateIsWrite();
         dateReadTracking.updateLastedMemberReadTime(now);
@@ -94,11 +101,13 @@ public class BoardService {
         dateLatestPostTime.updateLatestPostTime(now);
         dateLatestPostTimeRepository.save(dateLatestPostTime);
 
+        List<MemberNotificationStatusDto> memberNotificationStatusDtos = firebaseService.sendNewBoardNotificationToDiaryMember(me, members, diary);
+
         return ApiDataResponse.<BoardCreateResponseDto>builder()
                 .status(true)
                 .code(200)
                 .message("일상 등록 성공!")
-                .data(BoardCreateResponseDto.fromBoard(board))
+                .data(BoardCreateResponseDto.makeFrom(board, memberNotificationStatusDtos))
                 .build();
     }
 

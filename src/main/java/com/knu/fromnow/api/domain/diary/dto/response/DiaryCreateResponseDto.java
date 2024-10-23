@@ -20,7 +20,6 @@ public class DiaryCreateResponseDto {
         this.photoUrls = photoUrls;
     }
 
-
     public static DiaryCreateResponseDto fromDiary(Diary diary){
         return DiaryCreateResponseDto.builder()
                 .id(diary.getId())
