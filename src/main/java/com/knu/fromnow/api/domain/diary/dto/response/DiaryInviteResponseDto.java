@@ -1,6 +1,7 @@
 package com.knu.fromnow.api.domain.diary.dto.response;
 
 import com.knu.fromnow.api.domain.member.entity.Member;
+import com.knu.fromnow.api.global.spec.firebase.MemberNotificationStatusDto;
 import lombok.Builder;
 import lombok.Getter;
 
@@ -13,15 +14,17 @@ public class DiaryInviteResponseDto {
     private Long memberId;
     private String photoUrl;
     private String profileName;
-    private boolean isNotificationSuccess;
+    private MemberNotificationStatusDto memberNotificationStatusDto;
 
     @Builder
-    public DiaryInviteResponseDto(Long memberId, String photoUrl, String profileName, boolean isNotificationSuccess) {
+    public DiaryInviteResponseDto(Long memberId, String photoUrl, String profileName, MemberNotificationStatusDto memberNotificationStatusDto) {
         this.memberId = memberId;
         this.photoUrl = photoUrl;
         this.profileName = profileName;
-        this.isNotificationSuccess = isNotificationSuccess;
+        this.memberNotificationStatusDto = memberNotificationStatusDto;
     }
+
+
 
     public static List<DiaryInviteResponseDto> makeFrom(List<Member> members){
 

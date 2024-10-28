@@ -6,11 +6,13 @@ import com.knu.fromnow.api.domain.member.entity.Member;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
+import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Map;
 
 public interface DiaryMemberCustomRepository {
-
     List<DiaryOverViewResponseDto> fetchDiaryOverviewDtosByDiaryMembers(List<Diary> diaryList, Member member);
     List<Long> getUnacceptedDiaryIdsByMember(Member member);
     List<String> fetchMemberPhotoUrlsByDiary(Diary diary);
+    Map<Member, LocalDateTime> findRecievedAtByDiaryAndMembers(Diary diary, List<Member> members);
 }

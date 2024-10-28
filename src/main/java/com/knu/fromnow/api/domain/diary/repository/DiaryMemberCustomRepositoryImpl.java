@@ -2,22 +2,18 @@ package com.knu.fromnow.api.domain.diary.repository;
 
 import com.knu.fromnow.api.domain.diary.dto.response.DiaryOverViewResponseDto;
 import com.knu.fromnow.api.domain.diary.entity.Diary;
-import com.knu.fromnow.api.domain.diary.entity.QDiary;
+import com.knu.fromnow.api.domain.diary.entity.DiaryMember;
 import com.knu.fromnow.api.domain.diary.entity.QDiaryMember;
 import com.knu.fromnow.api.domain.member.entity.Member;
 import com.knu.fromnow.api.domain.member.entity.QMember;
-import com.querydsl.core.Tuple;
-import com.querydsl.core.types.Projections;
 import com.querydsl.jpa.impl.JPAQueryFactory;
-import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
-
-import static com.knu.fromnow.api.domain.member.entity.QMember.member;
 
 @Repository
 @RequiredArgsConstructor
@@ -84,5 +80,21 @@ public class DiaryMemberCustomRepositoryImpl implements DiaryMemberCustomReposit
                 .where(diaryMember.diary.eq(diary),
                         diaryMember.acceptedInvite.isTrue())
                 .fetch();
+    }
+
+    @Override
+    public Map<Member, LocalDateTime> findRecievedAtByDiaryAndMembers(Diary diary, List<Member> members) {
+        QDiaryMember qDiaryMember = QDiaryMember.diaryMember;
+
+        List<DiaryMember> diaryMembers = jpaQueryFactory
+                .selectFrom(qDiaryMember)
+                .where(
+                        qDiaryMember.diary.eq(diary)
+                                .and(qDiaryMember.member.in(members))
+                )
+                .fetch();
+
+        return diaryMembers.stream()
+                .collect(Collectors.toMap(DiaryMember::getMember, DiaryMember::getRecievedAt));
     }
 }

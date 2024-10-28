@@ -7,12 +7,14 @@ import lombok.Getter;
 public class MemberNotificationStatusDto {
     private Long memberId;
     private String profileName;
+    private String fcmToken;
     private boolean isNotificationSuccess;
 
     @Builder
-    public MemberNotificationStatusDto(Long memberId, String profileName, boolean isNotificationSuccess) {
+    public MemberNotificationStatusDto(Long memberId, String profileName, String fcmToken, boolean isNotificationSuccess) {
         this.memberId = memberId;
         this.profileName = profileName;
+        this.fcmToken = fcmToken;
         this.isNotificationSuccess = isNotificationSuccess;
     }
 }

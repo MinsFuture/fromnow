@@ -29,5 +29,4 @@ public class FirebaseController {
         return ResponseEntity.status(response.getCode()).body(response);
     }
 
-
 }

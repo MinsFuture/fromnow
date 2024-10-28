@@ -78,6 +78,7 @@ public class BoardService {
                 .orElseThrow(() -> new DiaryException(DiaryErrorCode.NO_EXIST_DIARY_EXCEPTION));
         List<Long> memberIds = diaryMemberRepository.findMemberIdsByDiaryId(diaryId);
         List<Member> members = memberRepository.findByIdIn(memberIds);
+        members.removeIf(member -> member.getId().equals(me.getId()));
 
         Board board = Board.builder()
                 .content(boardCreateRequestDto.getContent())
