@@ -5,6 +5,7 @@ import com.knu.fromnow.api.domain.board.repository.BoardRepository;
 import com.knu.fromnow.api.domain.diary.dto.request.AcceptDiaryDto;
 import com.knu.fromnow.api.domain.diary.dto.request.CreateDiaryDto;
 import com.knu.fromnow.api.domain.diary.dto.request.InviteToDiaryDto;
+import com.knu.fromnow.api.domain.diary.dto.request.RejectDiaryDto;
 import com.knu.fromnow.api.domain.diary.dto.request.UpdateDiaryDto;
 import com.knu.fromnow.api.domain.diary.dto.response.DiaryCreateResponseDto;
 import com.knu.fromnow.api.domain.diary.dto.response.DiaryDeleteResponseDto;
@@ -42,6 +43,7 @@ import com.knu.fromnow.api.global.error.errorcode.custom.DiaryErrorCode;
 import com.knu.fromnow.api.global.error.errorcode.custom.DiaryMemberErrorCode;
 import com.knu.fromnow.api.global.error.errorcode.custom.MemberErrorCode;
 import com.knu.fromnow.api.global.firebase.service.FirebaseService;
+import com.knu.fromnow.api.global.spec.api.ApiBasicResponse;
 import com.knu.fromnow.api.global.spec.api.ApiDataResponse;
 import com.knu.fromnow.api.global.spec.date.request.DateRequestDto;
 import lombok.RequiredArgsConstructor;
@@ -473,4 +475,22 @@ public class DiaryService {
                 .build();
     }
 
+    public ApiBasicResponse rejectInvite(RejectDiaryDto rejectDiaryDto, PrincipalDetails principalDetails) {
+        Member member = memberRepository.findByEmail(principalDetails.getEmail())
+                .orElseThrow(() -> new MemberException(MemberErrorCode.No_EXIST_EMAIL_MEMBER_EXCEPTION));
+
+        Diary diary = diaryRepository.findById(rejectDiaryDto.getRejectDiaryId())
+                .orElseThrow(() -> new DiaryException(DiaryErrorCode.NO_EXIST_DIARY_EXCEPTION));
+
+        DiaryMember diaryMember = diaryMemberRepository.findByDiaryAndMemberAndAcceptedInviteFalse(diary, member)
+                .orElseThrow(() -> new DiaryMemberException(DiaryMemberErrorCode.NO_EXIST_DIARY_MEMBER_EXCEPTION));
+
+        diaryMemberRepository.delete(diaryMember);
+
+        return ApiBasicResponse.builder()
+                .status(true)
+                .code(200)
+                .message("다이어리 초대 거절 성공")
+                .build();
+    }
 }

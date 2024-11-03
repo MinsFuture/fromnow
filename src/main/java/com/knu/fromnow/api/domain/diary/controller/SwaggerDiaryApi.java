@@ -3,6 +3,7 @@ package com.knu.fromnow.api.domain.diary.controller;
 import com.knu.fromnow.api.domain.diary.dto.request.AcceptDiaryDto;
 import com.knu.fromnow.api.domain.diary.dto.request.CreateDiaryDto;
 import com.knu.fromnow.api.domain.diary.dto.request.InviteToDiaryDto;
+import com.knu.fromnow.api.domain.diary.dto.request.RejectDiaryDto;
 import com.knu.fromnow.api.domain.diary.dto.request.UpdateDiaryDto;
 import com.knu.fromnow.api.domain.diary.dto.response.DiaryCreateResponseDto;
 import com.knu.fromnow.api.domain.diary.dto.response.DiaryDeleteResponseDto;
@@ -15,6 +16,7 @@ import com.knu.fromnow.api.domain.diary.dto.response.DiaryReadRowResponseDto;
 import com.knu.fromnow.api.domain.diary.dto.response.DiaryRequestsReceivedDto;
 import com.knu.fromnow.api.domain.diary.dto.response.DiarySearchResponseDto;
 import com.knu.fromnow.api.domain.member.entity.PrincipalDetails;
+import com.knu.fromnow.api.global.spec.api.ApiBasicResponse;
 import com.knu.fromnow.api.global.spec.api.ApiDataResponse;
 import com.knu.fromnow.api.global.spec.date.request.DateRequestDto;
 import io.swagger.v3.oas.annotations.Operation;
@@ -78,6 +80,21 @@ public interface SwaggerDiaryApi {
     );
 
     //////////////////////////////////////////////////////////////////////////////////////////////
+
+    @ApiResponses(
+            value = {
+                    @ApiResponse(responseCode = "200", description = "다이어리 초대 거절"),
+                    @ApiResponse(responseCode = "4XX", description = "요청 형식이 잘못되었습니다"),
+            }
+    )
+    @Operation(summary = "다이어리 초대를 거절하는 api", description = "초대를 거절합니다")
+    ResponseEntity<ApiBasicResponse> rejectedInvite(
+            @Parameter(description = "거절 할 다이어리 id") RejectDiaryDto rejectDiaryDto,
+            @Parameter(description = "Bearer ey...") PrincipalDetails principalDetails
+    );
+
+    //////////////////////////////////////////////////////////////////////////////////////////////
+
 
     @ApiResponses(
             value = {

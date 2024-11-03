@@ -4,6 +4,7 @@ package com.knu.fromnow.api.domain.diary.controller;
 import com.knu.fromnow.api.domain.diary.dto.request.AcceptDiaryDto;
 import com.knu.fromnow.api.domain.diary.dto.request.CreateDiaryDto;
 import com.knu.fromnow.api.domain.diary.dto.request.InviteToDiaryDto;
+import com.knu.fromnow.api.domain.diary.dto.request.RejectDiaryDto;
 import com.knu.fromnow.api.domain.diary.dto.request.UpdateDiaryDto;
 import com.knu.fromnow.api.domain.diary.dto.response.DiaryCreateResponseDto;
 import com.knu.fromnow.api.domain.diary.dto.response.DiaryDeleteResponseDto;
@@ -17,6 +18,7 @@ import com.knu.fromnow.api.domain.diary.dto.response.DiaryReadRowResponseDto;
 import com.knu.fromnow.api.domain.diary.dto.response.DiaryRequestsReceivedDto;
 import com.knu.fromnow.api.domain.diary.service.DiaryService;
 import com.knu.fromnow.api.domain.member.entity.PrincipalDetails;
+import com.knu.fromnow.api.global.spec.api.ApiBasicResponse;
 import com.knu.fromnow.api.global.spec.api.ApiDataResponse;
 import com.knu.fromnow.api.global.spec.date.request.DateRequestDto;
 import lombok.RequiredArgsConstructor;
@@ -84,6 +86,16 @@ public class ApiDiaryController implements SwaggerDiaryApi {
         return ResponseEntity.status(response.getCode()).body(response);
     }
 
+    @PostMapping("/reject")
+    @PreAuthorize("isAuthenticated()")
+    public ResponseEntity<ApiBasicResponse> rejectedInvite(
+            @RequestBody RejectDiaryDto rejectDiaryDto,
+            @AuthenticationPrincipal PrincipalDetails principalDetails
+    ){
+        ApiBasicResponse response = diaryService.rejectInvite(rejectDiaryDto, principalDetails);
+
+        return ResponseEntity.status(response.getCode()).body(response);
+    }
 
     @PutMapping("{diaryId}")
     @PreAuthorize("isAuthenticated()")

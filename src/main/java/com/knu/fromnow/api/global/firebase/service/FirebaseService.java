@@ -19,8 +19,10 @@ import com.knu.fromnow.api.global.spec.api.ApiDataResponse;
 import com.knu.fromnow.api.global.spec.firebase.MemberNotificationStatusDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.scheduling.annotation.Scheduled;
+import org.springframework.security.core.parameters.P;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.servlet.View;
 
 import java.io.IOException;
 import java.time.LocalDate;
@@ -29,10 +31,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.UUID;
-import java.util.function.Function;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -42,18 +41,21 @@ public class FirebaseService {
     private final MemberRepository memberRepository;
     private final DiaryMemberCustomRepository diaryMemberCustomRepository;
     private final ObjectMapper objectMapper;
+    private final View error;
 
     public ApiDataResponse<FirebaseTestResponseDto> testNotification(PrincipalDetails principalDetails) throws FirebaseMessagingException {
         Member member = memberRepository.findByEmail(principalDetails.getEmail())
                 .orElseThrow(() -> new MemberException(MemberErrorCode.No_EXIST_EMAIL_MEMBER_EXCEPTION));
 
+        String fcmToken = member.getFcmToken();
+
         Message message = Message.builder()
-                .setToken(member.getFcmToken())
+                .setToken(fcmToken)
                 .setNotification(Notification.builder()
                         .setTitle("테스트용")
                         .setBody("테스트 메시지")
                         .build())
-                .putData("link", "/camera")
+                .putData("path", "/camera")
                 .build();
 
         FirebaseTestResponseDto data = FirebaseTestResponseDto.builder()
@@ -99,13 +101,22 @@ public class FirebaseService {
      */
     public MemberNotificationStatusDto sendFriendNotificationToInvitedMember(Member fromMember, Member toMember) {
         String fcmToken = toMember.getFcmToken();
+        if(fcmToken == null){
+            return MemberNotificationStatusDto.builder()
+                    .memberId(toMember.getId())
+                    .profileName(toMember.getProfileName())
+                    .fcmToken(fcmToken)
+                    .isNotificationSuccess(false)
+                    .errorMessage("Fcm 토큰이 Null 입니다")
+                    .build();
+        }
         String randomUUID = getRandomUUID();
 
         Map<String, String> data = new HashMap<>();
         data.put("title", "친구 요청을 받았을때");
         data.put("body", fromMember.getProfileName() + "님이 당신과 친구가 되고 싶어해요.");
         data.put("id", randomUUID);
-        data.put("link", "MyFriend?req=req");
+        data.put("path", "MyFriend?req=req");
         data.put("imageUrl", fromMember.getPhotoUrl());
 
         Message message = Message.builder()
@@ -114,11 +125,13 @@ public class FirebaseService {
                 .build();
 
         boolean isNotificationSuccess = true;
+        String errorMessage = null;
 
         try {
             FirebaseMessaging.getInstance().send(message);
-        } catch (FirebaseMessagingException e) {
+        } catch (Exception e) {
             isNotificationSuccess = false;
+            errorMessage = e.getMessage();
         }
 
         return MemberNotificationStatusDto.builder()
@@ -126,6 +139,7 @@ public class FirebaseService {
                 .profileName(toMember.getProfileName())
                 .fcmToken(fcmToken)
                 .isNotificationSuccess(isNotificationSuccess)
+                .errorMessage(errorMessage)
                 .build();
     }
 
@@ -137,25 +151,44 @@ public class FirebaseService {
 
         for (Member member : invitedMembers) {
             String fcmToken = member.getFcmToken();
+            if(fcmToken == null){
+                responseDtos.add(DiaryInviteResponseDto.builder()
+                        .memberId(member.getId())
+                        .profileName(member.getProfileName())
+                        .photoUrl(member.getPhotoUrl())
+                        .memberNotificationStatusDto(MemberNotificationStatusDto.builder()
+                                .profileName(member.getProfileName())
+                                .memberId(member.getId())
+                                .fcmToken(fcmToken)
+                                .isNotificationSuccess(false)
+                                .errorMessage("Fcm 토큰이 Null 입니다")
+                                .build())
+                        .build());
+
+                continue;
+            }
             String randomUUID = getRandomUUID();
 
             Map<String, String> data = new HashMap<>();
             data.put("title", "다이어리(팀) 초대 받았을때");
             data.put("body", fromMember.getProfileName() + "님이 " + diary.getTitle() + " 모임에 당신을 초대했어요.");
             data.put("id", randomUUID);
-            data.put("link", "MyTeamRequest");
+            data.put("path", "MyTeamRequest");
             data.put("imageUrl", fromMember.getPhotoUrl());
 
+            boolean isNotificationSuccess = true;
+            String errorMessage = null;
+            // FCM 토큰이 있는 경우 알림 전송 시도
             Message message = Message.builder()
                     .setToken(fcmToken)
                     .putAllData(data)
                     .build();
-
-            boolean isNotificationSuccess = true;
             try {
                 FirebaseMessaging.getInstance().send(message);
-            } catch (FirebaseMessagingException e) {
-                isNotificationSuccess = false;
+                isNotificationSuccess = true;  // 전송 성공
+            } catch (Exception e) {
+                isNotificationSuccess = false; // 전송 실패
+                errorMessage = e.getMessage();
             }
 
             responseDtos.add(DiaryInviteResponseDto.builder()
@@ -167,6 +200,7 @@ public class FirebaseService {
                             .memberId(member.getId())
                             .fcmToken(fcmToken)
                             .isNotificationSuccess(isNotificationSuccess)
+                            .errorMessage(errorMessage)
                             .build())
                     .build());
         }
@@ -185,10 +219,20 @@ public class FirebaseService {
             String randomUUID = getRandomUUID();
             String fcmToken = member.getFcmToken();
 
+            if(fcmToken == null){
+                responseDtos.add(MemberNotificationStatusDto.builder()
+                        .memberId(member.getId())
+                        .profileName(member.getProfileName())
+                        .fcmToken(member.getFcmToken())
+                        .isNotificationSuccess(false)
+                        .errorMessage("Fcm 토큰이 Null 입니다")
+                        .build());
+            }
+
             Map<String, String> data = new HashMap<>();
 
             data.put("id", randomUUID);
-            data.put("link", "Team?teamId=" + diary.getId());
+            data.put("path", "Team?teamId=" + diary.getId());
             data.put("imageUrl", me.getPhotoUrl());
             data.put("title", "누가 새로운 글을 썼을때");
             data.put("body", me.getProfileName() + "님이 " + diary.getTitle() + " 모임에 새로운 일상을 등록했어요.");
@@ -214,18 +258,21 @@ public class FirebaseService {
                     .build();
 
             boolean isNotificationSuccess = true;
+            String errorMessage = null;
+
             try {
                 FirebaseMessaging.getInstance().send(message);
-            } catch (FirebaseMessagingException e) {
+            } catch (Exception e) {
                 isNotificationSuccess = false;
+                errorMessage = e.getMessage();
             }
-
 
             responseDtos.add(MemberNotificationStatusDto.builder()
                     .memberId(member.getId())
                     .profileName(member.getProfileName())
                     .fcmToken(member.getFcmToken())
                     .isNotificationSuccess(isNotificationSuccess)
+                    .errorMessage(errorMessage)
                     .build());
         }
 
