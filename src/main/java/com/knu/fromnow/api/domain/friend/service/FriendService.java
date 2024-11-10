@@ -110,6 +110,10 @@ public class FriendService {
         Member toMember = memberRepository.findByProfileName(sentFriendDto.getSentProfileName())
                 .orElseThrow(() -> new MemberException(MemberErrorCode.NO_EXIST_PROFILE_NAME_MEMBER_EXCEPTION));
 
+        if (friendRepository.existsByFromMemberIdAndToMemberId(fromMember.getId(), toMember.getId())) {
+            throw new FriendException(FriendErrorCode.ALREADY_WE_ARE_FRIEND_EXCEPTION);
+        }
+
         Friend sentFriendRequest = Friend.builder()
                 .fromMemberId(fromMember.getId())
                 .toMemberId(toMember.getId())

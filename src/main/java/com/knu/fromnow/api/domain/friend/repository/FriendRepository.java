@@ -11,4 +11,5 @@ public interface FriendRepository extends JpaRepository<Friend, Long> {
     Optional<Friend> findByFromMemberIdAndToMemberIdAndAreWeFriendFalse(Long fromMemberId, Long toMemberId);
     Optional<Friend> findByFromMemberIdAndToMemberIdAndAreWeFriendTrue(Long fromMemberId, Long toMemberId);
 
+    boolean existsByFromMemberIdAndToMemberId(Long fromMemberId, Long toMemberId);
 }

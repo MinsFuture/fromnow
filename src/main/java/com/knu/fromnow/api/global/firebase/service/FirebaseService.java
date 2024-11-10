@@ -2,6 +2,7 @@ package com.knu.fromnow.api.global.firebase.service;
 
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.firebase.messaging.AndroidConfig;
 import com.google.firebase.messaging.FirebaseMessaging;
 import com.google.firebase.messaging.FirebaseMessagingException;
 import com.google.firebase.messaging.Message;
@@ -122,6 +123,9 @@ public class FirebaseService {
         Message message = Message.builder()
                 .setToken(fcmToken)
                 .putAllData(data)
+                .setAndroidConfig(AndroidConfig.builder()
+                        .setPriority(AndroidConfig.Priority.HIGH)
+                        .build())
                 .build();
 
         boolean isNotificationSuccess = true;
@@ -182,6 +186,9 @@ public class FirebaseService {
             Message message = Message.builder()
                     .setToken(fcmToken)
                     .putAllData(data)
+                    .setAndroidConfig(AndroidConfig.builder()
+                            .setPriority(AndroidConfig.Priority.HIGH)
+                            .build())
                     .build();
             try {
                 FirebaseMessaging.getInstance().send(message);
@@ -255,6 +262,9 @@ public class FirebaseService {
             Message message = Message.builder()
                     .setToken(fcmToken)
                     .putAllData(data)
+                    .setAndroidConfig(AndroidConfig.builder()
+                            .setPriority(AndroidConfig.Priority.HIGH)
+                            .build())
                     .build();
 
             boolean isNotificationSuccess = true;

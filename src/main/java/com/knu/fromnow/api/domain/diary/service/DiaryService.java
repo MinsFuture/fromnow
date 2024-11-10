@@ -185,6 +185,16 @@ public class DiaryService {
         }
 
         List<Member> invitedMembers = memberRepository.findByProfileNameIn(inviteToDiaryDto.getProfileNames());
+        List<DiaryMember> diaryMembers = diaryMemberRepository.findByDiary(diary);
+
+        for (Member member : invitedMembers) {
+            boolean alreadyInvited = diaryMembers.stream()
+                    .anyMatch(diaryMember -> diaryMember.getMember().equals(member));
+
+            if (alreadyInvited) {
+                throw new MemberException(MemberErrorCode.ALREADY_INVITED_EXCEPTION); // Custom error code
+            }
+        }
 
         diaryMemberService.inviteMemberToDiary(diary, invitedMembers);
 
