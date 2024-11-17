@@ -5,6 +5,7 @@ import com.google.cloud.storage.BlobId;
 import com.google.cloud.storage.BlobInfo;
 import com.google.cloud.storage.Storage;
 import com.knu.fromnow.api.domain.board.entity.Board;
+import com.knu.fromnow.api.domain.member.entity.Member;
 import com.knu.fromnow.api.domain.photo.entity.BoardPhoto;
 import com.knu.fromnow.api.domain.photo.repository.BoardPhotoRepository;
 import lombok.RequiredArgsConstructor;
@@ -47,14 +48,14 @@ public class BoardPhotoService {
             boardPhotoRepository.save(photo);
     }
 
+    public String initRandomImageToGcs(){
+        Random random = new Random();
+        int number = random.nextInt(4) + 1;
+
+        return "https://storage.googleapis.com/fromnow-dev-bucket/basic_image_00" + number + ".png";
+    }
+
     public String uploadImageToGcs(MultipartFile file){
-        if(file.isEmpty()){
-            Random random = new Random();
-            int number = random.nextInt(4) + 1;
-
-            return "https://storage.googleapis.com/fromnow-dev-bucket/basic_image_00" + number + ".png";
-        }
-
         String uniqueFileName = createPhotoName(file);
         BlobId blobId = BlobId.of(bucketName, uniqueFileName);
         BlobInfo blobInfo = BlobInfo.newBuilder(blobId)

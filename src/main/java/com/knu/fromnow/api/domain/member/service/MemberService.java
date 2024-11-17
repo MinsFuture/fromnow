@@ -58,6 +58,7 @@ public class MemberService {
                 .orElseThrow(() -> new MemberException(MemberErrorCode.No_EXIST_EMAIL_MEMBER_EXCEPTION));
 
         member.setProfileName(createMemberDto.getProfileName());
+        member.setMemberPhoto(boardPhotoService.initRandomImageToGcs());
         memberRepository.save(member);
 
         return ApiDataResponse.<ProfileNameResponseDto>builder()
