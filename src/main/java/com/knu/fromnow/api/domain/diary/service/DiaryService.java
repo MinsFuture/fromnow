@@ -108,7 +108,7 @@ public class DiaryService {
         Member member = memberRepository.findByEmail(principalDetails.getEmail())
                 .orElseThrow(() -> new MemberException(MemberErrorCode.No_EXIST_EMAIL_MEMBER_EXCEPTION));
 
-        List<Long> diaryIds = diaryMemberRepository.findDiaryIdsByMemberId(member.getId());
+        List<Long> diaryIds = diaryMemberRepository.findDiaryIdsByMemberIdWithAcceptedInviteTrue(member.getId());
         List<Diary> diaryList = diaryRepository.findByIdIn(diaryIds);
         List<DiaryOverViewResponseDto> responseDtoList = diaryMemberCustomRepository.fetchDiaryOverviewDtosByDiaryMembers(diaryList, member);
         responseDtoList.sort(Comparator.comparing(DiaryOverViewResponseDto::getRecivedAt).reversed());
