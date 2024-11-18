@@ -13,6 +13,8 @@ import com.knu.fromnow.api.domain.diary.repository.DiaryMemberCustomRepository;
 import com.knu.fromnow.api.domain.member.entity.Member;
 import com.knu.fromnow.api.domain.member.entity.PrincipalDetails;
 import com.knu.fromnow.api.domain.member.repository.MemberRepository;
+import com.knu.fromnow.api.domain.mission.entity.Mission;
+import com.knu.fromnow.api.domain.mission.service.MissionService;
 import com.knu.fromnow.api.global.error.custom.MemberException;
 import com.knu.fromnow.api.global.error.errorcode.custom.MemberErrorCode;
 import com.knu.fromnow.api.global.firebase.dto.response.FirebaseTestResponseDto;
@@ -41,8 +43,8 @@ public class FirebaseService {
 
     private final MemberRepository memberRepository;
     private final DiaryMemberCustomRepository diaryMemberCustomRepository;
+    private final MissionService missionService;
     private final ObjectMapper objectMapper;
-    private final View error;
 
     public ApiDataResponse<FirebaseTestResponseDto> testNotification(PrincipalDetails principalDetails) throws FirebaseMessagingException {
         Member member = memberRepository.findByEmail(principalDetails.getEmail())
@@ -72,12 +74,22 @@ public class FirebaseService {
     }
 
     // 유저별 알림 전송 메서드
-    private void sendNotificationToUser(String fcmToken) throws FirebaseMessagingException {
+    private void sendNotificationToUser(String fcmToken, Mission mission) throws FirebaseMessagingException {
+        String title = mission.getTitle();
+        String content = mission.getContent();
+        String randomUUID = getRandomUUID();
+
+        Map<String, String> data = new HashMap<>();
+        data.put("title", title);
+        data.put("body", content);
+        data.put("id", randomUUID);
+        data.put("path", "Camera");
+
         Message message = Message.builder()
                 .setToken(fcmToken)
-                .setNotification(Notification.builder()
-                        .setTitle("매일 알림")
-                        .setBody("오후 2시 알림입니다!")
+                .putAllData(data)
+                .setAndroidConfig(AndroidConfig.builder()
+                        .setPriority(AndroidConfig.Priority.HIGH)
                         .build())
                 .build();
 
@@ -87,13 +99,28 @@ public class FirebaseService {
     }
 
     @Scheduled(cron = "0 0 14 * * ?")  // 매일 오후 2시에 실행
-    public void sendNotificationAtTwoPM() throws IOException, FirebaseMessagingException {
-        // 모든 유저의 FCM 토큰을 조회
+    public void sendNotificationAtTwoPM() throws FirebaseMessagingException {
+        // 모든 유저의 FCM 토큰을 조회, NUll은 제외
         List<String> fcmTokens = memberRepository.findAllFcmTokens();
+
+        Mission mission = missionService.getRanomMission();
 
         // 모든 유저에게 알림 발송
         for (String fcmToken : fcmTokens) {
-            sendNotificationToUser(fcmToken);
+            sendNotificationToUser(fcmToken, mission);
+        }
+    }
+
+    @Scheduled(cron = "0 0 19 * * ?")  // 매일 오후 2시에 실행
+    public void sendNotificationAtSevenPM() throws FirebaseMessagingException {
+        // 모든 유저의 FCM 토큰을 조회, NUll은 제외
+        List<String> fcmTokens = memberRepository.findAllFcmTokens();
+
+        Mission mission = missionService.getRanomMission();
+
+        // 모든 유저에게 알림 발송
+        for (String fcmToken : fcmTokens) {
+            sendNotificationToUser(fcmToken, mission);
         }
     }
 
