@@ -85,6 +85,9 @@ public class FirebaseService {
         data.put("id", randomUUID);
         data.put("path", "Camera");
 
+        System.out.println("title = " + title);
+        System.out.println("content = " + content);
+
         Message message = Message.builder()
                 .setToken(fcmToken)
                 .putAllData(data)
@@ -111,7 +114,7 @@ public class FirebaseService {
         }
     }
 
-    @Scheduled(cron = "0 0 19 * * ?")  // 매일 오후 2시에 실행
+    @Scheduled(cron = "0 10 19 * * ?")  // 매일 오후 2시에 실행
     public void sendNotificationAtSevenPM() throws FirebaseMessagingException {
         // 모든 유저의 FCM 토큰을 조회, NUll은 제외
         List<String> fcmTokens = memberRepository.findAllFcmTokens();
@@ -120,6 +123,7 @@ public class FirebaseService {
 
         // 모든 유저에게 알림 발송
         for (String fcmToken : fcmTokens) {
+            System.out.println("fcmToken = " + fcmToken);
             sendNotificationToUser(fcmToken, mission);
         }
     }
