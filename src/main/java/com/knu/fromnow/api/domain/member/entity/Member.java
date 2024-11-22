@@ -5,6 +5,7 @@ import com.knu.fromnow.api.domain.diary.entity.Diary;
 import com.knu.fromnow.api.domain.diary.entity.DiaryMember;
 import com.knu.fromnow.api.domain.like.entity.Like;
 import com.knu.fromnow.api.global.spec.BaseEntity;
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -44,16 +45,16 @@ public class Member extends BaseEntity {
 
     private String fcmToken;
 
-    @OneToMany(mappedBy = "member")
+    @OneToMany(mappedBy = "member", cascade = CascadeType.REMOVE)
     private List<Board> boardList = new ArrayList<>();
 
-    @OneToMany(mappedBy = "member")
+    @OneToMany(mappedBy = "member", cascade = CascadeType.REMOVE)
     private List<DiaryMember> diaryMembers = new ArrayList<>();
 
-    @OneToMany(mappedBy = "owner")
+    @OneToMany(mappedBy = "owner", cascade = CascadeType.REMOVE)
     private List<Diary> diaryList = new ArrayList<>();
 
-    @OneToMany(mappedBy = "member")
+    @OneToMany(mappedBy = "member", cascade = CascadeType.REMOVE)
     private List<Like> likeList = new ArrayList<>();
 
     @Builder

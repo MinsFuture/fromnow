@@ -1,5 +1,6 @@
 package com.knu.fromnow.api.domain.tracking.entity;
 
+import com.knu.fromnow.api.global.spec.BaseEntity;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -16,7 +17,7 @@ import java.time.LocalDateTime;
 @Entity
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Getter
-public class DateLatestPostTime {
+public class DateLatestPostTime extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

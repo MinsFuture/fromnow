@@ -1,8 +1,10 @@
 package com.knu.fromnow.api.domain.member.controller;
 
 import com.knu.fromnow.api.domain.member.dto.request.CreateMemberDto;
+import com.knu.fromnow.api.domain.member.dto.request.DeleteMemberRequestDto;
 import com.knu.fromnow.api.domain.member.dto.request.FcmRequestDto;
 import com.knu.fromnow.api.domain.member.dto.response.FcmResponseDto;
+import com.knu.fromnow.api.domain.member.dto.response.MemberWithdrawResponseDto;
 import com.knu.fromnow.api.domain.member.dto.response.PhotoUrlResponseDto;
 import com.knu.fromnow.api.domain.member.dto.response.ProfileNameResponseDto;
 import com.knu.fromnow.api.domain.member.entity.PrincipalDetails;
@@ -64,9 +66,21 @@ public interface MemberApi {
                     @ApiResponse(responseCode = "404", description = "요청 형식이 잘못되었습니다"),
             }
     )
-    @Operation(summary = "Fcm 토큰 갱신 성공!", description = "Fcm 토큰 갱신 성공!")
+    @Operation(summary = "Fcm 토큰 갱신 로직", description = "Fcm 토큰 갱신 성공!")
     ResponseEntity<ApiDataResponse<FcmResponseDto>> updateFcmToken(
             @Parameter(description = "Fcm 토큰") FcmRequestDto fcmRequestDto,
             @Parameter(description = "Bearer ey...") PrincipalDetails principalDetails);
+
+    @ApiResponses(
+            value = {
+                    @ApiResponse(responseCode = "200", description = "회원 탈퇴 성공!"),
+                    @ApiResponse(responseCode = "404", description = "요청 형식이 잘못되었습니다"),
+            }
+    )
+    @Operation(summary = "회원 탈퇴 로직", description = "회원 탈퇴 성공!")
+    ResponseEntity<ApiDataResponse<MemberWithdrawResponseDto>> deleteMember(
+            @Parameter(description = "회원 탈퇴 정보") DeleteMemberRequestDto deleteMemberRequestDto,
+            @Parameter(description = "Bearer ey...") PrincipalDetails principalDetails);
+
 
 }

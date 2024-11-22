@@ -2,8 +2,10 @@ package com.knu.fromnow.api.domain.member.service;
 
 import com.knu.fromnow.api.auth.jwt.service.JwtService;
 import com.knu.fromnow.api.domain.member.dto.request.CreateMemberDto;
+import com.knu.fromnow.api.domain.member.dto.request.DeleteMemberRequestDto;
 import com.knu.fromnow.api.domain.member.dto.request.FcmRequestDto;
 import com.knu.fromnow.api.domain.member.dto.response.FcmResponseDto;
+import com.knu.fromnow.api.domain.member.dto.response.MemberWithdrawResponseDto;
 import com.knu.fromnow.api.domain.member.dto.response.PhotoUrlResponseDto;
 import com.knu.fromnow.api.domain.member.dto.response.ProfileMemberDto;
 import com.knu.fromnow.api.domain.member.dto.response.ProfileNameResponseDto;
@@ -20,6 +22,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
+
+import java.util.Objects;
 
 @Service
 @RequiredArgsConstructor
@@ -125,6 +129,28 @@ public class MemberService {
                 .data(FcmResponseDto.builder()
                         .fcmToken(fcmToken)
                         .build())
+                .build();
+    }
+
+    public ApiDataResponse<MemberWithdrawResponseDto> deleteMember(DeleteMemberRequestDto deleteMemberRequestDto, PrincipalDetails principalDetails) {
+
+        Member findMember = memberRepository.findByProfileName(deleteMemberRequestDto.getProfileName())
+                .orElseThrow(() -> new MemberException(MemberErrorCode.NO_MATCHING_MEMBER_EXCEPTION));
+
+        Member me = memberRepository.findByEmail(principalDetails.getEmail())
+                .orElseThrow(() -> new MemberException(MemberErrorCode.No_EXIST_EMAIL_MEMBER_EXCEPTION));
+
+        if(!Objects.equals(findMember.getId(), me.getId())){
+            throw new MemberException(MemberErrorCode.CANNOT_DELETE_MEMBER);
+        }
+
+        memberRepository.delete(me);
+
+        return ApiDataResponse.<MemberWithdrawResponseDto>builder()
+                .status(true)
+                .code(200)
+                .message("회원 탈퇴 성공!")
+                .data(MemberWithdrawResponseDto.makeFrom(me))
                 .build();
     }
 }

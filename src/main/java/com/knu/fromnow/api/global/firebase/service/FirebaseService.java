@@ -14,6 +14,8 @@ import com.knu.fromnow.api.domain.member.entity.Member;
 import com.knu.fromnow.api.domain.member.entity.PrincipalDetails;
 import com.knu.fromnow.api.domain.member.repository.MemberRepository;
 import com.knu.fromnow.api.domain.mission.entity.Mission;
+import com.knu.fromnow.api.domain.mission.entity.MissionList;
+import com.knu.fromnow.api.domain.mission.repository.MissionRepository;
 import com.knu.fromnow.api.domain.mission.service.MissionService;
 import com.knu.fromnow.api.global.error.custom.MemberException;
 import com.knu.fromnow.api.global.error.errorcode.custom.MemberErrorCode;
@@ -22,12 +24,9 @@ import com.knu.fromnow.api.global.spec.api.ApiDataResponse;
 import com.knu.fromnow.api.global.spec.firebase.MemberNotificationStatusDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.scheduling.annotation.Scheduled;
-import org.springframework.security.core.parameters.P;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.servlet.View;
 
-import java.io.IOException;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -45,6 +44,7 @@ public class FirebaseService {
     private final DiaryMemberCustomRepository diaryMemberCustomRepository;
     private final MissionService missionService;
     private final ObjectMapper objectMapper;
+    private final MissionRepository missionRepository;
 
     public ApiDataResponse<FirebaseTestResponseDto> testNotification(PrincipalDetails principalDetails) throws FirebaseMessagingException {
         Member member = memberRepository.findByEmail(principalDetails.getEmail())
@@ -102,12 +102,11 @@ public class FirebaseService {
     public void sendNotificationAtTwoPM() throws FirebaseMessagingException {
         // 모든 유저의 FCM 토큰을 조회, NUll은 제외
         List<String> fcmTokens = memberRepository.findAllFcmTokens();
-
-        Mission mission = missionService.getRanomMission();
+        List<Mission> missions = missionRepository.findByDateOrderByCreatedAtAsc(LocalDate.now());
 
         // 모든 유저에게 알림 발송
         for (String fcmToken : fcmTokens) {
-            sendNotificationToUser(fcmToken, mission);
+            sendNotificationToUser(fcmToken, missions.get(0));
         }
     }
 
@@ -115,11 +114,11 @@ public class FirebaseService {
     public void sendNotificationAtSevenPM() throws FirebaseMessagingException {
         // 모든 유저의 FCM 토큰을 조회, NUll은 제외
         List<String> fcmTokens = memberRepository.findAllFcmTokens();
-        Mission mission = missionService.getRanomMission();
+        List<Mission> missions = missionRepository.findByDateOrderByCreatedAtAsc(LocalDate.now());
 
         // 모든 유저에게 알림 발송
         for (String fcmToken : fcmTokens) {
-            sendNotificationToUser(fcmToken, mission);
+            sendNotificationToUser(fcmToken, missions.get(1));
         }
     }
 
