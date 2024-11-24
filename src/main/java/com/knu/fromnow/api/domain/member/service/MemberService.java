@@ -32,8 +32,6 @@ public class MemberService {
 
     private final MemberRepository memberRepository;
     private final BoardPhotoService boardPhotoService;
-    private final JwtService jwtService;
-    private final BoardPhotoRepository boardPhotoRepository;
 
     /**
      * ProfileName 중복 체크 로직

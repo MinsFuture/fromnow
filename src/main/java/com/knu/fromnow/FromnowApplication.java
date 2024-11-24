@@ -10,6 +10,7 @@ import java.util.TimeZone;
 
 @SpringBootApplication
 @EnableScheduling
+@EnableJpaAuditing
 public class FromnowApplication {
 
 	@PostConstruct
