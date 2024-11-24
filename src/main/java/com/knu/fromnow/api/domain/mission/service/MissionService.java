@@ -39,26 +39,29 @@ public class MissionService {
         return new MissionList[]{missions[firstIndex], missions[secondIndex]};
     }
 
+    public MissionList getRandomMission() {
+        MissionList[] missions = MissionList.values();
+        Random random = new Random();
+        int randomIndex = random.nextInt(missions.length);
+        return missions[randomIndex];
+    }
+
     @Scheduled(cron = "0 0 0 * * ?")  // 매일 자정에 실행
     @Transactional
     public void initTodayMission() {
-        MissionList[] twoRandomMissions = getTwoRandomMissions();
-        for (MissionList mission : twoRandomMissions) {
-            missionRepository.save(Mission.builder()
-                            .title(mission.getTitle())
-                            .content(mission.getContent())
-                            .date(LocalDate.now())
-                    .build());
-        }
+        MissionList mission = getRandomMission();
+
+        missionRepository.save(Mission.builder()
+                .title(mission.getTitle())
+                .content(mission.getContent())
+                .date(LocalDate.now())
+                .build());
     }
 
     public ApiDataResponse<List<MissionTodayResponseDto>> getTodayMissionList(LocalDate date) {
-        List<Mission> missions = missionRepository.findByDateOrderByCreatedAtAsc(date);
+        Mission mission = missionRepository.findByDate(date);
         List<MissionTodayResponseDto> data = new ArrayList<>();
-
-        for (Mission mission : missions) {
-            data.add(MissionTodayResponseDto.makeFrom(mission));
-        }
+        data.add(MissionTodayResponseDto.makeFrom(mission));
 
         return ApiDataResponse.<List<MissionTodayResponseDto>>builder()
                 .status(true)

@@ -102,25 +102,25 @@ public class FirebaseService {
     public void sendNotificationAtTwoPM() throws FirebaseMessagingException {
         // 모든 유저의 FCM 토큰을 조회, NUll은 제외
         List<String> fcmTokens = memberRepository.findAllFcmTokens();
-        List<Mission> missions = missionRepository.findByDateOrderByCreatedAtAsc(LocalDate.now());
+        Mission mission = missionRepository.findByDate(LocalDate.now());
 
         // 모든 유저에게 알림 발송
         for (String fcmToken : fcmTokens) {
-            sendNotificationToUser(fcmToken, missions.get(0));
+            sendNotificationToUser(fcmToken,  mission);
         }
     }
 
-    @Scheduled(cron = "0 0 19 * * ?")  // 매일 오후 2시에 실행
+   /* @Scheduled(cron = "0 0 19 * * ?")  // 매일 오후 7시에 실행
     public void sendNotificationAtSevenPM() throws FirebaseMessagingException {
         // 모든 유저의 FCM 토큰을 조회, NUll은 제외
         List<String> fcmTokens = memberRepository.findAllFcmTokens();
-        List<Mission> missions = missionRepository.findByDateOrderByCreatedAtAsc(LocalDate.now());
+        Mission mission = missionRepository.findByDate(LocalDate.now());
 
         // 모든 유저에게 알림 발송
         for (String fcmToken : fcmTokens) {
-            sendNotificationToUser(fcmToken, missions.get(1));
+            sendNotificationToUser(fcmToken, mission);
         }
-    }
+    }*/
 
     /**
      * 친구 초대 받았을때
