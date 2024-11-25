@@ -60,6 +60,7 @@ public class Oauth2Service {
 
         if (member.getRole() == Role.ROLE_NEW_USER) {
             httpStatus = HttpStatus.CREATED;
+            member.setRequiresAdditionalInfoToTrue();
             message = "새로 회원가입하는 유저입니다!";
         }
         member.setMemberRole(provider);
@@ -89,6 +90,7 @@ public class Oauth2Service {
                         .message(message)
                         .data(Oauth2ProfileResponseDto.builder()
                                 .profileName(member.getProfileName())
+                                .requiresAdditionalInfo(member.isRequiresAdditionalInfo())
                                 .build())
                         .build());
 

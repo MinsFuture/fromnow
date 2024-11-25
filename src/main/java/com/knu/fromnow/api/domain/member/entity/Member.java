@@ -41,6 +41,8 @@ public class Member extends BaseEntity {
 
     private String profileName;
 
+    private boolean requiresAdditionalInfo;
+
     private String refreshToken;
 
     private String fcmToken;
@@ -58,10 +60,11 @@ public class Member extends BaseEntity {
     private List<Like> likeList = new ArrayList<>();
 
     @Builder
-    public Member(Role role, String email, String profileName, String refreshToken, String fcmToken) {
+    public Member(Role role, String email, String profileName, boolean requiresAdditionalInfo, String refreshToken, String fcmToken) {
         this.role = role;
         this.email = email;
         this.profileName = profileName;
+        this.requiresAdditionalInfo = requiresAdditionalInfo;
         this.refreshToken = refreshToken;
         this.fcmToken = fcmToken;
     }
@@ -78,6 +81,10 @@ public class Member extends BaseEntity {
         this.photoUrl = photoUrl;
     }
 
+    public void setRequiresAdditionalInfoToTrue(){
+        this.requiresAdditionalInfo = true;
+    }
+
     public void setMemberRole(String provider){
        if(provider.equals("google")){
             this.role = Role.ROLE_GOOGLE_USER;
@@ -90,5 +97,9 @@ public class Member extends BaseEntity {
 
     public void updateFcmToken(String fcmToken) {
         this.fcmToken = fcmToken;
+    }
+
+    public void setRequiresAdditionalInfoToFalse() {
+        this.requiresAdditionalInfo = false;
     }
 }

@@ -61,6 +61,7 @@ public class MemberService {
 
         member.setProfileName(createMemberDto.getProfileName());
         member.setMemberPhoto(boardPhotoService.initRandomImageToGcs());
+        member.setRequiresAdditionalInfoToFalse();
         memberRepository.save(member);
 
         return ApiDataResponse.<ProfileNameResponseDto>builder()
