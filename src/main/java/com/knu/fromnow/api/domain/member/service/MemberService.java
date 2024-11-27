@@ -60,7 +60,9 @@ public class MemberService {
                 .orElseThrow(() -> new MemberException(MemberErrorCode.No_EXIST_EMAIL_MEMBER_EXCEPTION));
 
         member.setProfileName(createMemberDto.getProfileName());
-        member.setMemberPhoto(boardPhotoService.initRandomImageToGcs());
+        if(member.getPhotoUrl() == null){
+            member.setMemberPhoto(boardPhotoService.initRandomImageToGcs());
+        }
         member.setRequiresAdditionalInfoToFalse();
         memberRepository.save(member);
 
