@@ -32,8 +32,7 @@ public class LikeService {
                 .orElseThrow(() -> new MemberException(MemberErrorCode.No_EXIST_EMAIL_MEMBER_EXCEPTION));
 
         List<Long> boardIds = likeCustomRepository.findAllBoardsWithMyLikes(member.getId());
-        List<Board> boards = boardRepository.findByIdIn(boardIds);
-
+        List<Board> boards = boardRepository.findByIdsWithOrderByCreatedAtDesc(boardIds);
         List<BoardOverViewResponseDto> responseDtos = boardService.getBoardOverViewResponseDtos(boards, member);
 
         return ApiDataResponse.<List<BoardOverViewResponseDto>>builder()

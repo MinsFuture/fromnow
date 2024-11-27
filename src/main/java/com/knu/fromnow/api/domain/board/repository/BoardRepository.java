@@ -12,7 +12,7 @@ import java.util.List;
 import java.util.Optional;
 
 public interface BoardRepository extends JpaRepository<Board, Long> {
-    @Query("SELECT b FROM boards b JOIN FETCH b.boardPhoto WHERE b.diary.id = :diaryId AND b.createdAt BETWEEN :startDate AND :endDate")
+    @Query("SELECT b FROM boards b JOIN FETCH b.boardPhoto WHERE b.diary.id = :diaryId AND b.createdAt BETWEEN :startDate AND :endDate ORDER BY b.createdAt DESC")
     List<Board> findByDiaryIdAndCreatedAtBetween(
             @Param("diaryId") Long diaryId,
             @Param("startDate") LocalDateTime startDate,
@@ -20,5 +20,8 @@ public interface BoardRepository extends JpaRepository<Board, Long> {
     );
 
     List<Board> findByIdIn(List<Long> boardIds);
+
+    @Query("SELECT b FROM boards b WHERE b.id IN :ids ORDER BY b.createdAt DESC")
+    List<Board> findByIdsWithOrderByCreatedAtDesc(@Param("ids") List<Long> ids);
 
 }

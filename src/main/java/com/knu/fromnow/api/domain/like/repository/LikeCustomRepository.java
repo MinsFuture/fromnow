@@ -4,4 +4,6 @@ import java.util.List;
 
 public interface LikeCustomRepository {
     List<Long> findAllBoardsWithMyLikes(Long memberId);
+
+
 }
