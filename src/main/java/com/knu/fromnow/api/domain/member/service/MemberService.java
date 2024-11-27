@@ -80,13 +80,16 @@ public class MemberService {
         Member member = memberRepository.findByEmail(principalDetails.getEmail())
                 .orElseThrow(() -> new MemberException(MemberErrorCode.No_EXIST_EMAIL_MEMBER_EXCEPTION));
 
-        String photoUrl = boardPhotoService.uploadImageToGcs(file);
-        member.setMemberPhoto(photoUrl);
+        String photoUrl = member.getPhotoUrl();
+        if (file != null) {
+            photoUrl = boardPhotoService.uploadImageToGcs(file);
+            member.setMemberPhoto(photoUrl);
+        }
 
         return ApiDataResponse.<PhotoUrlResponseDto>builder()
                 .status(true)
                 .code(200)
-                .message("수정 한 photoUrl은 다음과 같습니다")
+                .message("수정 한 photoUrl은 다음과 같습니다. File이 null일 경우 Random 이미지가 들어있음.")
                 .data(PhotoUrlResponseDto.builder().photoUrl(photoUrl)
                         .build())
                 .build();
