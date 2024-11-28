@@ -3,6 +3,7 @@ package com.knu.fromnow.api.domain.member.controller;
 import com.knu.fromnow.api.domain.member.dto.request.CreateMemberDto;
 import com.knu.fromnow.api.domain.member.dto.request.DeleteMemberRequestDto;
 import com.knu.fromnow.api.domain.member.dto.request.FcmRequestDto;
+import com.knu.fromnow.api.domain.member.dto.request.LogoutMemberRequestDto;
 import com.knu.fromnow.api.domain.member.dto.response.FcmResponseDto;
 import com.knu.fromnow.api.domain.member.dto.response.MemberWithdrawResponseDto;
 import com.knu.fromnow.api.domain.member.dto.response.PhotoUrlResponseDto;
@@ -77,6 +78,15 @@ public class ApiMemberController implements MemberApi {
             @RequestBody DeleteMemberRequestDto deleteMemberRequestDto,
             @AuthenticationPrincipal PrincipalDetails principalDetails){
         ApiDataResponse<MemberWithdrawResponseDto> response = memberService.deleteMember(deleteMemberRequestDto, principalDetails);
+
+        return ResponseEntity.status(response.getCode()).body(response);
+    }
+
+    @PostMapping("/logout")
+    public ResponseEntity<ApiBasicResponse> logoutMember(
+            @RequestBody LogoutMemberRequestDto logoutMemberRequestDto,
+            @AuthenticationPrincipal PrincipalDetails principalDetails){
+        ApiBasicResponse response = memberService.logoutMember(logoutMemberRequestDto, principalDetails);
 
         return ResponseEntity.status(response.getCode()).body(response);
     }

@@ -49,14 +49,13 @@ public class Oauth2Service {
                 throw new RuntimeException("제공하지 않는 인증기관입니다.");
         }
 
-        Map<String, Object> result = new HashMap<>();
-        HttpStatus httpStatus = HttpStatus.OK;
-        String message = "이미 계정이 있는 유저입니다!";
-
         Member member = memberRepository.findByEmail(oauth2Attribute.getEmail())
                 .orElseGet(() -> {
                     return getMemberByProvider(oauth2Attribute, provider);
                 });
+
+        HttpStatus httpStatus = HttpStatus.OK;
+        String message = "이미 계정이 있는 유저입니다!";
 
         if (member.getRole() == Role.ROLE_NEW_USER) {
             httpStatus = HttpStatus.CREATED;

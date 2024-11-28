@@ -23,7 +23,6 @@ import com.knu.fromnow.api.domain.tracking.entity.DateReadTracking;
 import com.knu.fromnow.api.domain.diary.entity.Diary;
 import com.knu.fromnow.api.domain.diary.entity.DiaryMember;
 import com.knu.fromnow.api.domain.tracking.repository.DateLatestPostTimeRepository;
-import com.knu.fromnow.api.domain.tracking.repository.DateReadTrackingCustomRepository;
 import com.knu.fromnow.api.domain.tracking.repository.DateReadTrackingRepository;
 import com.knu.fromnow.api.domain.diary.repository.DiaryMemberCustomRepository;
 import com.knu.fromnow.api.domain.diary.repository.DiaryMemberRepository;
@@ -75,7 +74,6 @@ public class DiaryService {
     private final DateLatestPostTimeService dateLatestPostTimeService;
     private final DateReadTrackingService dateReadTrackingService;
     private final FirebaseService firebaseService;
-    private final DateReadTrackingCustomRepository dateReadTrackingCustomRepository;
     private final BoardRepository boardRepository;
 
     public ApiDataResponse<DiaryCreateResponseDto> createDiary(CreateDiaryDto createDiaryDto, PrincipalDetails principalDetails) {

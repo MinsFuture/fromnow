@@ -14,7 +14,9 @@ public enum MemberErrorCode implements ErrorCode {
     NO_MATCHING_MEMBER_EXCEPTION(HttpStatus.BAD_REQUEST, "해당 다이어리에 소속된 멤버가 아닙니다. 다이어리를 조회 할 권한이 없습니다"),
     NO_OWNER_EXCEPTION(HttpStatus.BAD_REQUEST, "해당 다이어리의 Owner가 아닙니다."),
     ALREADY_INVITED_EXCEPTION(HttpStatus.BAD_REQUEST, "이미 다이어리에 소속된 멤버를 초대하고 있습니다"),
-    CANNOT_DELETE_MEMBER(HttpStatus.BAD_REQUEST, "자기 자신만 탈퇴 할 수 있습니다");
+    CANNOT_DELETE_MEMBER(HttpStatus.BAD_REQUEST, "자기 자신만 탈퇴 할 수 있습니다"),
+    CANNOT_LOGOUT_MEMBER(HttpStatus.BAD_REQUEST, "자기 자신만 로그아웃 할 수 있습니다");
+
 
     MemberErrorCode(HttpStatus httpStatus, String message) {
         this.httpStatus = httpStatus;

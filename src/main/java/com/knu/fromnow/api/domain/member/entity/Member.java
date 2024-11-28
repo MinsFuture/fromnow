@@ -102,4 +102,9 @@ public class Member extends BaseEntity {
     public void setRequiresAdditionalInfoToFalse() {
         this.requiresAdditionalInfo = false;
     }
+
+    public void logout() {
+        this.refreshToken = null;
+        this.fcmToken = null;
+    }
 }

@@ -4,6 +4,7 @@ import com.knu.fromnow.api.auth.jwt.service.JwtService;
 import com.knu.fromnow.api.domain.member.dto.request.CreateMemberDto;
 import com.knu.fromnow.api.domain.member.dto.request.DeleteMemberRequestDto;
 import com.knu.fromnow.api.domain.member.dto.request.FcmRequestDto;
+import com.knu.fromnow.api.domain.member.dto.request.LogoutMemberRequestDto;
 import com.knu.fromnow.api.domain.member.dto.response.FcmResponseDto;
 import com.knu.fromnow.api.domain.member.dto.response.MemberWithdrawResponseDto;
 import com.knu.fromnow.api.domain.member.dto.response.PhotoUrlResponseDto;
@@ -81,7 +82,7 @@ public class MemberService {
                 .orElseThrow(() -> new MemberException(MemberErrorCode.No_EXIST_EMAIL_MEMBER_EXCEPTION));
 
         String photoUrl = member.getPhotoUrl();
-        if (file != null) {
+        if (!file.isEmpty()) {
             photoUrl = boardPhotoService.uploadImageToGcs(file);
             member.setMemberPhoto(photoUrl);
         }
@@ -155,6 +156,27 @@ public class MemberService {
                 .code(200)
                 .message("회원 탈퇴 성공!")
                 .data(MemberWithdrawResponseDto.makeFrom(me))
+                .build();
+    }
+
+    public ApiBasicResponse logoutMember(LogoutMemberRequestDto logoutMemberRequestDto, PrincipalDetails principalDetails) {
+        Member findMember = memberRepository.findByProfileName(logoutMemberRequestDto.getProfileName())
+                .orElseThrow(() -> new MemberException(MemberErrorCode.NO_MATCHING_MEMBER_EXCEPTION));
+
+        Member me = memberRepository.findByEmail(principalDetails.getEmail())
+                .orElseThrow(() -> new MemberException(MemberErrorCode.No_EXIST_EMAIL_MEMBER_EXCEPTION));
+
+        if(!Objects.equals(findMember.getId(), me.getId())){
+            throw new MemberException(MemberErrorCode.CANNOT_LOGOUT_MEMBER);
+        }
+
+        me.logout();
+        memberRepository.save(me);
+
+        return ApiBasicResponse.builder()
+                .status(true)
+                .code(200)
+                .message("로그아웃 성공!")
                 .build();
     }
 }
