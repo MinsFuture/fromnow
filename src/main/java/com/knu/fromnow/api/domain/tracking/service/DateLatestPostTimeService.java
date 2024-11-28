@@ -5,7 +5,6 @@ import com.knu.fromnow.api.domain.tracking.entity.DateLatestPostTime;
 import com.knu.fromnow.api.domain.diary.entity.Diary;
 import com.knu.fromnow.api.domain.tracking.repository.DateLatestPostTimeRepository;
 import lombok.RequiredArgsConstructor;
-import org.checkerframework.checker.units.qual.A;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -29,26 +28,6 @@ public class DateLatestPostTimeService {
                 .build();
 
         dateLatestPostTimeRepository.save(dateLatestPostTime);
-    }
-
-    @Scheduled(cron = "0 0 0 * * ?")  // 매일 자정에 실행
-    @Transactional
-    public void initDateLatestPostTimeAtMidNight(){
-        List<Diary> diaries = diaryRepository.findAll();
-
-        List<DateLatestPostTime> trackings = new ArrayList<>();
-
-        for (Diary diary : diaries) {
-            DateLatestPostTime dateLatestPostTime = DateLatestPostTime.builder()
-                    .diaryId(diary.getId())
-                    .date(LocalDate.now())
-                    .latestPostTime(LocalDate.now().atStartOfDay())
-                    .build();
-
-            trackings.add(dateLatestPostTime);
-        }
-
-        dateLatestPostTimeRepository.saveAll(trackings);
     }
 
 }

@@ -13,8 +13,6 @@ import com.knu.fromnow.api.domain.diary.repository.DiaryMemberCustomRepository;
 import com.knu.fromnow.api.domain.member.entity.Member;
 import com.knu.fromnow.api.domain.member.entity.PrincipalDetails;
 import com.knu.fromnow.api.domain.member.repository.MemberRepository;
-import com.knu.fromnow.api.domain.mission.entity.Mission;
-import com.knu.fromnow.api.domain.mission.entity.MissionList;
 import com.knu.fromnow.api.domain.mission.repository.MissionRepository;
 import com.knu.fromnow.api.domain.mission.service.MissionService;
 import com.knu.fromnow.api.global.error.custom.MemberException;
@@ -42,47 +40,15 @@ public class FirebaseService {
 
     private final MemberRepository memberRepository;
     private final DiaryMemberCustomRepository diaryMemberCustomRepository;
-    private final MissionService missionService;
     private final ObjectMapper objectMapper;
-    private final MissionRepository missionRepository;
-
-    public ApiDataResponse<FirebaseTestResponseDto> testNotification(PrincipalDetails principalDetails) throws FirebaseMessagingException {
-        Member member = memberRepository.findByEmail(principalDetails.getEmail())
-                .orElseThrow(() -> new MemberException(MemberErrorCode.No_EXIST_EMAIL_MEMBER_EXCEPTION));
-
-        String fcmToken = member.getFcmToken();
-
-        Message message = Message.builder()
-                .setToken(fcmToken)
-                .setNotification(Notification.builder()
-                        .setTitle("테스트용")
-                        .setBody("테스트 메시지")
-                        .build())
-                .putData("path", "/camera")
-                .build();
-
-        FirebaseTestResponseDto data = FirebaseTestResponseDto.builder()
-                .message(FirebaseMessaging.getInstance().send(message))
-                .build();
-
-        return ApiDataResponse.<FirebaseTestResponseDto>builder()
-                .status(true)
-                .code(200)
-                .message("테스트")
-                .data(data)
-                .build();
-    }
 
     // 유저별 알림 전송 메서드
-    private void sendNotificationToUser(String fcmToken, Mission mission) throws FirebaseMessagingException {
-        String title = mission.getTitle();
-        String content = mission.getContent();
+    private void sendNotificationToUser(String fcmToken) throws FirebaseMessagingException {
         String randomUUID = getRandomUUID();
 
         Map<String, String> data = new HashMap<>();
-        data.put("title", title);
-        data.put("body", content);
         data.put("id", randomUUID);
+        data.put("mission", "true");
         data.put("path", "Camera");
 
         Message message = Message.builder()
@@ -98,29 +64,16 @@ public class FirebaseService {
         System.out.println("Successfully sent message: " + response);
     }
 
-    @Scheduled(cron = "0 0 14 * * ?")  // 매일 오후 2시에 실행
-    public void sendNotificationAtTwoPM() throws FirebaseMessagingException {
+    @Scheduled(cron = "0 0 15 * * ?")  // 매일 오후 3시에 실행
+    public void sendNotificationAtThreePM() throws FirebaseMessagingException {
         // 모든 유저의 FCM 토큰을 조회, NUll은 제외
         List<String> fcmTokens = memberRepository.findAllFcmTokens();
-        Mission mission = missionRepository.findByDate(LocalDate.now());
 
         // 모든 유저에게 알림 발송
         for (String fcmToken : fcmTokens) {
-            sendNotificationToUser(fcmToken,  mission);
+            sendNotificationToUser(fcmToken);
         }
     }
-
-   /* @Scheduled(cron = "0 0 19 * * ?")  // 매일 오후 7시에 실행
-    public void sendNotificationAtSevenPM() throws FirebaseMessagingException {
-        // 모든 유저의 FCM 토큰을 조회, NUll은 제외
-        List<String> fcmTokens = memberRepository.findAllFcmTokens();
-        Mission mission = missionRepository.findByDate(LocalDate.now());
-
-        // 모든 유저에게 알림 발송
-        for (String fcmToken : fcmTokens) {
-            sendNotificationToUser(fcmToken, mission);
-        }
-    }*/
 
     /**
      * 친구 초대 받았을때
