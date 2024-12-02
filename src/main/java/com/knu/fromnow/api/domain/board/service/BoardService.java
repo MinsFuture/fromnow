@@ -210,6 +210,10 @@ public class BoardService {
         Member member = memberRepository.findByEmail(principalDetails.getEmail())
                 .orElseThrow(() -> new MemberException(MemberErrorCode.No_EXIST_EMAIL_MEMBER_EXCEPTION));
 
+        if(likeRepository.existsByMemberAndBoard(member, board)){
+            throw new LikeException(LikeErrorCode.ALREADY_CLICK_LIKE_EXCEPTION);
+        }
+
         board.likeBoard();
         boardRepository.save(board);
 

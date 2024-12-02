@@ -28,8 +28,6 @@ import java.util.Map;
 @Service
 @RequiredArgsConstructor
 public class Oauth2Service {
-
-    private static final Logger log = LoggerFactory.getLogger(Oauth2Service.class);
     private final MemberRepository memberRepository;
     private final JwtService jwtService;
     private final RestTemplate restTemplate;

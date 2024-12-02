@@ -14,6 +14,9 @@ public class MissionTodayResponseDto {
     public MissionTodayResponseDto(String title, String content, String missionImg) {
         this.title = title;
         this.content = content;
+        if(missionImg == null){
+            this.content = "";
+        }
         this.missionImg = missionImg;
     }
 
