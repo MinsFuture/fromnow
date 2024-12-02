@@ -5,6 +5,7 @@ import com.knu.fromnow.api.domain.like.entity.Like;
 import com.knu.fromnow.api.domain.member.entity.Member;
 import com.knu.fromnow.api.domain.photo.entity.BoardPhoto;
 import com.knu.fromnow.api.global.spec.BaseEntity;
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
@@ -37,7 +38,7 @@ public class Board extends BaseEntity {
     @Column(name = "board_likes")
     private int like = 0;
 
-    @OneToOne(mappedBy = "board")
+    @OneToOne(mappedBy = "board", cascade = CascadeType.ALL)
     private BoardPhoto boardPhoto;
 
     @ManyToOne(fetch = FetchType.LAZY)
