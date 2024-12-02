@@ -46,6 +46,8 @@ import com.knu.fromnow.api.global.spec.api.ApiBasicResponse;
 import com.knu.fromnow.api.global.spec.api.ApiDataResponse;
 import com.knu.fromnow.api.global.spec.date.request.DateRequestDto;
 import lombok.RequiredArgsConstructor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -62,6 +64,7 @@ import java.util.stream.Collectors;
 @Transactional
 public class DiaryService {
 
+    private static final Logger log = LoggerFactory.getLogger(DiaryService.class);
     private final MemberCustomRepository memberCustomRepository;
     private final DiaryMemberService diaryMemberService;
     private final DiaryRepository diaryRepository;
@@ -77,9 +80,6 @@ public class DiaryService {
     private final BoardRepository boardRepository;
 
     public ApiDataResponse<DiaryCreateResponseDto> createDiary(CreateDiaryDto createDiaryDto, PrincipalDetails principalDetails) {
-        LocalDateTime now = LocalDateTime.now();
-        LocalDate today = now.toLocalDate();
-
         Member member = memberRepository.findByEmail(principalDetails.getEmail())
                 .orElseThrow(() -> new MemberException(MemberErrorCode.No_EXIST_EMAIL_MEMBER_EXCEPTION));
 
@@ -90,6 +90,11 @@ public class DiaryService {
         diaryRepository.save(diary);
 
         LocalDateTime createdAt = diary.getCreatedAt();
+        LocalDate today = createdAt.toLocalDate();
+
+        log.info("now = {}", createdAt);
+        log.info("today = {}", today);
+
         diaryMemberService.initMemberToDiary(diary, member, createdAt);
         dateReadTrackingService.initDateReadTracking(diary, member, today);
         dateLatestPostTimeService.initDateLatestPostTime(diary, today);
