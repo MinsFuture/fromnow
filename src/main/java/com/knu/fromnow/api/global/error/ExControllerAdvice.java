@@ -5,6 +5,7 @@ import com.knu.fromnow.api.global.error.custom.DateReadTrackingException;
 import com.knu.fromnow.api.global.error.custom.DiaryException;
 import com.knu.fromnow.api.global.error.custom.DiaryMemberException;
 import com.knu.fromnow.api.global.error.custom.FriendException;
+import com.knu.fromnow.api.global.error.custom.LikeException;
 import com.knu.fromnow.api.global.error.custom.MemberException;
 import com.knu.fromnow.api.global.error.custom.JwtTokenException;
 import com.knu.fromnow.api.global.spec.api.ApiErrorResponse;
@@ -98,6 +99,12 @@ public class ExControllerAdvice {
     @ExceptionHandler(DiaryMemberException.class)
     public ResponseEntity<ApiErrorResponse> handleDiaryMemberException(DiaryMemberException e){
         ApiErrorResponse apiErrorResponse = buildErrorResponseWithCustomException(e.getDiaryMemberErrorCode());
+        return buildResponseEntity(apiErrorResponse);
+    }
+
+    @ExceptionHandler(LikeException.class)
+    public ResponseEntity<ApiErrorResponse> handleLikeException(LikeException e){
+        ApiErrorResponse apiErrorResponse = buildErrorResponseWithCustomException(e.getLikeErrorCode());
         return buildResponseEntity(apiErrorResponse);
     }
 

@@ -28,7 +28,6 @@ public class ApiMyController implements SwaggerMyApi{
 
     private final LikeService likeService;
     private final FriendService friendService;
-    private final DiaryService diaryService;
     private final DiaryMemberService diaryMemberService;
     private final MemberService memberService;
 

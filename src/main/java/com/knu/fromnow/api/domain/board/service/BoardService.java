@@ -245,8 +245,7 @@ public class BoardService {
 
         Like like = likeRepository.findByMemberAndBoard(member, board)
                 .orElseThrow(() -> new LikeException(LikeErrorCode.NEVER_CLICK_THE_LIKE_BUTTON_EXCEPTION));
-        like.disLike();
-        likeRepository.save(like);
+        likeRepository.delete(like);
 
         return ApiDataResponse.<BoardLikeResponseDto>builder()
                 .status(true)

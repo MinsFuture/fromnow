@@ -38,6 +38,7 @@ public class LikeService {
         return ApiDataResponse.<List<BoardOverViewResponseDto>>builder()
                 .status(true)
                 .code(200)
+                .message("내가 좋아요 누른 게시글들 불러오기 성공!")
                 .data(responseDtos)
                 .build();
     }
