@@ -406,7 +406,7 @@ public class DiaryService {
         List<DiarySearchResponseDto> list = new ArrayList<>();
 
         for (Member member : members) {
-            if(!alreadyInDiaryMembers.contains(member.getId())){
+            if(!alreadyInvitedMembers.contains(member.getId())){
                 boolean isTeam = alreadyInDiaryMembers.contains(member.getId());
 
                 list.add(DiarySearchResponseDto.builder()
