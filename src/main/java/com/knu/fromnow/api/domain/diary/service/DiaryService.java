@@ -393,23 +393,29 @@ public class DiaryService {
     }
 
     public ApiDataResponse<List<DiarySearchResponseDto>> searchMember(Long diaryId, String profileName) {
-        List<Long> memberIds = diaryMemberRepository.findMemberIdsByDiaryId(diaryId);
-        if(memberIds.isEmpty()){
+        List<Long> alreadyInDiaryMembers = diaryMemberRepository.findMemberIdsByDiaryIdAndAcceptedInviteTrue(diaryId);
+        List<Long> alreadyInvitedMembers = diaryMemberRepository.findMemberIdsByDiaryIdAndAcceptedInviteFalse(diaryId);
+        if(alreadyInDiaryMembers.isEmpty()){
             throw new DiaryException(DiaryErrorCode.NO_EXIST_DIARY_EXCEPTION);
         }
+        // 현재 다이어리에 A, B, C, AA, AAA 세명이 있음
 
+        // A를 검색하면 A, AA, AAA를 가져올 것.
         List<Member> members = memberCustomRepository.findMembersByProfileNameContainingIgnoreCase(profileName);
+
         List<DiarySearchResponseDto> list = new ArrayList<>();
 
         for (Member member : members) {
-            boolean isTeam = memberIds.contains(member.getId());
+            if(!alreadyInDiaryMembers.contains(member.getId())){
+                boolean isTeam = alreadyInDiaryMembers.contains(member.getId());
 
-            list.add(DiarySearchResponseDto.builder()
-                    .memberId(member.getId())
-                    .profilePhotoUrl(member.getPhotoUrl())
-                    .profileName(member.getProfileName())
-                    .isTeam(isTeam)
-                    .build());
+                list.add(DiarySearchResponseDto.builder()
+                        .memberId(member.getId())
+                        .profilePhotoUrl(member.getPhotoUrl())
+                        .profileName(member.getProfileName())
+                        .isTeam(isTeam)
+                        .build());
+            }
         }
 
         return ApiDataResponse.<List<DiarySearchResponseDto>>builder()
