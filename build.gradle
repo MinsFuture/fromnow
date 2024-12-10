@@ -78,6 +78,12 @@ dependencies {
 	// Google Cloud Storage
 	implementation group: 'org.springframework.cloud', name: 'spring-cloud-gcp-starter', version: '1.2.5.RELEASE'
 	implementation group: 'org.springframework.cloud', name: 'spring-cloud-gcp-storage', version: '1.2.5.RELEASE'
+
+    // BOM 설정
+    implementation platform("com.azure.spring:spring-cloud-azure-dependencies:5.18.0")
+
+    // Storage Blob Starter 의존성 추가
+    implementation "com.azure.spring:spring-cloud-azure-starter-storage-blob"
 }
 
 tasks.named('test') {

@@ -42,6 +42,7 @@ public class SecurityConfig {
                                 .requestMatchers(new AntPathRequestMatcher("/api/oauth2/**")).permitAll()
                                 .requestMatchers(new AntPathRequestMatcher("/v3/**")).permitAll()
                                 .requestMatchers(new AntPathRequestMatcher("/swagger-ui/**")).permitAll()
+                                .requestMatchers(new AntPathRequestMatcher("/azure/**")).permitAll()
                                 .anyRequest().authenticated()
                         )
                         .addFilterAfter(jwtAuthorizationFilter, LogoutFilter.class)

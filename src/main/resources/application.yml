@@ -23,6 +23,14 @@ spring:
       max-request-size: 50MB
 
   cloud:
+    azure:
+      storage:
+        blob:
+          account-name: ${AZURE_ACCOUNT_NAME}
+          account-key: ${AZURE_ACCOUNT_KEY}
+          endpoint: ${AZURE_STORAGE_ENDPOINT}
+          connection-string: ${AZURE_CONNECTION_STRING}
+
     gcp:
       storage:
         credentials:
