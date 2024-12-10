@@ -60,6 +60,18 @@ public class DiaryMemberService {
        diaryMemberRepository.saveAll(diaryMembers);
     }
 
+    public void immediateInviteMemberToDiary(Diary diary, Member member){
+        DiaryMember diaryMember = DiaryMember.builder()
+                .diary(diary)
+                .member(member)
+                .acceptedInvite(true)
+                .build();
+
+        diaryMemberRepository.save(diaryMember);
+    }
+
+
+
     public ApiDataResponse<List<DiaryRequestsReceivedDto>> getDiaryRequestsReceived(PrincipalDetails principalDetails) {
         Member member = memberRepository.findByEmail(principalDetails.getEmail())
                 .orElseThrow(() -> new MemberException(MemberErrorCode.No_EXIST_EMAIL_MEMBER_EXCEPTION));

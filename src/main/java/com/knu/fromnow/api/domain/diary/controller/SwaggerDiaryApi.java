@@ -2,6 +2,7 @@ package com.knu.fromnow.api.domain.diary.controller;
 
 import com.knu.fromnow.api.domain.diary.dto.request.AcceptDiaryDto;
 import com.knu.fromnow.api.domain.diary.dto.request.CreateDiaryDto;
+import com.knu.fromnow.api.domain.diary.dto.request.ImmediateDiaryDto;
 import com.knu.fromnow.api.domain.diary.dto.request.InviteToDiaryDto;
 import com.knu.fromnow.api.domain.diary.dto.request.RejectDiaryDto;
 import com.knu.fromnow.api.domain.diary.dto.request.UpdateDiaryDto;
@@ -192,6 +193,20 @@ public interface SwaggerDiaryApi {
             @Parameter(description = "프로필 이름") String profileName,
             @Parameter(description = "다이어리 id") Long diaryId
     );
+
+    /////////////////////////////////////////////////////////////////////////////////////////////
+    @ApiResponses(
+            value = {
+                    @ApiResponse(responseCode = "200", description = "다이어리 즉시 초대 API"),
+                    @ApiResponse(responseCode = "4XX", description = "요청 형식이 잘못되었습니다"),
+            }
+    )
+    @Operation(summary = "다이어리 즉시 초대 APi", description = "다이어리 즉시 초대 APi")
+    ResponseEntity<ApiDataResponse<List<DiaryInviteResponseDto>>> immediatelyInviteToDiary(
+            @Parameter(description = "초대 할 다이어리와 프로필 이름") ImmediateDiaryDto immediateDiaryDto,
+            @Parameter(description = "Bearer ey...") PrincipalDetails principalDetails
+    );
+
 
 
 }

@@ -4,6 +4,7 @@ import com.knu.fromnow.api.domain.board.entity.Board;
 import com.knu.fromnow.api.domain.board.repository.BoardRepository;
 import com.knu.fromnow.api.domain.diary.dto.request.AcceptDiaryDto;
 import com.knu.fromnow.api.domain.diary.dto.request.CreateDiaryDto;
+import com.knu.fromnow.api.domain.diary.dto.request.ImmediateDiaryDto;
 import com.knu.fromnow.api.domain.diary.dto.request.InviteToDiaryDto;
 import com.knu.fromnow.api.domain.diary.dto.request.RejectDiaryDto;
 import com.knu.fromnow.api.domain.diary.dto.request.UpdateDiaryDto;
@@ -317,7 +318,7 @@ public class DiaryService {
                 .orElseThrow(() -> new MemberException(MemberErrorCode.No_EXIST_EMAIL_MEMBER_EXCEPTION));
 
         // 다이어리의 멤버인지 확인
-        if(!diaryMemberRepository.existsByDiaryAndMember(diary, member)){
+        if (!diaryMemberRepository.existsByDiaryAndMember(diary, member)) {
             throw new DiaryMemberException(DiaryMemberErrorCode.NO_EXIST_DIARY_MEMBER_EXCEPTION);
         }
 
@@ -367,7 +368,7 @@ public class DiaryService {
         Member member = memberRepository.findByEmail(principalDetails.getEmail())
                 .orElseThrow(() -> new MemberException(MemberErrorCode.No_EXIST_EMAIL_MEMBER_EXCEPTION));
 
-        if(!diaryMemberRepository.existsByDiaryAndMember(diary, member)){
+        if (!diaryMemberRepository.existsByDiaryAndMember(diary, member)) {
             throw new DiaryMemberException(DiaryMemberErrorCode.NO_EXIST_DIARY_MEMBER_EXCEPTION);
         }
 
@@ -395,7 +396,7 @@ public class DiaryService {
     public ApiDataResponse<List<DiarySearchResponseDto>> searchMember(Long diaryId, String profileName) {
         List<Long> alreadyInDiaryMembers = diaryMemberRepository.findMemberIdsByDiaryIdAndAcceptedInviteTrue(diaryId);
         List<Long> alreadyInvitedMembers = diaryMemberRepository.findMemberIdsByDiaryIdAndAcceptedInviteFalse(diaryId);
-        if(alreadyInDiaryMembers.isEmpty()){
+        if (alreadyInDiaryMembers.isEmpty()) {
             throw new DiaryException(DiaryErrorCode.NO_EXIST_DIARY_EXCEPTION);
         }
         // 현재 다이어리에 A, B, C, AA, AAA 세명이 있음
@@ -406,7 +407,7 @@ public class DiaryService {
         List<DiarySearchResponseDto> list = new ArrayList<>();
 
         for (Member member : members) {
-            if(!alreadyInvitedMembers.contains(member.getId())){
+            if (!alreadyInvitedMembers.contains(member.getId())) {
                 boolean isTeam = alreadyInDiaryMembers.contains(member.getId());
 
                 list.add(DiarySearchResponseDto.builder()
@@ -510,6 +511,43 @@ public class DiaryService {
                 .status(true)
                 .code(200)
                 .message("다이어리 초대 거절 성공")
+                .build();
+    }
+
+    public ApiDataResponse<List<DiaryInviteResponseDto>> immediateInviteToDiary(ImmediateDiaryDto immediateDiaryDto, PrincipalDetails principalDetails) {
+        Diary diary = diaryRepository.findById(immediateDiaryDto.getDiaryId())
+                .orElseThrow(() -> new DiaryException(DiaryErrorCode.NO_EXIST_DIARY_EXCEPTION));
+
+        Member owner = memberRepository.findByEmail(principalDetails.getEmail())
+                .orElseThrow(() -> new MemberException(MemberErrorCode.No_EXIST_EMAIL_MEMBER_EXCEPTION));
+
+        if (!diary.getOwner().equals(owner)) {
+            throw new MemberException(MemberErrorCode.NO_OWNER_EXCEPTION);
+        }
+
+        Member member = memberRepository.findByProfileName(immediateDiaryDto.getProfileName())
+                .orElseThrow(() -> new MemberException(MemberErrorCode.NO_EXIST_PROFILE_NAME_MEMBER_EXCEPTION));
+
+        List<DiaryMember> diaryMembers = diaryMemberRepository.findByDiary(diary);
+
+        boolean alreadyInvited = diaryMembers.stream()
+                .anyMatch(diaryMember -> diaryMember.getMember().equals(member));
+
+        if (alreadyInvited) {
+            throw new MemberException(MemberErrorCode.ALREADY_INVITED_EXCEPTION); // Custom error code
+        }
+
+        diaryMemberService.immediateInviteMemberToDiary(diary, member);
+        List<Member> invitedMembers = new ArrayList<>();
+        invitedMembers.add(member);
+
+        List<DiaryInviteResponseDto> data = firebaseService.sendDiaryNotificationToInvitedMembers(owner, invitedMembers, diary);
+
+        return ApiDataResponse.<List<DiaryInviteResponseDto>>builder()
+                .status(true)
+                .code(200)
+                .message("모임 요청을 성공적으로 보냈습니다. 다이어리에 추가 된 멤버 데이터는 아래와 같습니다.")
+                .data(data)
                 .build();
     }
 }

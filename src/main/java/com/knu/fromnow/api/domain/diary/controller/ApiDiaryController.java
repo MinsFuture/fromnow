@@ -3,6 +3,7 @@ package com.knu.fromnow.api.domain.diary.controller;
 
 import com.knu.fromnow.api.domain.diary.dto.request.AcceptDiaryDto;
 import com.knu.fromnow.api.domain.diary.dto.request.CreateDiaryDto;
+import com.knu.fromnow.api.domain.diary.dto.request.ImmediateDiaryDto;
 import com.knu.fromnow.api.domain.diary.dto.request.InviteToDiaryDto;
 import com.knu.fromnow.api.domain.diary.dto.request.RejectDiaryDto;
 import com.knu.fromnow.api.domain.diary.dto.request.UpdateDiaryDto;
@@ -182,6 +183,17 @@ public class ApiDiaryController implements SwaggerDiaryApi {
             @PathVariable("diaryId") Long diaryId
     ){
         ApiDataResponse<List<DiarySearchResponseDto>> response = diaryService.searchMember(diaryId, profileName);
+
+        return ResponseEntity.status(response.getCode()).body(response);
+    }
+
+    @PostMapping("/immediate-invite")
+    @PreAuthorize("isAuthenticated()")
+    public ResponseEntity<ApiDataResponse<List<DiaryInviteResponseDto>>> immediatelyInviteToDiary(
+            @RequestBody ImmediateDiaryDto immediateDiaryDto,
+            @AuthenticationPrincipal PrincipalDetails principalDetails
+    ) {
+        ApiDataResponse<List<DiaryInviteResponseDto>> response = diaryService.immediateInviteToDiary(immediateDiaryDto, principalDetails);
 
         return ResponseEntity.status(response.getCode()).body(response);
     }
