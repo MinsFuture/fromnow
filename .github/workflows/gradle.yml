@@ -52,20 +52,18 @@ jobs:
           docker build -t ${{ secrets.DOCKER_USERNAME }}/fromnow .
           docker push ${{ secrets.DOCKER_USERNAME }}/fromnow
 
-      - name: Deploy to Instance
+      - name: Deploy to Azure Instance
         uses: appleboy/ssh-action@v1.0.3
         with:
-          host: ${{ secrets.GCP_HOST }}
-          username: ${{ secrets.GCP_USERNAME }}
-          key: ${{ secrets.GCP_PRIVATE_KEY }}  
-          passphrase: ${{ secrets.GCP_KEY_PASSPHRASE }}
+          host: ${{ secrets.AZURE_HOST }}
+          username: ${{ secrets.AZURE_USERNAME }}
+          key: ${{ secrets.AZURE_PRIVATE_KEY }}
           script: |
             sudo docker login -u ${{ secrets.DOCKER_USERNAME }} -p ${{ secrets.DOCKER_PASSWORD }}
             sudo docker stop fromnow-backend || true
             sudo docker rm fromnow-backend || true
             sudo docker pull ${{ secrets.DOCKER_USERNAME }}/fromnow
             sudo docker run --name fromnow-backend -d -p 8080:8080 \
-              -v /home/iamgroot240516/bucket/linen-radio-438510-m9-5b0964e71e0a.json:/config/linen-radio-438510-m9-5b0964e71e0a.json \
-              -v /home/iamgroot240516/firebase/fromnow-34d51-firebase-adminsdk-fiy84-7b40c25669.json:/config/fromnow-34d51-firebase-adminsdk-fiy84-7b40c25669.json \
+            -v /home/helloaway/firebase/fromnow-34d51-firebase-adminsdk-fiy84-7b40c25669.json:/config/fromnow-34d51-firebase-adminsdk-fiy84-7b40c25669.json \
               ${{ secrets.DOCKER_USERNAME }}/fromnow
             sudo docker image prune -f
