@@ -1,7 +1,7 @@
 spring:
   jpa:
     hibernate:
-      ddl-auto: update
+      ddl-auto: create
     properties:
       hibernate:
         show_sql: true
@@ -30,18 +30,7 @@ spring:
           account-key: ${AZURE_ACCOUNT_KEY}
           endpoint: ${AZURE_STORAGE_ENDPOINT}
           connection-string: ${AZURE_CONNECTION_STRING}
-
-    gcp:
-      storage:
-        credentials:
-          location: classpath:linen-radio-438510-m9-5b0964e71e0a.json
-        project-id: linen-radio-438510-m9
-        bucket: fromnow-dev-bucket
-
-google:
-  cloud:
-    credentials:
-      path: linen-radio-438510-m9-5b0964e71e0a.json
+          container-name: ${AZURE_CONTAINER_NAME}
 
 firebase:
   json:

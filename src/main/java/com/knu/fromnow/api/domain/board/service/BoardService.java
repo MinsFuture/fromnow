@@ -43,6 +43,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -67,7 +68,7 @@ public class BoardService {
     private final FirebaseService firebaseService;
     private final DiaryMemberRepository diaryMemberRepository;
 
-    public ApiDataResponse<BoardCreateResponseDto> createBoard(MultipartFile file, BoardCreateRequestDto boardCreateRequestDto, Long diaryId, PrincipalDetails principalDetails) {
+    public ApiDataResponse<BoardCreateResponseDto> createBoard(MultipartFile file, BoardCreateRequestDto boardCreateRequestDto, Long diaryId, PrincipalDetails principalDetails) throws IOException {
         LocalDateTime now = LocalDateTime.now();
         LocalDate today = now.toLocalDate();
 
@@ -255,7 +256,7 @@ public class BoardService {
                 .build();
     }
 
-    public ApiDataResponse<DiaryChooseResponseDto> createBoardAndChooseDiary(MultipartFile file, DiaryChooseRequestDto diaryChooseRequestDto, PrincipalDetails principalDetails) {
+    public ApiDataResponse<DiaryChooseResponseDto> createBoardAndChooseDiary(MultipartFile file, DiaryChooseRequestDto diaryChooseRequestDto, PrincipalDetails principalDetails) throws IOException {
         LocalDateTime now = LocalDateTime.now();
         LocalDate today = now.toLocalDate();
 

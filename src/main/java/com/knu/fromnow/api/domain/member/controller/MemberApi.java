@@ -22,6 +22,8 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
+
 @Tag(name = "회원", description = "회원 관련 api")
 public interface MemberApi {
 
@@ -59,7 +61,7 @@ public interface MemberApi {
     @Operation(summary = "프로필 사진 생성 로직", description = "MultiPart/form-data 형식으로 보내주셔야 해요!")
     ResponseEntity<ApiDataResponse<PhotoUrlResponseDto>> setMemberPhoto(
             @Parameter(description = "프로필 사진", required = true) MultipartFile file,
-            @Parameter(description = "Bearer ey...") PrincipalDetails principalDetails);
+            @Parameter(description = "Bearer ey...") PrincipalDetails principalDetails) throws IOException;
 
     @ApiResponses(
             value = {

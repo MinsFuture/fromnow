@@ -23,6 +23,8 @@ import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
+
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/board")
@@ -36,7 +38,7 @@ public class ApiBoardController implements SwaggerBoardApi {
             @PathVariable("diaryId") Long diaryId,
             @RequestPart("uploadPhotos") MultipartFile file,
             @RequestPart("createDiaryDto") BoardCreateRequestDto boardCreateRequestDto,
-            @AuthenticationPrincipal PrincipalDetails principalDetails) {
+            @AuthenticationPrincipal PrincipalDetails principalDetails) throws IOException {
         ApiDataResponse<BoardCreateResponseDto> response
                 = boardService.createBoard(file, boardCreateRequestDto, diaryId, principalDetails);
 
@@ -48,7 +50,7 @@ public class ApiBoardController implements SwaggerBoardApi {
     public ResponseEntity<ApiDataResponse<DiaryChooseResponseDto>> createBoardAndChooseDiary(
             @RequestPart("uploadPhotos") MultipartFile file,
             @RequestPart("chooseDiaryDto") DiaryChooseRequestDto diaryChooseRequestDto,
-            @AuthenticationPrincipal PrincipalDetails principalDetails) {
+            @AuthenticationPrincipal PrincipalDetails principalDetails) throws IOException {
         ApiDataResponse<DiaryChooseResponseDto> response
                 = boardService.createBoardAndChooseDiary(file, diaryChooseRequestDto, principalDetails);
 

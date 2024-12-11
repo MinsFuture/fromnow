@@ -15,6 +15,8 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
+
 public interface SwaggerBoardApi {
     @ApiResponses(
             value = {
@@ -27,7 +29,7 @@ public interface SwaggerBoardApi {
             @Parameter(description = "다이어리 id", required = true) Long diaryId,
             @Parameter(description = "일기 사진들", required = true) MultipartFile file,
             @Parameter(description = "일기 내용", required = true) BoardCreateRequestDto boardCreateRequestDto,
-            @Parameter(description = "Bearer ey...") PrincipalDetails principalDetails);
+            @Parameter(description = "Bearer ey...") PrincipalDetails principalDetails) throws IOException;
 
 
     @ApiResponses(
@@ -41,7 +43,7 @@ public interface SwaggerBoardApi {
             @Parameter(description = "일기 사진들", required = true) MultipartFile file,
             @Parameter(description = "일기 내용 + 넣을 diaryId list") DiaryChooseRequestDto diaryChooseRequestDto,
             @Parameter(description = "Bearer ey...") PrincipalDetails principalDetails
-    );
+    ) throws IOException;
 
     @ApiResponses(
             value = {

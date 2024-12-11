@@ -1,6 +1,5 @@
 package com.knu.fromnow.api.domain.member.service;
 
-import com.knu.fromnow.api.auth.jwt.service.JwtService;
 import com.knu.fromnow.api.domain.member.dto.request.CreateMemberDto;
 import com.knu.fromnow.api.domain.member.dto.request.DeleteMemberRequestDto;
 import com.knu.fromnow.api.domain.member.dto.request.FcmRequestDto;
@@ -13,8 +12,8 @@ import com.knu.fromnow.api.domain.member.dto.response.ProfileNameResponseDto;
 import com.knu.fromnow.api.domain.member.entity.Member;
 import com.knu.fromnow.api.domain.member.entity.PrincipalDetails;
 import com.knu.fromnow.api.domain.member.repository.MemberRepository;
-import com.knu.fromnow.api.domain.photo.repository.BoardPhotoRepository;
 import com.knu.fromnow.api.domain.photo.service.BoardPhotoService;
+import com.knu.fromnow.api.global.azure.service.AzureBlobStorageService;
 import com.knu.fromnow.api.global.error.custom.MemberException;
 import com.knu.fromnow.api.global.error.errorcode.custom.MemberErrorCode;
 import com.knu.fromnow.api.global.spec.api.ApiBasicResponse;
@@ -24,6 +23,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.util.Objects;
 
 @Service
@@ -33,6 +33,7 @@ public class MemberService {
 
     private final MemberRepository memberRepository;
     private final BoardPhotoService boardPhotoService;
+    private final AzureBlobStorageService azureBlobStorageService;
 
     /**
      * ProfileName 중복 체크 로직
@@ -62,7 +63,7 @@ public class MemberService {
 
         member.setProfileName(createMemberDto.getProfileName());
         if(member.getPhotoUrl() == null){
-            member.setMemberPhoto(boardPhotoService.initRandomImageToGcs());
+            member.setMemberPhoto(boardPhotoService.getRandomImageFromAzure());
         }
         member.setRequiresAdditionalInfoToFalse();
         memberRepository.save(member);
@@ -77,13 +78,13 @@ public class MemberService {
                 .build();
     }
 
-    public ApiDataResponse<PhotoUrlResponseDto> setMemberPhoto(MultipartFile file, PrincipalDetails principalDetails){
+    public ApiDataResponse<PhotoUrlResponseDto> setMemberPhoto(MultipartFile file, PrincipalDetails principalDetails) throws IOException {
         Member member = memberRepository.findByEmail(principalDetails.getEmail())
                 .orElseThrow(() -> new MemberException(MemberErrorCode.No_EXIST_EMAIL_MEMBER_EXCEPTION));
 
         String photoUrl = member.getPhotoUrl();
         if (!file.isEmpty()) {
-            photoUrl = boardPhotoService.uploadImageToGcs(file);
+            photoUrl = azureBlobStorageService.uploadImageToAzure(file);
             member.setMemberPhoto(photoUrl);
         }
 
