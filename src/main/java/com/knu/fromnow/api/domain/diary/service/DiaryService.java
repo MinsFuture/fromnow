@@ -10,6 +10,7 @@ import com.knu.fromnow.api.domain.diary.dto.request.RejectDiaryDto;
 import com.knu.fromnow.api.domain.diary.dto.request.UpdateDiaryDto;
 import com.knu.fromnow.api.domain.diary.dto.response.DiaryCreateResponseDto;
 import com.knu.fromnow.api.domain.diary.dto.response.DiaryDeleteResponseDto;
+import com.knu.fromnow.api.domain.diary.dto.response.DiaryImmeInviteResponseDto;
 import com.knu.fromnow.api.domain.diary.dto.response.DiaryInviteResponseDto;
 import com.knu.fromnow.api.domain.diary.dto.response.DiaryMenuResponseDto;
 import com.knu.fromnow.api.domain.diary.dto.response.DiaryOverViewResponseDto;
@@ -514,16 +515,9 @@ public class DiaryService {
                 .build();
     }
 
-    public ApiDataResponse<List<DiaryInviteResponseDto>> immediateInviteToDiary(ImmediateDiaryDto immediateDiaryDto, PrincipalDetails principalDetails) {
+    public ApiDataResponse<DiaryImmeInviteResponseDto> immediateInviteToDiary(ImmediateDiaryDto immediateDiaryDto, PrincipalDetails principalDetails) {
         Diary diary = diaryRepository.findById(immediateDiaryDto.getDiaryId())
                 .orElseThrow(() -> new DiaryException(DiaryErrorCode.NO_EXIST_DIARY_EXCEPTION));
-
-        Member owner = memberRepository.findByEmail(principalDetails.getEmail())
-                .orElseThrow(() -> new MemberException(MemberErrorCode.No_EXIST_EMAIL_MEMBER_EXCEPTION));
-
-        if (!diary.getOwner().equals(owner)) {
-            throw new MemberException(MemberErrorCode.NO_OWNER_EXCEPTION);
-        }
 
         Member member = memberRepository.findByProfileName(immediateDiaryDto.getProfileName())
                 .orElseThrow(() -> new MemberException(MemberErrorCode.NO_EXIST_PROFILE_NAME_MEMBER_EXCEPTION));
@@ -538,12 +532,9 @@ public class DiaryService {
         }
 
         diaryMemberService.immediateInviteMemberToDiary(diary, member);
-        List<Member> invitedMembers = new ArrayList<>();
-        invitedMembers.add(member);
+        DiaryImmeInviteResponseDto data = DiaryImmeInviteResponseDto.makeFrom(member);
 
-        List<DiaryInviteResponseDto> data = firebaseService.sendDiaryNotificationToInvitedMembers(owner, invitedMembers, diary);
-
-        return ApiDataResponse.<List<DiaryInviteResponseDto>>builder()
+        return ApiDataResponse.<DiaryImmeInviteResponseDto>builder()
                 .status(true)
                 .code(200)
                 .message("모임 요청을 성공적으로 보냈습니다. 다이어리에 추가 된 멤버 데이터는 아래와 같습니다.")

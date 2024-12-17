@@ -9,6 +9,7 @@ import com.knu.fromnow.api.domain.diary.dto.request.RejectDiaryDto;
 import com.knu.fromnow.api.domain.diary.dto.request.UpdateDiaryDto;
 import com.knu.fromnow.api.domain.diary.dto.response.DiaryCreateResponseDto;
 import com.knu.fromnow.api.domain.diary.dto.response.DiaryDeleteResponseDto;
+import com.knu.fromnow.api.domain.diary.dto.response.DiaryImmeInviteResponseDto;
 import com.knu.fromnow.api.domain.diary.dto.response.DiaryReadColResponseDto;
 import com.knu.fromnow.api.domain.diary.dto.response.DiarySearchResponseDto;
 import com.knu.fromnow.api.domain.diary.dto.response.DiaryInviteResponseDto;
@@ -189,11 +190,11 @@ public class ApiDiaryController implements SwaggerDiaryApi {
 
     @PostMapping("/immediate-invite")
     @PreAuthorize("isAuthenticated()")
-    public ResponseEntity<ApiDataResponse<List<DiaryInviteResponseDto>>> immediatelyInviteToDiary(
+    public ResponseEntity<ApiDataResponse<DiaryImmeInviteResponseDto>> immediatelyInviteToDiary(
             @RequestBody ImmediateDiaryDto immediateDiaryDto,
             @AuthenticationPrincipal PrincipalDetails principalDetails
     ) {
-        ApiDataResponse<List<DiaryInviteResponseDto>> response = diaryService.immediateInviteToDiary(immediateDiaryDto, principalDetails);
+        ApiDataResponse<DiaryImmeInviteResponseDto> response = diaryService.immediateInviteToDiary(immediateDiaryDto, principalDetails);
 
         return ResponseEntity.status(response.getCode()).body(response);
     }
