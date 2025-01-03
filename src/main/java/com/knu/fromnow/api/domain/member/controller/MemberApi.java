@@ -1,9 +1,7 @@
 package com.knu.fromnow.api.domain.member.controller;
 
 import com.knu.fromnow.api.domain.member.dto.request.CreateMemberDto;
-import com.knu.fromnow.api.domain.member.dto.request.DeleteMemberRequestDto;
 import com.knu.fromnow.api.domain.member.dto.request.FcmRequestDto;
-import com.knu.fromnow.api.domain.member.dto.request.LogoutMemberRequestDto;
 import com.knu.fromnow.api.domain.member.dto.response.FcmResponseDto;
 import com.knu.fromnow.api.domain.member.dto.response.MemberWithdrawResponseDto;
 import com.knu.fromnow.api.domain.member.dto.response.PhotoUrlResponseDto;
@@ -82,7 +80,6 @@ public interface MemberApi {
     )
     @Operation(summary = "회원 탈퇴 로직", description = "회원 탈퇴 성공!")
     ResponseEntity<ApiDataResponse<MemberWithdrawResponseDto>> deleteMember(
-            @Parameter(description = "회원 탈퇴 정보 - 프로필 이름") DeleteMemberRequestDto deleteMemberRequestDto,
             @Parameter(description = "Bearer ey...") PrincipalDetails principalDetails);
 
     @ApiResponses(
@@ -93,7 +90,6 @@ public interface MemberApi {
     )
     @Operation(summary = "회원 로그아웃 로직", description = "회원 탈퇴 성공!")
     ResponseEntity<ApiBasicResponse> logoutMember(
-            @Parameter(description = "회원 로그아웃 정보 - 프로필 이름") LogoutMemberRequestDto logoutMemberRequestDto,
             @Parameter(description = "Bearer ey...") PrincipalDetails principalDetails);
 
 

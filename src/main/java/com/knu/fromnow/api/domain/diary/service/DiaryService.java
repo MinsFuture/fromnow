@@ -132,7 +132,7 @@ public class DiaryService {
                 .orElseThrow(() -> new MemberException(MemberErrorCode.No_EXIST_EMAIL_MEMBER_EXCEPTION));
 
         Diary diary = diaryRepository.findById(diaryId)
-                .orElseThrow(() -> new DiaryException(DiaryErrorCode.NO_EXIST_DIARY_EXCEPTION));
+                .orElseThrow(() -> new DiaryException(DiaryErrorCode.NO_EXIST_DIARY_ID_EXCEPTION));
 
         if (!diary.getOwner().equals(member)) {
             throw new MemberException(MemberErrorCode.NO_OWNER_EXCEPTION);
@@ -157,7 +157,7 @@ public class DiaryService {
                 .orElseThrow(() -> new MemberException(MemberErrorCode.No_EXIST_EMAIL_MEMBER_EXCEPTION));
 
         Diary diary = diaryRepository.findById(diaryId)
-                .orElseThrow(() -> new DiaryException(DiaryErrorCode.NO_EXIST_DIARY_EXCEPTION));
+                .orElseThrow(() -> new DiaryException(DiaryErrorCode.NO_EXIST_DIARY_ID_EXCEPTION));
 
         if (!diary.getOwner().equals(member)) {
             throw new MemberException(MemberErrorCode.NO_OWNER_EXCEPTION);
@@ -180,7 +180,7 @@ public class DiaryService {
 
     public ApiDataResponse<List<DiaryInviteResponseDto>> inviteToDiary(InviteToDiaryDto inviteToDiaryDto, PrincipalDetails principalDetails) {
         Diary diary = diaryRepository.findById(inviteToDiaryDto.getDiaryId())
-                .orElseThrow(() -> new DiaryException(DiaryErrorCode.NO_EXIST_DIARY_EXCEPTION));
+                .orElseThrow(() -> new DiaryException(DiaryErrorCode.NO_EXIST_DIARY_ID_EXCEPTION));
 
         Member owner = memberRepository.findByEmail(principalDetails.getEmail())
                 .orElseThrow(() -> new MemberException(MemberErrorCode.No_EXIST_EMAIL_MEMBER_EXCEPTION));
@@ -218,7 +218,7 @@ public class DiaryService {
         LocalDate today = now.toLocalDate();
 
         Diary diary = diaryRepository.findById(acceptDiaryDto.getDiaryId())
-                .orElseThrow(() -> new DiaryException(DiaryErrorCode.NO_EXIST_DIARY_EXCEPTION));
+                .orElseThrow(() -> new DiaryException(DiaryErrorCode.NO_EXIST_DIARY_ID_EXCEPTION));
 
         Member member = memberRepository.findByEmail(principalDetails.getEmail())
                 .orElseThrow(() -> new MemberException(MemberErrorCode.No_EXIST_EMAIL_MEMBER_EXCEPTION));
@@ -266,7 +266,7 @@ public class DiaryService {
 
     public ApiDataResponse<List<DiaryMenuResponseDto>> getDiaryMenu(Long id, PrincipalDetails principalDetails) {
         Diary diary = diaryRepository.findById(id)
-                .orElseThrow(() -> new DiaryException(DiaryErrorCode.NO_EXIST_DIARY_EXCEPTION));
+                .orElseThrow(() -> new DiaryException(DiaryErrorCode.NO_EXIST_DIARY_ID_EXCEPTION));
 
         Member member = memberRepository.findByEmail(principalDetails.getEmail())
                 .orElseThrow(() -> new MemberException(MemberErrorCode.No_EXIST_EMAIL_MEMBER_EXCEPTION));
@@ -313,7 +313,7 @@ public class DiaryService {
 
     public ApiDataResponse<List<DiaryReadRowResponseDto>> getRowScroll(Long id, int year, int month, PrincipalDetails principalDetails) {
         Diary diary = diaryRepository.findById(id)
-                .orElseThrow(() -> new DiaryException(DiaryErrorCode.NO_EXIST_DIARY_EXCEPTION));
+                .orElseThrow(() -> new DiaryException(DiaryErrorCode.NO_EXIST_DIARY_ID_EXCEPTION));
 
         Member member = memberRepository.findByEmail(principalDetails.getEmail())
                 .orElseThrow(() -> new MemberException(MemberErrorCode.No_EXIST_EMAIL_MEMBER_EXCEPTION));
@@ -364,7 +364,7 @@ public class DiaryService {
     public ApiDataResponse<DiaryReadCompleteResponseDto> readAllPostsByDate(Long diaryId, DateRequestDto dateRequestDto, PrincipalDetails principalDetails) {
 
         Diary diary = diaryRepository.findById(diaryId)
-                .orElseThrow(() -> new DiaryException(DiaryErrorCode.NO_EXIST_DIARY_EXCEPTION));
+                .orElseThrow(() -> new DiaryException(DiaryErrorCode.NO_EXIST_DIARY_ID_EXCEPTION));
 
         Member member = memberRepository.findByEmail(principalDetails.getEmail())
                 .orElseThrow(() -> new MemberException(MemberErrorCode.No_EXIST_EMAIL_MEMBER_EXCEPTION));
@@ -398,7 +398,7 @@ public class DiaryService {
         List<Long> alreadyInDiaryMembers = diaryMemberRepository.findMemberIdsByDiaryIdAndAcceptedInviteTrue(diaryId);
         List<Long> alreadyInvitedMembers = diaryMemberRepository.findMemberIdsByDiaryIdAndAcceptedInviteFalse(diaryId);
         if (alreadyInDiaryMembers.isEmpty()) {
-            throw new DiaryException(DiaryErrorCode.NO_EXIST_DIARY_EXCEPTION);
+            throw new DiaryException(DiaryErrorCode.NO_EXIST_DIARY_ID_EXCEPTION);
         }
         // 현재 다이어리에 A, B, C, AA, AAA 세명이 있음
 
@@ -432,7 +432,7 @@ public class DiaryService {
             Long diaryId, int year, int month, int num, PrincipalDetails principalDetails) {
 
         Diary diary = diaryRepository.findById(diaryId)
-                .orElseThrow(() -> new DiaryException(DiaryErrorCode.NO_EXIST_DIARY_EXCEPTION));
+                .orElseThrow(() -> new DiaryException(DiaryErrorCode.NO_EXIST_DIARY_ID_EXCEPTION));
 
         Member member = memberRepository.findByEmail(principalDetails.getEmail())
                 .orElseThrow(() -> new MemberException(MemberErrorCode.No_EXIST_EMAIL_MEMBER_EXCEPTION));
@@ -501,7 +501,7 @@ public class DiaryService {
                 .orElseThrow(() -> new MemberException(MemberErrorCode.No_EXIST_EMAIL_MEMBER_EXCEPTION));
 
         Diary diary = diaryRepository.findById(rejectDiaryDto.getRejectDiaryId())
-                .orElseThrow(() -> new DiaryException(DiaryErrorCode.NO_EXIST_DIARY_EXCEPTION));
+                .orElseThrow(() -> new DiaryException(DiaryErrorCode.NO_EXIST_DIARY_ID_EXCEPTION));
 
         DiaryMember diaryMember = diaryMemberRepository.findByDiaryAndMemberAndAcceptedInviteFalse(diary, member)
                 .orElseThrow(() -> new DiaryMemberException(DiaryMemberErrorCode.NO_EXIST_DIARY_MEMBER_EXCEPTION));
@@ -517,7 +517,7 @@ public class DiaryService {
 
     public ApiDataResponse<DiaryImmeInviteResponseDto> immediateInviteToDiary(ImmediateDiaryDto immediateDiaryDto, PrincipalDetails principalDetails) {
         Diary diary = diaryRepository.findById(immediateDiaryDto.getDiaryId())
-                .orElseThrow(() -> new DiaryException(DiaryErrorCode.NO_EXIST_DIARY_EXCEPTION));
+                .orElseThrow(() -> new DiaryException(DiaryErrorCode.NO_EXIST_DIARY_ID_EXCEPTION));
 
         Member member = memberRepository.findByProfileName(immediateDiaryDto.getProfileName())
                 .orElseThrow(() -> new MemberException(MemberErrorCode.NO_EXIST_PROFILE_NAME_MEMBER_EXCEPTION));

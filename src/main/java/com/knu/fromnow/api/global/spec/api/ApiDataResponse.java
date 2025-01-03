@@ -18,4 +18,13 @@ public class ApiDataResponse<T> {
         this.message = message;
         this.data = data;
     }
+    public static <T> ApiDataResponse<T> successResponse(String message, T data) {
+        return ApiDataResponse.<T>builder()
+                .status(true)
+                .code(200)
+                .message(message)
+                .data(data)
+                .build();
+    }
+
 }

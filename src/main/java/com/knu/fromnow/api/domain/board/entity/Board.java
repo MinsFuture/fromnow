@@ -73,4 +73,18 @@ public class Board extends BaseEntity {
     public void uploadBoardPhoto(BoardPhoto boardPhoto){
         this.boardPhoto = boardPhoto;
     }
+
+    public static Board create(String content) {
+        return Board.builder()
+                .content(content)
+                .build();
+    }
+
+    public void setDiary(Diary diary) {
+        this.diary = diary;
+    }
+
+    public void setMember(Member member) {
+        this.member = member;
+    }
 }

@@ -11,4 +11,8 @@ public class FcmResponseDto {
     public FcmResponseDto(String fcmToken) {
         this.fcmToken = fcmToken;
     }
+
+    public static FcmResponseDto of(String fcmToken){
+        return FcmResponseDto.builder().fcmToken(fcmToken).build();
+    }
 }

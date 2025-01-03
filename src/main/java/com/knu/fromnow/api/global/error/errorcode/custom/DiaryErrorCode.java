@@ -9,7 +9,7 @@ import org.springframework.http.HttpStatus;
 @RequiredArgsConstructor
 public enum DiaryErrorCode implements ErrorCode {
 
-    NO_EXIST_DIARY_EXCEPTION(HttpStatus.BAD_REQUEST, "요청 id에 해당하는 diary가 없습니다");
+    NO_EXIST_DIARY_ID_EXCEPTION(HttpStatus.BAD_REQUEST, "요청 id에 해당하는 diary가 없습니다");
 
     DiaryErrorCode(HttpStatus httpStatus, String message) {
         this.httpStatus = httpStatus;

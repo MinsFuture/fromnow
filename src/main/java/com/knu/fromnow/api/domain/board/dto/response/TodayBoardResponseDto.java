@@ -18,4 +18,12 @@ public class TodayBoardResponseDto {
         this.isBlur = isBlur;
         this.boardOverViewResponseDtoList = boardOverViewResponseDtoList;
     }
+
+    public static TodayBoardResponseDto of(boolean isBlur, boolean isRead, List<BoardOverViewResponseDto> boardOverViewResponseDtos){
+        return TodayBoardResponseDto.builder()
+                .isBlur(isBlur)
+                .isRead(isRead)
+                .boardOverViewResponseDtoList(boardOverViewResponseDtos)
+                .build();
+    }
 }

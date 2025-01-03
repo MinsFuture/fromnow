@@ -13,7 +13,7 @@ public class BoardLikeResponseDto {
         this.likes = likes;
     }
 
-    public static BoardLikeResponseDto fromBoard(Board board){
+    public static BoardLikeResponseDto from(Board board){
         return BoardLikeResponseDto.builder()
                 .likes(board.getLike())
                 .build();

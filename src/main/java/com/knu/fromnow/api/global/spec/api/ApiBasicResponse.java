@@ -15,4 +15,12 @@ public class ApiBasicResponse {
         this.code = code;
         this.message = message;
     }
+
+    public static ApiBasicResponse successResponse(String message){
+        return ApiBasicResponse.builder()
+                .status(true)
+                .code(200)
+                .message(message)
+                .build();
+    }
 }

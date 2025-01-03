@@ -9,13 +9,12 @@ import com.knu.fromnow.api.auth.oauth2.entity.Oauth2Attribute;
 import com.knu.fromnow.api.domain.member.entity.Member;
 import com.knu.fromnow.api.domain.member.entity.Role;
 import com.knu.fromnow.api.domain.member.repository.MemberRepository;
+import com.knu.fromnow.api.domain.photo.service.BoardPhotoService;
 import com.knu.fromnow.api.global.spec.api.ApiDataResponse;
 import lombok.RequiredArgsConstructor;
 import net.minidev.json.JSONObject;
 import net.minidev.json.parser.JSONParser;
 import net.minidev.json.parser.ParseException;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.http.*;
 import org.springframework.stereotype.Service;
 import org.springframework.util.MultiValueMap;
@@ -29,6 +28,7 @@ import java.util.Map;
 @RequiredArgsConstructor
 public class Oauth2Service {
     private final MemberRepository memberRepository;
+    private final BoardPhotoService boardPhotoService;
     private final JwtService jwtService;
     private final RestTemplate restTemplate;
 
@@ -59,12 +59,13 @@ public class Oauth2Service {
             httpStatus = HttpStatus.CREATED;
             member.setRequiresAdditionalInfoToTrue();
             message = "새로 회원가입하는 유저입니다!";
+            member.initMemberPhoto(boardPhotoService.getRandomImageFromAzure());
         }
-        member.setMemberRole(provider);
+        member.updateMemberRole(provider);
 
         String accessToken = jwtService.createAccessToken(member.getEmail(), member.getRole().name());
         String refreshToken = jwtService.createRefreshToken();
-        member.setRefreshToken(refreshToken);
+        member.updateRefreshToken(refreshToken);
         memberRepository.save(member);
 
         ResponseCookie responseCookie = ResponseCookie.from("Authorization-refresh", refreshToken)
@@ -77,7 +78,6 @@ public class Oauth2Service {
         HttpHeaders headers = new HttpHeaders();
         headers.add(HttpHeaders.SET_COOKIE, responseCookie.toString());
         headers.add("Authorization", "Bearer " + accessToken);
-
 
         return ResponseEntity.status(httpStatus.value())
                 .headers(headers)

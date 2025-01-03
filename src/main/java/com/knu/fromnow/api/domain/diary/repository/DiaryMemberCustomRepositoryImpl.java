@@ -97,4 +97,16 @@ public class DiaryMemberCustomRepositoryImpl implements DiaryMemberCustomReposit
         return diaryMembers.stream()
                 .collect(Collectors.toMap(DiaryMember::getMember, DiaryMember::getRecievedAt));
     }
+
+    @Override
+    public List<Member> findMembersByDiaryIdExceptMe(Diary diary, Member member) {
+        QDiaryMember qDiaryMember = QDiaryMember.diaryMember;
+        return jpaQueryFactory
+                .select(qDiaryMember.member)
+                .from(qDiaryMember)
+                .where(qDiaryMember.diary.eq(diary)
+                        .and(qDiaryMember.member.ne(member))
+                )
+                .fetch();
+    }
 }

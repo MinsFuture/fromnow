@@ -14,7 +14,6 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.OneToMany;
-import jakarta.persistence.OneToOne;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
@@ -28,7 +27,8 @@ import java.util.List;
 @Getter
 public class Member extends BaseEntity {
 
-    @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "member_id")
     private Long id;
 
@@ -69,33 +69,42 @@ public class Member extends BaseEntity {
         this.fcmToken = fcmToken;
     }
 
-    public void setRefreshToken(String refreshToken) {
+    public void validateNullString(String str){
+        if(str == null || str.trim().isEmpty()){
+            throw new IllegalArgumentException("String cannot be null or empty");
+        }
+    }
+
+    public void updateRefreshToken(String refreshToken) {
+        validateNullString(refreshToken);
         this.refreshToken = refreshToken;
     }
 
-    public void setProfileName(String profileName){
+    public void updateProfileName(String profileName) {
+        validateNullString(profileName);
         this.profileName = profileName;
     }
 
-    public void setMemberPhoto(String photoUrl){
+    public void initMemberPhoto(String photoUrl) {
         this.photoUrl = photoUrl;
     }
 
-    public void setRequiresAdditionalInfoToTrue(){
+    public void setRequiresAdditionalInfoToTrue() {
         this.requiresAdditionalInfo = true;
     }
 
-    public void setMemberRole(String provider){
-       if(provider.equals("google")){
+    public void updateMemberRole(String provider) {
+        if (provider.equals("google")) {
             this.role = Role.ROLE_GOOGLE_USER;
-       }
+        }
 
-       if(provider.equals("kakao")){
-           this.role = Role.ROLE_KAKAO_USER;
-       }
+        if (provider.equals("kakao")) {
+            this.role = Role.ROLE_KAKAO_USER;
+        }
     }
 
     public void updateFcmToken(String fcmToken) {
+        validateNullString(fcmToken);
         this.fcmToken = fcmToken;
     }
 
@@ -106,5 +115,12 @@ public class Member extends BaseEntity {
     public void logout() {
         this.refreshToken = null;
         this.fcmToken = null;
+    }
+
+    public void addBoard(Board board){
+        this.boardList.add(board);
+        if (board.getMember() != this) {
+            board.setMember(this);
+        }
     }
 }

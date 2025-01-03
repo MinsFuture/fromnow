@@ -25,7 +25,7 @@ public class BoardCreateResponseDto {
         this.notificationStatuses = notificationStatuses;
     }
 
-    public static BoardCreateResponseDto makeFrom(Board board, List<MemberNotificationStatusDto> memberNotificationStatusDtos){
+    public static BoardCreateResponseDto of(Board board, List<MemberNotificationStatusDto> memberNotificationStatusDtos){
         return BoardCreateResponseDto.builder()
                 .id(board.getId())
                 .likes(board.getLike())

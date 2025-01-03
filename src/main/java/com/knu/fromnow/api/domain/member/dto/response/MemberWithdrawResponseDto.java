@@ -16,7 +16,7 @@ public class MemberWithdrawResponseDto {
         this.profileName = profileName;
     }
 
-    public static MemberWithdrawResponseDto makeFrom(Member member){
+    public static MemberWithdrawResponseDto from(Member member){
         return MemberWithdrawResponseDto.builder()
                 .id(member.getId())
                 .profileName(member.getProfileName())

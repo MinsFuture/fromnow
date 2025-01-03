@@ -45,4 +45,12 @@ public class Like extends BaseEntity {
     public void disLike(){
         this.isLiked = false;
     }
+
+    public static Like initLike(Board board, Member member){
+        return Like.builder()
+                .board(board)
+                .member(member)
+                .isLiked(true)
+                .build();
+    }
 }

@@ -7,6 +7,7 @@ import com.knu.fromnow.api.domain.member.entity.Role;
 import com.knu.fromnow.api.domain.member.service.MemberService;
 import com.knu.fromnow.api.global.error.custom.JwtTokenException;
 import com.knu.fromnow.api.global.error.errorcode.custom.JwtTokenErrorCode;
+import com.knu.fromnow.api.global.validation.service.ValidationService;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -28,8 +29,8 @@ import java.util.Arrays;
 @Slf4j
 public class JwtAuthorizationFilter extends OncePerRequestFilter {
 
-    private final MemberService memberService;
     private final JwtService jwtService;
+    private final ValidationService validationService;
 
     @Override
     protected boolean shouldNotFilter(HttpServletRequest request) throws ServletException {
@@ -70,7 +71,7 @@ public class JwtAuthorizationFilter extends OncePerRequestFilter {
                     || jwtService.getRole(accesstoken).equals(Role.ROLE_KAKAO_USER.name())) {
                 String email = jwtService.getEmail(accesstoken);
                 log.info("email : {}", email);
-                member = memberService.findByEmail(email);
+                member = validationService.validateMemberByEmail(email);
                 log.info("member email : {}", member.getEmail());
             }
 

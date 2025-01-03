@@ -12,4 +12,8 @@ public class ProfileNameResponseDto {
     public ProfileNameResponseDto(String profileName) {
         this.profileName = profileName;
     }
+
+    public static ProfileNameResponseDto of(String profileName){
+        return ProfileNameResponseDto.builder().profileName(profileName).build();
+    }
 }

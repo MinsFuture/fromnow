@@ -11,4 +11,8 @@ public class PhotoUrlResponseDto {
     public PhotoUrlResponseDto(String photoUrl) {
         this.photoUrl = photoUrl;
     }
+
+    public static PhotoUrlResponseDto of(String photoUrl){
+        return PhotoUrlResponseDto.builder().photoUrl(photoUrl).build();
+    }
 }

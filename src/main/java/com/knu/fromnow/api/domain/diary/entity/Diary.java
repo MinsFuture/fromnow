@@ -52,4 +52,11 @@ public class Diary extends BaseEntity {
     public void updateDiaryTitle(UpdateDiaryDto updateDiaryDto){
         this.title = updateDiaryDto.getNewTitle();
     }
+
+    public void addBoard(Board board) {
+        this.boardList.add(board);
+        if (board.getDiary() != this) {
+            board.setDiary(this);
+        }
+    }
 }

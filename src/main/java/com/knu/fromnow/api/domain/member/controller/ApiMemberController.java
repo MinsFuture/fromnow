@@ -1,9 +1,7 @@
 package com.knu.fromnow.api.domain.member.controller;
 
 import com.knu.fromnow.api.domain.member.dto.request.CreateMemberDto;
-import com.knu.fromnow.api.domain.member.dto.request.DeleteMemberRequestDto;
 import com.knu.fromnow.api.domain.member.dto.request.FcmRequestDto;
-import com.knu.fromnow.api.domain.member.dto.request.LogoutMemberRequestDto;
 import com.knu.fromnow.api.domain.member.dto.response.FcmResponseDto;
 import com.knu.fromnow.api.domain.member.dto.response.MemberWithdrawResponseDto;
 import com.knu.fromnow.api.domain.member.dto.response.PhotoUrlResponseDto;
@@ -69,7 +67,7 @@ public class ApiMemberController implements MemberApi {
     @PreAuthorize("isAuthenticated()")
     public ResponseEntity<ApiDataResponse<FcmResponseDto>> updateFcmToken(
             @RequestBody FcmRequestDto fcmRequestDto,
-            @AuthenticationPrincipal PrincipalDetails principalDetails){
+            @AuthenticationPrincipal PrincipalDetails principalDetails) {
         ApiDataResponse<FcmResponseDto> response = memberService.updateFcmToken(fcmRequestDto, principalDetails);
 
         return ResponseEntity.status(response.getCode()).body(response);
@@ -77,18 +75,16 @@ public class ApiMemberController implements MemberApi {
 
     @DeleteMapping("/withdraw")
     public ResponseEntity<ApiDataResponse<MemberWithdrawResponseDto>> deleteMember(
-            @RequestBody DeleteMemberRequestDto deleteMemberRequestDto,
-            @AuthenticationPrincipal PrincipalDetails principalDetails){
-        ApiDataResponse<MemberWithdrawResponseDto> response = memberService.deleteMember(deleteMemberRequestDto, principalDetails);
+            @AuthenticationPrincipal PrincipalDetails principalDetails) {
+        ApiDataResponse<MemberWithdrawResponseDto> response = memberService.deleteMember(principalDetails);
 
         return ResponseEntity.status(response.getCode()).body(response);
     }
 
     @PostMapping("/logout")
     public ResponseEntity<ApiBasicResponse> logoutMember(
-            @RequestBody LogoutMemberRequestDto logoutMemberRequestDto,
-            @AuthenticationPrincipal PrincipalDetails principalDetails){
-        ApiBasicResponse response = memberService.logoutMember(logoutMemberRequestDto, principalDetails);
+            @AuthenticationPrincipal PrincipalDetails principalDetails) {
+        ApiBasicResponse response = memberService.logoutMember(principalDetails);
 
         return ResponseEntity.status(response.getCode()).body(response);
     }
