@@ -46,8 +46,8 @@ public class BoardCustomRepositoryImpl implements BoardCustomRepository{
                                 .as("isLiked")
                 ))
                 .from(board)
-                .join(board.member, member) // xxToOne 관계 페치 조인
-                .join(board.boardPhoto, boardPhoto) // xxToOne 관계 페치 조인
+                .join(board.member, member)
+                .join(board.boardPhoto, boardPhoto)
                 .where(board.diary.id.eq(diaryId)
                         .and(board.createdAt.between(startDate, endDate)))
                 .orderBy(board.createdAt.desc())
@@ -74,8 +74,8 @@ public class BoardCustomRepositoryImpl implements BoardCustomRepository{
                 ))
                 .from(like)
                 .join(like.board, board)
-                .join(board.member, member).fetchJoin()
-                .join(board.boardPhoto, boardPhoto).fetchJoin()
+                .join(board.member, member)
+                .join(board.boardPhoto, boardPhoto)
                 .where(like.member.id.eq(myId)
                         .and(like.isLiked.isTrue()))
                 .orderBy(board.createdAt.desc())
