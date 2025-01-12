@@ -14,13 +14,10 @@ public class MissionTodayResponseDto {
     public MissionTodayResponseDto(String title, String content, String missionImg) {
         this.title = title;
         this.content = content;
-        if(missionImg == null){
-            this.content = "";
-        }
         this.missionImg = missionImg;
     }
 
-    public static MissionTodayResponseDto makeFrom(Mission mission){
+    public static MissionTodayResponseDto from(Mission mission){
         return MissionTodayResponseDto.builder()
                 .title(mission.getTitle())
                 .content(mission.getContent())
