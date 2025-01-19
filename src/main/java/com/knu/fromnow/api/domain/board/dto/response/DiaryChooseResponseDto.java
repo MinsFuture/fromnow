@@ -21,7 +21,7 @@ public class DiaryChooseResponseDto {
         this.uploadDiaryIds = uploadDiaryIds;
     }
 
-    public static DiaryChooseResponseDto from(Board board, List<Diary> diaryList){
+    public static DiaryChooseResponseDto of(Board board, List<Diary> diaryList){
         return DiaryChooseResponseDto.builder()
                 .likes(board.getLike())
                 .content(board.getContent())

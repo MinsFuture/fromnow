@@ -17,7 +17,7 @@ public class DiaryImmeInviteResponseDto {
         this.profileName = profileName;
     }
 
-    public static DiaryImmeInviteResponseDto makeFrom(Member member){
+    public static DiaryImmeInviteResponseDto from(Member member){
         return DiaryImmeInviteResponseDto.builder()
                 .memberId(member.getId())
                 .photoUrl(member.getPhotoUrl())

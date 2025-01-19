@@ -3,16 +3,17 @@ package com.knu.fromnow.api.domain.diary.repository;
 import com.knu.fromnow.api.domain.diary.dto.response.DiaryOverViewResponseDto;
 import com.knu.fromnow.api.domain.diary.entity.Diary;
 import com.knu.fromnow.api.domain.diary.entity.DiaryMember;
+import com.knu.fromnow.api.domain.diary.entity.QDiary;
 import com.knu.fromnow.api.domain.diary.entity.QDiaryMember;
 import com.knu.fromnow.api.domain.member.entity.Member;
 import com.knu.fromnow.api.domain.member.entity.QMember;
+import com.querydsl.core.Tuple;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 
 import java.time.LocalDateTime;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Repository
@@ -20,41 +21,6 @@ import java.util.stream.Collectors;
 public class DiaryMemberCustomRepositoryImpl implements DiaryMemberCustomRepository{
 
     private final JPAQueryFactory jpaQueryFactory;
-
-    @Override
-    public List<DiaryOverViewResponseDto> fetchDiaryOverviewDtosByDiaryMembers(List<Diary> diaryList, Member me) {
-        QMember member = QMember.member;
-        QDiaryMember diaryMember = QDiaryMember.diaryMember;
-
-        // 다이어리마다 멤버들의 photoUrl과 recivedAt을 리스트로 수집
-        return diaryList.stream().map(d -> {
-            List<String> photoUrls = jpaQueryFactory
-                    .select(member.photoUrl)
-                    .from(diaryMember)
-                    .join(diaryMember.member, member)
-                    .where(diaryMember.diary.eq(d),
-                            diaryMember.acceptedInvite.isTrue())
-                    .fetch();
-
-            // recivedAt을 조회
-            LocalDateTime recivedAt = jpaQueryFactory
-                    .select(diaryMember.recievedAt)
-                    .from(diaryMember)
-                    .where(diaryMember.diary.eq(d),
-                            diaryMember.member.eq(me))
-                    .fetchOne();
-
-            // DiaryOverViewResponseDto로 변환
-            return DiaryOverViewResponseDto.builder()
-                    .id(d.getId())
-                    .title(d.getTitle())
-                    .photoUrls(photoUrls)
-                    .createdAt(d.getCreatedAt().toString())
-                    .recivedAt(String.valueOf(recivedAt))  // recivedAt 값 추가
-                    .build();
-        }).collect(Collectors.toList());
-    }
-
 
     @Override
     public List<Long> getUnacceptedDiaryIdsByMember(Member member) {
@@ -108,5 +74,45 @@ public class DiaryMemberCustomRepositoryImpl implements DiaryMemberCustomReposit
                         .and(qDiaryMember.member.ne(member))
                 )
                 .fetch();
+    }
+
+    /**
+     * 홈 화면에 띄워줄 내 다이어리 리스트 + 해당 다이어리에 속해있는 멤버들의 프로필 사진들을 반환하는 로직
+     * @param memberId
+     *
+     * @return DiaryOverViewResponseDto
+     */
+    @Override
+    public List<DiaryOverViewResponseDto> fetchDiaryOverViewDtosByMe(Long memberId) {
+        QDiary diary = QDiary.diary;
+        QDiaryMember diaryMember = QDiaryMember.diaryMember;
+        QMember member = QMember.member;
+
+        List<Tuple> results = jpaQueryFactory
+                .select(diary, diaryMember, member)
+                .from(diaryMember)
+                .join(diaryMember.diary, diary).fetchJoin()
+                .join(diaryMember.member, member).fetchJoin()
+                .where(diaryMember.id.eq(memberId))
+                .fetch();
+
+        Map<Long, DiaryOverViewResponseDto> diaryMap = new LinkedHashMap<>();
+        for (Tuple tuple : results) {
+            var diaryEntity = tuple.get(diary);
+            var receivedAt = tuple.get(diaryMember.recievedAt);
+            var photoUrl = tuple.get(member.photoUrl);
+
+            diaryMap.computeIfAbsent(diaryEntity.getId(), id ->
+                    DiaryOverViewResponseDto.builder()
+                            .id(diaryEntity.getId())
+                            .title(diaryEntity.getTitle())
+                            .photoUrls(new ArrayList<>())
+                            .createdAt(diaryEntity.getCreatedAt().toString())
+                            .recivedAt(receivedAt.toString())
+                            .build()
+            ).getPhotoUrls().add(photoUrl);
+        }
+
+        return new ArrayList<>(diaryMap.values());
     }
 }

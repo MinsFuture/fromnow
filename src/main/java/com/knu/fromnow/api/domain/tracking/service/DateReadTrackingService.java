@@ -39,4 +39,16 @@ public class DateReadTrackingService {
         dateReadTrackingRepository.save(dateReadTracking);
     }
 
+    public void createTrackingWhenAcceptedDiary(Member member, Diary diary, LocalDate today) {
+        DateReadTracking dateReadTracking = DateReadTracking.builder()
+                .diaryId(diary.getId())
+                .memberId(member.getId())
+                .isWrite(false)
+                .date(today)
+                .lastedMemberReadTime(today.atStartOfDay())
+                .build();
+
+        dateReadTrackingRepository.save(dateReadTracking);
+    }
+
 }

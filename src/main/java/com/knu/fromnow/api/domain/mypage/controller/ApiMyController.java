@@ -3,7 +3,6 @@ package com.knu.fromnow.api.domain.mypage.controller;
 import com.knu.fromnow.api.domain.board.dto.response.BoardOverViewResponseDto;
 import com.knu.fromnow.api.domain.diary.dto.response.DiaryRequestsReceivedDto;
 import com.knu.fromnow.api.domain.diary.service.DiaryMemberService;
-import com.knu.fromnow.api.domain.diary.service.DiaryService;
 import com.knu.fromnow.api.domain.friend.dto.response.FriendBasicResponseDto;
 import com.knu.fromnow.api.domain.friend.service.FriendService;
 import com.knu.fromnow.api.domain.like.service.LikeService;

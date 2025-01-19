@@ -3,12 +3,12 @@ package com.knu.fromnow.api.global.validation.service;
 import com.knu.fromnow.api.domain.board.entity.Board;
 import com.knu.fromnow.api.domain.board.repository.BoardRepository;
 import com.knu.fromnow.api.domain.diary.entity.Diary;
+import com.knu.fromnow.api.domain.diary.entity.DiaryMember;
+import com.knu.fromnow.api.domain.diary.repository.DiaryMemberRepository;
 import com.knu.fromnow.api.domain.diary.repository.DiaryRepository;
-import com.knu.fromnow.api.domain.diary.service.DiaryService;
 import com.knu.fromnow.api.domain.like.entity.Like;
 import com.knu.fromnow.api.domain.like.repository.LikeRepository;
 import com.knu.fromnow.api.domain.member.entity.Member;
-import com.knu.fromnow.api.domain.member.entity.PrincipalDetails;
 import com.knu.fromnow.api.domain.member.repository.MemberRepository;
 import com.knu.fromnow.api.domain.tracking.entity.DateLatestPostTime;
 import com.knu.fromnow.api.domain.tracking.entity.DateReadTracking;
@@ -18,12 +18,14 @@ import com.knu.fromnow.api.global.error.custom.BoardException;
 import com.knu.fromnow.api.global.error.custom.DateLatestPostTimeException;
 import com.knu.fromnow.api.global.error.custom.DateReadTrackingException;
 import com.knu.fromnow.api.global.error.custom.DiaryException;
+import com.knu.fromnow.api.global.error.custom.DiaryMemberException;
 import com.knu.fromnow.api.global.error.custom.LikeException;
 import com.knu.fromnow.api.global.error.custom.MemberException;
 import com.knu.fromnow.api.global.error.errorcode.custom.BoardErrorCode;
 import com.knu.fromnow.api.global.error.errorcode.custom.DateLatestPostTimeErrorCode;
 import com.knu.fromnow.api.global.error.errorcode.custom.DateReadTrackingErrorCode;
 import com.knu.fromnow.api.global.error.errorcode.custom.DiaryErrorCode;
+import com.knu.fromnow.api.global.error.errorcode.custom.DiaryMemberErrorCode;
 import com.knu.fromnow.api.global.error.errorcode.custom.LikeErrorCode;
 import com.knu.fromnow.api.global.error.errorcode.custom.MemberErrorCode;
 import lombok.RequiredArgsConstructor;
@@ -40,6 +42,7 @@ public class ValidationService {
     private final LikeRepository likeRepository;
     private final DateReadTrackingRepository dateReadTrackingRepository;
     private final DateLatestPostTimeRepository dateLatestPostTimeRepository;
+    private final DiaryMemberRepository diaryMemberRepository;
 
 
     public void checkProfileNameUniqueness(String profileName){
@@ -65,6 +68,11 @@ public class ValidationService {
     public Diary validateDiaryById(Long id){
         return diaryRepository.findById(id)
                 .orElseThrow(() -> new DiaryException(DiaryErrorCode.NO_EXIST_DIARY_ID_EXCEPTION));
+    }
+
+    public DiaryMember validateMemberAndDiary(Member member, Diary diary){
+        return diaryMemberRepository.findByDiaryAndMember(diary, member)
+                .orElseThrow(() -> new DiaryMemberException(DiaryMemberErrorCode.NO_EXIST_DIARY_MEMBER_EXCEPTION));
     }
 
     public Like validateLikeByMemberAndBoard(Member member, Board board){

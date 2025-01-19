@@ -1,6 +1,7 @@
 package com.knu.fromnow.api.domain.diary.entity;
 
 import com.knu.fromnow.api.domain.board.entity.Board;
+import com.knu.fromnow.api.domain.diary.dto.request.CreateDiaryDto;
 import com.knu.fromnow.api.domain.diary.dto.request.UpdateDiaryDto;
 import com.knu.fromnow.api.domain.member.entity.Member;
 import com.knu.fromnow.api.global.spec.BaseEntity;
@@ -27,7 +28,8 @@ import java.util.List;
 @Getter
 public class Diary extends BaseEntity {
 
-    @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "diary_id")
     private Long id;
 
@@ -49,7 +51,14 @@ public class Diary extends BaseEntity {
         this.owner = owner;
     }
 
-    public void updateDiaryTitle(UpdateDiaryDto updateDiaryDto){
+    public static Diary createBoard(CreateDiaryDto createDiaryDto, Member owner) {
+        return Diary.builder()
+                .title(createDiaryDto.getTitle())
+                .owner(owner)
+                .build();
+    }
+
+    public void updateDiaryTitle(UpdateDiaryDto updateDiaryDto) {
         this.title = updateDiaryDto.getNewTitle();
     }
 

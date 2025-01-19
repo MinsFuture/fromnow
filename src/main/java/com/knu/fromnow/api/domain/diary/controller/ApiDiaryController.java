@@ -18,7 +18,9 @@ import com.knu.fromnow.api.domain.diary.dto.response.DiaryOverViewResponseDto;
 import com.knu.fromnow.api.domain.diary.dto.response.DiaryReadCompleteResponseDto;
 import com.knu.fromnow.api.domain.diary.dto.response.DiaryReadRowResponseDto;
 import com.knu.fromnow.api.domain.diary.dto.response.DiaryRequestsReceivedDto;
-import com.knu.fromnow.api.domain.diary.service.DiaryService;
+import com.knu.fromnow.api.domain.diary.service.DiaryInviteService;
+import com.knu.fromnow.api.domain.diary.service.DiaryCrudService;
+import com.knu.fromnow.api.domain.diary.service.DiaryManagementService;
 import com.knu.fromnow.api.domain.member.entity.PrincipalDetails;
 import com.knu.fromnow.api.global.spec.api.ApiBasicResponse;
 import com.knu.fromnow.api.global.spec.api.ApiDataResponse;
@@ -44,14 +46,16 @@ import java.util.List;
 @RequestMapping("/api/diary")
 public class ApiDiaryController implements SwaggerDiaryApi {
 
-    private final DiaryService diaryService;
+    private final DiaryCrudService diaryCRUDService;
+    private final DiaryInviteService diaryInviteService;
+    private final DiaryManagementService diaryManagementService;
 
     @PostMapping
     @PreAuthorize("isAuthenticated()")
     public ResponseEntity<ApiDataResponse<DiaryCreateResponseDto>> createDiary(
             @RequestBody CreateDiaryDto createDiaryDto,
             @AuthenticationPrincipal PrincipalDetails principalDetails) {
-        ApiDataResponse<DiaryCreateResponseDto> response = diaryService.createDiary(createDiaryDto, principalDetails);
+        ApiDataResponse<DiaryCreateResponseDto> response = diaryCRUDService.createDiary(createDiaryDto, principalDetails);
 
         return ResponseEntity.status(response.getCode()).body(response);
     }
@@ -61,7 +65,7 @@ public class ApiDiaryController implements SwaggerDiaryApi {
     public ResponseEntity<ApiDataResponse<List<DiaryOverViewResponseDto>>> getDiaryOverView(
             @AuthenticationPrincipal PrincipalDetails principalDetails
     ) {
-        ApiDataResponse<List<DiaryOverViewResponseDto>> diaryOverView = diaryService.getDiaryOverView(principalDetails);
+        ApiDataResponse<List<DiaryOverViewResponseDto>> diaryOverView = diaryCRUDService.getDiaryOverView(principalDetails);
 
         return ResponseEntity.status(diaryOverView.getCode()).body(diaryOverView);
     }
@@ -72,7 +76,7 @@ public class ApiDiaryController implements SwaggerDiaryApi {
             @RequestBody InviteToDiaryDto inviteToDiaryDto,
             @AuthenticationPrincipal PrincipalDetails principalDetails
     ) {
-        ApiDataResponse<List<DiaryInviteResponseDto>> response = diaryService.inviteToDiary(inviteToDiaryDto, principalDetails);
+        ApiDataResponse<List<DiaryInviteResponseDto>> response = diaryInviteService.inviteToDiary(inviteToDiaryDto, principalDetails);
 
         return ResponseEntity.status(response.getCode()).body(response);
     }
@@ -83,7 +87,7 @@ public class ApiDiaryController implements SwaggerDiaryApi {
             @RequestBody AcceptDiaryDto acceptDiaryDto,
             @AuthenticationPrincipal PrincipalDetails principalDetails
     ) {
-        ApiDataResponse<DiaryOverViewResponseDto> response = diaryService.acceptInvite(acceptDiaryDto, principalDetails);
+        ApiDataResponse<DiaryOverViewResponseDto> response = diaryInviteService.acceptInvite(acceptDiaryDto, principalDetails);
 
         return ResponseEntity.status(response.getCode()).body(response);
     }
@@ -94,7 +98,7 @@ public class ApiDiaryController implements SwaggerDiaryApi {
             @RequestBody RejectDiaryDto rejectDiaryDto,
             @AuthenticationPrincipal PrincipalDetails principalDetails
     ){
-        ApiBasicResponse response = diaryService.rejectInvite(rejectDiaryDto, principalDetails);
+        ApiBasicResponse response = diaryInviteService.rejectInvite(rejectDiaryDto, principalDetails);
 
         return ResponseEntity.status(response.getCode()).body(response);
     }
@@ -106,7 +110,7 @@ public class ApiDiaryController implements SwaggerDiaryApi {
             @RequestBody UpdateDiaryDto updateDiarydto,
             @AuthenticationPrincipal PrincipalDetails principalDetails
     ) {
-        ApiDataResponse<DiaryRequestsReceivedDto> response = diaryService.updateDiaryTitle(updateDiarydto, principalDetails, diaryId);
+        ApiDataResponse<DiaryRequestsReceivedDto> response = diaryCRUDService.updateDiaryTitle(updateDiarydto, principalDetails, diaryId);
 
         return ResponseEntity.status(response.getCode()).body(response);
     }
@@ -117,7 +121,7 @@ public class ApiDiaryController implements SwaggerDiaryApi {
             @PathVariable("diaryId") Long diaryId,
             @AuthenticationPrincipal PrincipalDetails principalDetails
     ) {
-        ApiDataResponse<DiaryDeleteResponseDto> response = diaryService.deleteDiary(principalDetails, diaryId);
+        ApiDataResponse<DiaryDeleteResponseDto> response = diaryCRUDService.deleteDiary(principalDetails, diaryId);
 
         return ResponseEntity.status(response.getCode()).body(response);
     }
@@ -128,7 +132,7 @@ public class ApiDiaryController implements SwaggerDiaryApi {
             @PathVariable("diaryId") Long id,
             @AuthenticationPrincipal PrincipalDetails principalDetails
     ){
-        ApiDataResponse<List<DiaryMenuResponseDto>> response = diaryService.getDiaryMenu(id, principalDetails);
+        ApiDataResponse<List<DiaryMenuResponseDto>> response = diaryManagementService.getDiaryMenu(id, principalDetails);
 
         return ResponseEntity.status(response.getCode()).body(response);
     }
@@ -144,7 +148,7 @@ public class ApiDiaryController implements SwaggerDiaryApi {
             @RequestParam("month") int month,
             @AuthenticationPrincipal PrincipalDetails principalDetails
     ){
-        ApiDataResponse<List<DiaryReadRowResponseDto>> response = diaryService.getRowScroll(diaryId, year, month, principalDetails);
+        ApiDataResponse<List<DiaryReadRowResponseDto>> response = diaryManagementService.getRowScroll(diaryId, year, month, principalDetails);
 
         return ResponseEntity.status(response.getCode()).body(response);
     }
@@ -158,7 +162,7 @@ public class ApiDiaryController implements SwaggerDiaryApi {
             @RequestParam("num") int num,
             @AuthenticationPrincipal PrincipalDetails principalDetails
     ){
-        ApiDataResponse<List<DiaryReadColResponseDto>> response = diaryService.getColScroll(diaryId, year, month, num, principalDetails);
+        ApiDataResponse<List<DiaryReadColResponseDto>> response = diaryManagementService.getColScroll(diaryId, year, month, num, principalDetails);
 
         return ResponseEntity.status(response.getCode()).body(response);
     }
@@ -172,7 +176,7 @@ public class ApiDiaryController implements SwaggerDiaryApi {
             @PathVariable("diaryId") Long diaryId,
             @RequestBody DateRequestDto dateRequestDto,
             @AuthenticationPrincipal PrincipalDetails principalDetails){
-        ApiDataResponse<DiaryReadCompleteResponseDto> response = diaryService.readAllPostsByDate(diaryId, dateRequestDto, principalDetails);
+        ApiDataResponse<DiaryReadCompleteResponseDto> response = diaryManagementService.readAllPostsByDate(diaryId, dateRequestDto, principalDetails);
 
         return ResponseEntity.status(response.getCode()).body(response);
     }
@@ -183,7 +187,7 @@ public class ApiDiaryController implements SwaggerDiaryApi {
             @RequestParam(required = true) String profileName,
             @PathVariable("diaryId") Long diaryId
     ){
-        ApiDataResponse<List<DiarySearchResponseDto>> response = diaryService.searchMember(diaryId, profileName);
+        ApiDataResponse<List<DiarySearchResponseDto>> response = diaryManagementService.searchMember(diaryId, profileName);
 
         return ResponseEntity.status(response.getCode()).body(response);
     }
@@ -194,9 +198,21 @@ public class ApiDiaryController implements SwaggerDiaryApi {
             @RequestBody ImmediateDiaryDto immediateDiaryDto,
             @AuthenticationPrincipal PrincipalDetails principalDetails
     ) {
-        ApiDataResponse<DiaryImmeInviteResponseDto> response = diaryService.immediateInviteToDiary(immediateDiaryDto, principalDetails);
+        ApiDataResponse<DiaryImmeInviteResponseDto> response = diaryInviteService.immediateInviteToDiary(immediateDiaryDto, principalDetails);
 
         return ResponseEntity.status(response.getCode()).body(response);
     }
+
+    @DeleteMapping("/{diaryId}/leave")
+    @PreAuthorize("isAuthenticated()")
+    public ResponseEntity<ApiBasicResponse> leaveMyDiary(
+            @PathVariable("diaryId") Long diaryId,
+            @AuthenticationPrincipal PrincipalDetails principalDetails
+    ){
+        ApiBasicResponse response = diaryCRUDService.leaveMyDiary(diaryId, principalDetails);
+
+        return ResponseEntity.status(response.getCode()).body(response);
+    }
+
 
 }

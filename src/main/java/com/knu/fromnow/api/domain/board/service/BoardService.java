@@ -17,7 +17,6 @@ import com.knu.fromnow.api.domain.like.entity.Like;
 import com.knu.fromnow.api.domain.like.repository.LikeRepository;
 import com.knu.fromnow.api.domain.member.entity.Member;
 import com.knu.fromnow.api.domain.member.entity.PrincipalDetails;
-import com.knu.fromnow.api.domain.member.repository.MemberRepository;
 import com.knu.fromnow.api.domain.photo.service.BoardPhotoService;
 import com.knu.fromnow.api.domain.tracking.entity.DateLatestPostTime;
 import com.knu.fromnow.api.domain.tracking.entity.DateReadTracking;
@@ -175,7 +174,7 @@ public class BoardService {
         dateLatestPostTimeList.forEach(dateLatestPostTime -> dateLatestPostTime.updateLatestPostTime(now));
         dateLatestPostTimeRepository.saveAll(dateLatestPostTimeList);
 
-        return ApiDataResponse.successResponse("일상 등록 성공!", DiaryChooseResponseDto.from(boardList.get(0), diaryList));
+        return ApiDataResponse.successResponse("일상 등록 성공!", DiaryChooseResponseDto.of(boardList.get(0), diaryList));
     }
 
 

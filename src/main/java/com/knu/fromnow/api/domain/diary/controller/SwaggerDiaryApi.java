@@ -25,10 +25,12 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.http.ResponseEntity;
 
 import java.util.List;
 
+@Tag(name = "다이어리", description = "다이어리 관련 api")
 public interface SwaggerDiaryApi {
 
     @ApiResponses(
@@ -208,6 +210,17 @@ public interface SwaggerDiaryApi {
             @Parameter(description = "Bearer ey...") PrincipalDetails principalDetails
     );
 
-
+    /////////////////////////////////////////////////////////////////////////////////////////////
+    @ApiResponses(
+            value = {
+                    @ApiResponse(responseCode = "200", description = "다이어리 나가기 APII"),
+                    @ApiResponse(responseCode = "4XX", description = "요청 형식이 잘못되었습니다"),
+            }
+    )
+    @Operation(summary = "다이어리 나가기 APi", description = "다이어리 나가기 APi")
+    ResponseEntity<ApiBasicResponse> leaveMyDiary(
+            @Parameter(description = "다이어리 id") Long diaryId,
+            @Parameter(description = "Bearer ey...") PrincipalDetails principalDetails
+    );
 
 }

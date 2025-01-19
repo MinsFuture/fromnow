@@ -1,5 +1,6 @@
 package com.knu.fromnow.api.domain.diary.dto.response;
 
+import com.knu.fromnow.api.domain.member.entity.Member;
 import lombok.Builder;
 import lombok.Getter;
 
@@ -17,5 +18,14 @@ public class DiarySearchResponseDto {
         this.profileName = profileName;
         this.profilePhotoUrl = profilePhotoUrl;
         this.isTeam = isTeam;
+    }
+
+    public static DiarySearchResponseDto of(Member member, boolean isTeam){
+        return DiarySearchResponseDto.builder()
+                .memberId(member.getId())
+                .profilePhotoUrl(member.getPhotoUrl())
+                .profileName(member.getProfileName())
+                .isTeam(isTeam)
+                .build();
     }
 }

@@ -9,10 +9,9 @@ import java.util.List;
 import java.util.Map;
 
 public interface DiaryMemberCustomRepository {
-    List<DiaryOverViewResponseDto> fetchDiaryOverviewDtosByDiaryMembers(List<Diary> diaryList, Member member);
     List<Long> getUnacceptedDiaryIdsByMember(Member member);
     List<String> fetchMemberPhotoUrlsByDiary(Diary diary);
     Map<Member, LocalDateTime> findRecievedAtByDiaryAndMembers(Diary diary, List<Member> members);
     List<Member> findMembersByDiaryIdExceptMe(Diary diary, Member member);
-
+    List<DiaryOverViewResponseDto> fetchDiaryOverViewDtosByMe(Long memberId);
 }

@@ -19,4 +19,11 @@ public class DiaryRequestsReceivedDto {
         this.diaryId = diaryId;
         this.photoUrls = photoUrls;
     }
+
+    public static DiaryRequestsReceivedDto from(Diary diary){
+        return DiaryRequestsReceivedDto.builder()
+                .diaryId(diary.getId())
+                .diaryTitle(diary.getTitle())
+                .build();
+    }
 }

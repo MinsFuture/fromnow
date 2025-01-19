@@ -3,6 +3,8 @@ package com.knu.fromnow.api.domain.diary.dto.response;
 import lombok.Builder;
 import lombok.Getter;
 
+import java.time.LocalDate;
+
 @Getter
 public class DiaryReadRowResponseDto {
 
@@ -15,5 +17,13 @@ public class DiaryReadRowResponseDto {
         this.isNew = isNew;
         this.hasPosts = hasPosts;
         this.date = date;
+    }
+
+    public static DiaryReadRowResponseDto of(boolean isNew, boolean hasPosts, LocalDate date){
+        return DiaryReadRowResponseDto.builder()
+                .isNew(isNew)
+                .hasPosts(hasPosts)
+                .date(date.toString())
+                .build();
     }
 }

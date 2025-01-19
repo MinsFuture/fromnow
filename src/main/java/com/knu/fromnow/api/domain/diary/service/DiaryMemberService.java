@@ -12,6 +12,7 @@ import com.knu.fromnow.api.domain.member.repository.MemberRepository;
 import com.knu.fromnow.api.global.error.custom.MemberException;
 import com.knu.fromnow.api.global.error.errorcode.custom.MemberErrorCode;
 import com.knu.fromnow.api.global.spec.api.ApiDataResponse;
+import com.knu.fromnow.api.global.validation.service.ValidationService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -25,6 +26,7 @@ import java.util.List;
 @Transactional
 public class DiaryMemberService {
     private final MemberRepository memberRepository;
+    private final ValidationService validationService;
     private final DiaryMemberRepository diaryMemberRepository;
     private final DiaryMemberCustomRepository diaryMemberCustomRepository;
     private final DiaryRepository diaryRepository;
@@ -71,10 +73,8 @@ public class DiaryMemberService {
     }
 
 
-
     public ApiDataResponse<List<DiaryRequestsReceivedDto>> getDiaryRequestsReceived(PrincipalDetails principalDetails) {
-        Member member = memberRepository.findByEmail(principalDetails.getEmail())
-                .orElseThrow(() -> new MemberException(MemberErrorCode.No_EXIST_EMAIL_MEMBER_EXCEPTION));
+        Member member = validationService.validateMemberByEmail(principalDetails.getEmail());
 
         List<Long> diaryIds = diaryMemberCustomRepository.getUnacceptedDiaryIdsByMember(member);
         List<Diary> diaryList = diaryRepository.findByIdIn(diaryIds);
@@ -93,12 +93,7 @@ public class DiaryMemberService {
             list.add(diaryRequestsReceivedDto);
         }
 
-        return ApiDataResponse.<List<DiaryRequestsReceivedDto>>builder()
-                .status(true)
-                .code(200)
-                .message("내가 받은 모임 요청 리스트 반환 성공!")
-                .data(list)
-                .build();
+        return ApiDataResponse.successResponse("내가 받은 모임 요청 리스트 반환 성공!", list);
     }
 
 }
