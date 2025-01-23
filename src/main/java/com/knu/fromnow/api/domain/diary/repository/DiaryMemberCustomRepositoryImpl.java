@@ -108,7 +108,7 @@ public class DiaryMemberCustomRepositoryImpl implements DiaryMemberCustomReposit
                             .title(diaryEntity.getTitle())
                             .photoUrls(new ArrayList<>())
                             .createdAt(diaryEntity.getCreatedAt().toString())
-                            .recivedAt(receivedAt.toString())
+                            .recivedAt(receivedAt != null ? receivedAt.toString() : diaryEntity.getCreatedAt().toString()) // Null 처리
                             .build()
             ).getPhotoUrls().add(photoUrl);
         }
