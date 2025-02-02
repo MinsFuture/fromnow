@@ -63,5 +63,5 @@ jobs:
             sudo docker stop fromnow-backend || true
             sudo docker rm fromnow-backend || true
             sudo docker pull ${{ secrets.DOCKER_USERNAME }}/fromnow
-            sudo docker run --name fromnow-backend -d --restart always -p 8080:8080 \ -v /home/helloaway/firebase/fromnow-34d51-firebase-adminsdk-fiy84-7b40c25669.json:/config/fromnow-34d51-firebase-adminsdk-fiy84-7b40c25669.json --log-opt max-size=10m --log-opt max-file=5 ${{ secrets.DOCKER_USERNAME }}/fromnow
+            sudo docker run --name fromnow-backend -d --restart always -p 8080:8080 -v /home/helloaway/firebase/fromnow-34d51-firebase-adminsdk-fiy84-7b40c25669.json:/config/fromnow-34d51-firebase-adminsdk-fiy84-7b40c25669.json --log-opt max-size=10m --log-opt max-file=5 ${{ secrets.DOCKER_USERNAME }}/fromnow
             sudo docker image prune -f
