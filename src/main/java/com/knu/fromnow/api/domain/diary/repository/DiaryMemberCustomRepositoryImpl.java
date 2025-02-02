@@ -93,7 +93,7 @@ public class DiaryMemberCustomRepositoryImpl implements DiaryMemberCustomReposit
                 .from(diaryMember)
                 .join(diaryMember.diary, diary).fetchJoin()
                 .join(diaryMember.member, member).fetchJoin()
-                .where(diaryMember.id.eq(memberId))
+                .where(diaryMember.member.id.eq(memberId))
                 .fetch();
 
         Map<Long, DiaryOverViewResponseDto> diaryMap = new LinkedHashMap<>();

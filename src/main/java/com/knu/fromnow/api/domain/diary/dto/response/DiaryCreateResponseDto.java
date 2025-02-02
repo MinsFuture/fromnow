@@ -26,7 +26,6 @@ public class DiaryCreateResponseDto {
                 .title(diary.getTitle())
                 .photoUrls(diary.getOwner().getPhotoUrl())
                 .build();
-
     }
 
 }
