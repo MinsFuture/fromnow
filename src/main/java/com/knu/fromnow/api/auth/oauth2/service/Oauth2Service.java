@@ -65,7 +65,9 @@ public class Oauth2Service {
 
         String accessToken = jwtService.createAccessToken(member.getEmail(), member.getRole().name());
         String refreshToken = jwtService.createRefreshToken();
+        String initFcm = "initFcm";
         member.updateRefreshToken(refreshToken);
+        member.updateFcmToken(initFcm);
         memberRepository.save(member);
 
         ResponseCookie responseCookie = ResponseCookie.from("Authorization-refresh", refreshToken)
