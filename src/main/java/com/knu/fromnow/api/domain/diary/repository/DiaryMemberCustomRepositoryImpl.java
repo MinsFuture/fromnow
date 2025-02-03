@@ -76,43 +76,48 @@ public class DiaryMemberCustomRepositoryImpl implements DiaryMemberCustomReposit
                 .fetch();
     }
 
-    /**
-     * 홈 화면에 띄워줄 내 다이어리 리스트 + 해당 다이어리에 속해있는 멤버들의 프로필 사진들을 반환하는 로직
-     * @param memberId
-     *
-     * @return DiaryOverViewResponseDto
-     */
     @Override
-    public List<DiaryOverViewResponseDto> fetchDiaryOverViewDtosByMe(Long memberId) {
+    public List<DiaryOverViewResponseDto> fetchDiaryOverViewDtosByMe(Member me) {
         QDiary diary = QDiary.diary;
-        QDiaryMember diaryMember = QDiaryMember.diaryMember;
         QMember member = QMember.member;
+        QDiaryMember diaryMember = QDiaryMember.diaryMember;
 
-        List<Tuple> results = jpaQueryFactory
-                .select(diary, diaryMember, member)
+        // 사용자가 속한 다이어리 목록 조회
+        List<Diary> diaryList = jpaQueryFactory
+                .select(diary)
                 .from(diaryMember)
-                .join(diaryMember.diary, diary).fetchJoin()
-                .join(diaryMember.member, member).fetchJoin()
-                .where(diaryMember.member.id.eq(memberId))
+                .join(diaryMember.diary, diary)
+                .where(diaryMember.member.eq(me),
+                        diaryMember.acceptedInvite.isTrue())
                 .fetch();
 
-        Map<Long, DiaryOverViewResponseDto> diaryMap = new LinkedHashMap<>();
-        for (Tuple tuple : results) {
-            var diaryEntity = tuple.get(diary);
-            var receivedAt = tuple.get(diaryMember.recievedAt);
-            var photoUrl = tuple.get(member.photoUrl);
+        // 다이어리별 멤버들의 photoUrl과 receivedAt을 조회하여 DTO 변환
+        return diaryList.stream().map(d -> {
+            List<String> photoUrls = jpaQueryFactory
+                    .select(member.photoUrl)
+                    .from(diaryMember)
+                    .join(diaryMember.member, member)
+                    .where(diaryMember.diary.eq(d),
+                            diaryMember.acceptedInvite.isTrue())
+                    .fetch();
 
-            diaryMap.computeIfAbsent(diaryEntity.getId(), id ->
-                    DiaryOverViewResponseDto.builder()
-                            .id(diaryEntity.getId())
-                            .title(diaryEntity.getTitle())
-                            .photoUrls(new ArrayList<>())
-                            .createdAt(diaryEntity.getCreatedAt().toString())
-                            .recivedAt(receivedAt != null ? receivedAt.toString() : diaryEntity.getCreatedAt().toString()) // Null 처리
-                            .build()
-            ).getPhotoUrls().add(photoUrl);
-        }
+            // receivedAt 조회
+            LocalDateTime receivedAt = jpaQueryFactory
+                    .select(diaryMember.recievedAt)
+                    .from(diaryMember)
+                    .where(diaryMember.diary.eq(d),
+                            diaryMember.member.eq(me))
+                    .fetchOne();
 
-        return new ArrayList<>(diaryMap.values());
+            // DTO 변환 및 반환
+            return DiaryOverViewResponseDto.builder()
+                    .id(d.getId())
+                    .title(d.getTitle())
+                    .photoUrls(photoUrls)
+                    .createdAt(d.getCreatedAt().toString())
+                    .recivedAt(String.valueOf(receivedAt))  // receivedAt 값 추가
+                    .build();
+        }).collect(Collectors.toList());
     }
+
 }

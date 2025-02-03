@@ -13,5 +13,5 @@ public interface DiaryMemberCustomRepository {
     List<String> fetchMemberPhotoUrlsByDiary(Diary diary);
     Map<Member, LocalDateTime> findRecievedAtByDiaryAndMembers(Diary diary, List<Member> members);
     List<Member> findMembersByDiaryIdExceptMe(Diary diary, Member member);
-    List<DiaryOverViewResponseDto> fetchDiaryOverViewDtosByMe(Long memberId);
+    List<DiaryOverViewResponseDto> fetchDiaryOverViewDtosByMe(Member member);
 }

@@ -66,7 +66,7 @@ public class DiaryCrudService {
 
     public ApiDataResponse<List<DiaryOverViewResponseDto>> getDiaryOverView(PrincipalDetails principalDetails) {
         Member me = validationService.validateMemberByEmail(principalDetails.getEmail());
-        List<DiaryOverViewResponseDto> responseDtoList = diaryMemberCustomRepository.fetchDiaryOverViewDtosByMe(me.getId());
+        List<DiaryOverViewResponseDto> responseDtoList = diaryMemberCustomRepository.fetchDiaryOverViewDtosByMe(me);
         responseDtoList.sort(Comparator.comparing(DiaryOverViewResponseDto::getRecivedAt).reversed());
 
         return ApiDataResponse.successResponse("다이어리 리스트 반환 성공!", responseDtoList);
