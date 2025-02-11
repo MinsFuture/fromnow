@@ -31,6 +31,8 @@ import com.knu.fromnow.api.global.spec.api.ApiDataResponse;
 import com.knu.fromnow.api.global.spec.firebase.MemberNotificationStatusDto;
 import com.knu.fromnow.api.global.validation.service.ValidationService;
 import lombok.RequiredArgsConstructor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -47,6 +49,7 @@ import java.util.List;
 @Transactional
 public class BoardService {
 
+    private static final Logger log = LoggerFactory.getLogger(BoardService.class);
     private final ValidationService validationService;
     private final BoardPhotoService boardPhotoService;
     private final BoardRepository boardRepository;
@@ -143,6 +146,7 @@ public class BoardService {
         LocalDateTime now = LocalDateTime.now();
         LocalDate today = now.toLocalDate();
 
+        log.info("ids : {}", diaryChooseRequestDto.getDiaryIds());
         Member member = validationService.validateMemberByEmail(principalDetails.getEmail());
         List<Diary> diaryList = diaryRepository.findByIdIn(diaryChooseRequestDto.getDiaryIds());
         List<Long> diaryIds = diaryList.stream().map(Diary::getId).toList();
