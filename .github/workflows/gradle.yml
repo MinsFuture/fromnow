@@ -2,7 +2,7 @@ name: CI/CD using GitHub Actions & Docker
 
 on:
   push:
-    branches: [ "main", "develop" ]
+    branches: [ "main" ]
 
 permissions:
   contents: read
@@ -33,9 +33,7 @@ jobs:
             ${{ runner.os }}-gradle-
 
       - name: make application.yml
-        if: |
-          contains(github.ref, 'refs/heads/main') ||
-          contains(github.ref, 'refs/heads/develop')
+        if: contains(github.ref, 'refs/heads/main')
         run: |
           mkdir -p ./src/main/resources
           cd ./src/main/resources
@@ -46,7 +44,7 @@ jobs:
         run: ./gradlew clean build -x test
 
       - name: Docker build & push to prod
-        if: contains(github.ref, 'refs/heads/develop')
+        if: contains(github.ref, 'refs/heads/main')
         run: |
           docker login -u ${{ secrets.DOCKER_USERNAME }} -p ${{ secrets.DOCKER_PASSWORD }}
           docker build -t ${{ secrets.DOCKER_USERNAME }}/fromnow .
